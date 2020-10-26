@@ -1,9 +1,10 @@
 import {
   TILE_TYPE_ENUM,
-  DIRECTION_ENUM
+  DIRECTION_ENUM,
+	ENEMY_TYPE_ENUM,
 } from '../enums/index'
 
-const mapList = [
+const mapInfo = [
   [{
       "src": null,
       "type": null,
@@ -417,10 +418,21 @@ const playerInfo = {
   direction: DIRECTION_ENUM.RIGHT
 }
 
+const enemiesInfo = [
+	{
+		x:1,
+		y:1,
+		direction: DIRECTION_ENUM.RIGHT,
+		type: ENEMY_TYPE_ENUM.SKELETON_WOODEN
+	}
+]
+
 const level1 = {
-  mapList,
-  playerInfo
+	mapInfo,
+  playerInfo,
+	enemiesInfo
 }
+
 
 export {
   level1

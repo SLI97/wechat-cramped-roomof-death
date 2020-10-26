@@ -1,7 +1,7 @@
-import Sprite from './sprite'
-import DataBus from '../databus'
+import Sprite from './Sprite'
+import DataManager from '../DataManager'
 
-let databus = new DataBus()
+let databus = new DataManager()
 
 const __ = {
   timer: Symbol('timer'),

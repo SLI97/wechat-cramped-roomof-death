@@ -1,6 +1,6 @@
-import DataBus from '../databus'
+import DataManager from '../DataManager'
 
-let databus = new DataBus()
+let databus = new DataManager()
 
 const IMG_IDLE_PREFIX = 'images/idle/idle'
 const IMG_TURN_PREFIX = 'images/turn/turn'
@@ -11,7 +11,7 @@ const __ = {
 
 const {
   offset
-} = databus
+} = databus.getOffset()
 
 const PLAYER_STATE = {
   IDLE: 'IDLE',

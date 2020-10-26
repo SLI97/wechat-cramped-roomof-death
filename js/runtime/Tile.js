@@ -1,4 +1,4 @@
-import Sprite from '../base/sprite'
+import Sprite from '../base/Sprite'
 
 import {
   TILE_TYPE_ENUM

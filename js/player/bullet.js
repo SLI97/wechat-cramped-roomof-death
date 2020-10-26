@@ -1,5 +1,5 @@
-import Sprite   from '../base/sprite'
-import DataBus  from '../databus'
+import Sprite   from '../base/Sprite'
+import DataManager  from '../DataManager'
 
 const BULLET_IMG_SRC = 'images/bullet.png'
 const BULLET_WIDTH   = 16
@@ -9,7 +9,7 @@ const __ = {
   speed: Symbol('speed')
 }
 
-let databus = new DataBus()
+let databus = new DataManager()
 
 export default class Bullet extends Sprite {
   constructor() {
