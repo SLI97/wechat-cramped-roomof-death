@@ -10,9 +10,9 @@ const IMG_PREFIX = 'images/bg/bg'
 
 export default class Background extends Singleton {
 
-	static GetInstance() {
-		return super.GetInstance(Background)
-	}
+  static get Instance() {
+    return super.GetInstance(Background)
+  }
 
 	constructor() {
 		super()
@@ -21,7 +21,7 @@ export default class Background extends Singleton {
 
 	initTile() {
 		this.tileMap = []
-		const DM = DataManager.GetInstance()
+		const DM = DataManager.Instance
 		const mapInfo = DM.getMapInfo()
 		const offset = DM.getOffset()
 

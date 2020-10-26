@@ -3,7 +3,7 @@ import {
   level1,
   level2
 } from './levels/level1'
-import {DIRECTION_ENUM} from './enums'
+import {DIRECTION_ENUM} from './enums/index'
 import Singleton from './base/Singleton'
 
 /**
@@ -11,39 +11,39 @@ import Singleton from './base/Singleton'
  */
 export default class DataManager extends Singleton {
 
-	static GetInstance() {
-		return super.GetInstance(DataManager)
-	}
+  static get Instance() {
+    return super.GetInstance(DataManager)
+  }
 
   constructor() {
-		super()
-	  this.levelIndex = 1
+    super()
+    this.levelIndex = 1
 
     // console.log(this.level)
+    this.level = level1
 
     this.offset = {
       width: 0,
       height: 0
     }
 
-	  this.enemiesInfo = this.level.enemiesInfo
-	  this.playerInfo = this.level.playerInfo
-	  this.mapInfo = this.level.mapInfo
+    this.enemiesInfo = this.level.enemiesInfo
+    this.playerInfo = this.level.playerInfo
+    this.mapInfo = this.level.mapInfo
 
-	  this.mapRowCount = this.mapInfo.length
-	  this.mapColumnCount = this.mapInfo[0].length || 0
+    this.mapRowCount = this.mapInfo.length
+    this.mapColumnCount = this.mapInfo[0].length || 0
 
 
-
-	  this.histroyStack = [
-	    {
-	    	playerInfo:{
-			    x: 1,
-			    y: 1,
-			    direction: DIRECTION_ENUM.RIGHT
-		    },
-		    enemies:[]
-	    }
+    this.histroyStack = [
+      {
+        playerInfo: {
+          x: 1,
+          y: 1,
+          direction: DIRECTION_ENUM.RIGHT
+        },
+        enemies: []
+      }
     ]
 
 
@@ -53,8 +53,8 @@ export default class DataManager extends Singleton {
   }
 
   reset() {
-	  this.level = `level${this.levelIndex}`
-  	this.playerInfo = this.getLevel().playerInfo
+    // this.level = [`level${this.levelIndex}`]
+    this.playerInfo = this.level.playerInfo
     // this.frame = 0
     // this.score = 0
     // this.bullets = []
@@ -63,11 +63,11 @@ export default class DataManager extends Singleton {
     // this.gameOver = false
   }
 
-	Revoke(){
-  	const info = this.histroyStack.pop()
-		this.playerInfo = info.playerInfo
-		this.enemies = info.enemies
-	}
+  Revoke() {
+    const info = this.histroyStack.pop()
+    this.playerInfo = info.playerInfo
+    this.enemies = info.enemies
+  }
 
   /**
    * 回收敌人，进入对象池
@@ -93,51 +93,51 @@ export default class DataManager extends Singleton {
   //   this.pool.recover('bullet', bullet)
   // }
 
-  getMapInfo(){
-	  return this.mapInfo
+  getMapInfo() {
+    return this.mapInfo
   }
 
-  setMapInfo(info){
-	  this.mapInfo = info
+  setMapInfo(info) {
+    this.mapInfo = info
   }
 
-  getMapCount(){
-	  return {
-	  	row:this.mapRowCount,
-	  	column:this.mapColumnCount,
-	  }
+  getMapCount() {
+    return {
+      row: this.mapRowCount,
+      column: this.mapColumnCount,
+    }
   }
 
-  getPlayerInfo(info){
-  	return this.playerInfo
+  getPlayerInfo(info) {
+    return this.playerInfo
   }
 
-  setPlayerInfo(info){
-  	this.playerInfo = info
+  setPlayerInfo(info) {
+    this.playerInfo = info
   }
 
-	getLevel() {
-		return this.level
-	}
-
-  setLevel(level1){
-	  this.level = level1
+  getLevel() {
+    return this.level
   }
 
-	getLevelIndex(){
-		return this.levelIndex
-	}
-
-  setLevelIndex(index){
-  	this.levelIndex = index
+  setLevel(level1) {
+    this.level = level1
   }
 
-  getOffset(){
-  	return this.offset
+  getLevelIndex() {
+    return this.levelIndex
   }
 
-	setOffset(disX,disY) {
-		this.offset.width = disX
-		this.offset.height = disY
-	}
+  setLevelIndex(index) {
+    this.levelIndex = index
+  }
+
+  getOffset() {
+    return this.offset
+  }
+
+  setOffset(disX, disY) {
+    this.offset.width = disX
+    this.offset.height = disY
+  }
 }

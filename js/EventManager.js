@@ -3,24 +3,25 @@ import Singleton from './base/Singleton'
 
 export default class EventManager extends Singleton {
 
-	static GetInstance() {
-		return super.GetInstance(EventManager)
-	}
+  static get Instance() {
+    return super.GetInstance(EventManager)
+  }
 
 	constructor() {
 		super()
 		this.eventDic = new Map()
 
-		Object.keys(EVENT_ENUM).forEach(event => {
-			this.eventDic.put(event, [])
-		})
+		// Object.keys(EVENT_ENUM).forEach(event => {
+		// 	this.eventDic.put(event, [])
+		// })
 	}
 
 	on(event, action) {
 		if (this.eventDic.has(event)) {
 			this.eventDic[event].push(action)
 		} else {
-			this.eventDic[event] = [action]
+
+			this.eventDic.set(event,[action])
 		}
 	}
 
@@ -33,7 +34,7 @@ export default class EventManager extends Singleton {
 
 	emit(event, params) {
 		if (this.eventDic.has(event)) {
-			this.eventDic[event].forEach(action => {
+			this.eventDic.get(event).forEach(action => {
 				action(params)
 			})
 		}

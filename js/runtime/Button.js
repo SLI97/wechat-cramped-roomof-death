@@ -1,6 +1,6 @@
 import Sprite from '../base/Sprite'
 import EventManager from '../EventManager'
-import {EVENT_ENUM} from '../enums'
+import {EVENT_ENUM} from '../enums/index'
 
 const IMG_PREFIX = 'images/ctrl/ctrl'
 const CTRL_WIDTH = 48
@@ -11,7 +11,7 @@ const screenHeight = window.innerHeight
 /***
  * 按钮类
  */
-export class Button extends Sprite {
+export default class Button extends Sprite {
 	constructor(type, index) {
 		super(`${IMG_PREFIX} (${index}).png`)
 		this.type = type
@@ -37,6 +37,6 @@ export class Button extends Sprite {
 	}
 
 	onClick() {
-		EventManager.GetInstance().emit(EVENT_ENUM.PLAYER_CTRL, this.type)
+		EventManager.Instance.emit(EVENT_ENUM.PLAYER_CTRL, this.type)
 	}
 }

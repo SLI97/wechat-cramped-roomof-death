@@ -2,15 +2,16 @@ import {
 	CONTROLLER_ENUM
 } from '../enums/index'
 import Singleton from '../base/Singleton'
+import Button from './Button'
 
 /***
  * 控制器，管理所有按钮的类
  */
 export default class Controller  extends Singleton {
 
-	static GetInstance() {
-		return super.GetInstance(Controller)
-	}
+  static get Instance() {
+    return super.GetInstance(Controller)
+  }
 
 	constructor() {
 		super()

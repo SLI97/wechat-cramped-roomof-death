@@ -1,4 +1,5 @@
 import Player from './player/Player'
+import Animator from './player/Animator'
 import Enemy from './npc/enemy'
 import Background from './runtime/Background'
 import GameInfo from './runtime/gameinfo'
@@ -8,6 +9,7 @@ import DataManager from './DataManager'
 import Singleton from './base/Singleton'
 
 import {CONTROLLER_ENUM} from './enums/index'
+import EventManager from './EventManager'
 
 let ctx = canvas.getContext('2d')
 
@@ -23,7 +25,7 @@ const BG_COLOR = '#140B28'
  */
 export default class Main extends Singleton {
 
-	static GetInstance() {
+	static get Instance() {
 		return super.GetInstance(Main)
 	}
 
@@ -31,18 +33,20 @@ export default class Main extends Singleton {
 		super()
 		// 维护当前requestAnimationFrame的id
 		// this.aniId    = 0
-		this.databus = DataManager.GetInstance()
-		this.bg = Background.GetInstance()
-		this.player = Player.GetInstance()
-		this.controller = Controller.GetInstance()
-		this.music = Music.GetInstance()
+		// this.eventbus = EventManager.Instance
+		// this.music = Music.Instance
 
 		this.restart()
 	}
 
 	restart() {
 		this.calcOffset()
-		this.databus.reset()
+		DataManager.Instance.reset()
+
+		const {playerInfo}= DataManager.Instance.getLevel()
+		Player.Instance.x = playerInfo.x
+		Player.Instance.y = playerInfo.y
+		Player.Instance.direction = playerInfo.direction
 
 		// this.hasEventBind = false
 
@@ -53,15 +57,7 @@ export default class Main extends Singleton {
 		//   this.bindLoop,
 		//   canvas
 		// )
-
-
-		const {
-			x,
-			y,
-			direction
-		} = this.databus.getLevel().playerInfo
-
-		this.databus.setPlayerInfo(x, y, direction)
+		console.log(Player.Instance)
 
 		this.bindLoop = this.loop.bind(this)
 		this.loop()
@@ -69,7 +65,7 @@ export default class Main extends Singleton {
 
 	// 实现游戏帧循环
 	loop() {
-		this.databus.frame++
+		DataManager.Instance.frame++
 
 		this.update()
 		this.render()
@@ -91,8 +87,8 @@ export default class Main extends Singleton {
 		ctx.fillStyle = BG_COLOR
 		ctx.fillRect(0, 0, width, height)
 
-		this.bg.render(ctx)
-		this.controller.render(ctx)
+		Background.Instance.render(ctx)
+		Controller.Instance.render(ctx)
 
 		// databus.bullets
 		//   .concat(databus.enemys)
@@ -100,12 +96,12 @@ export default class Main extends Singleton {
 		//     item.drawToCanvas(ctx)
 		//   })
 
-		// this.player.drawToCanvas(ctx, this.offset)
-		this.player.render(ctx)
+		// Player.Instance.drawToCanvas(ctx, this.offset)
+		Player.Instance.render(ctx)
 
 		// databus.animations.forEach((ani) => {
-		if (this.player.isPlaying) {
-			this.player.aniRender(ctx)
+		if (Player.Instance.isPlaying) {
+			Player.Instance.aniRender(ctx)
 		}
 		// })
 	}
@@ -115,7 +111,7 @@ export default class Main extends Singleton {
 		// if (databus.gameOver)
 		//   return;
 
-		// this.bg.update()
+		// Background.Instance.update()
 
 		// databus.bullets
 		//   .concat(databus.enemys)
@@ -128,91 +124,34 @@ export default class Main extends Singleton {
 		// this.collisionDetection()
 
 		// if (databus.frame % 20 === 0) {
-		//   this.player.shoot()
+		//   Player.Instance.shoot()
 		//   this.music.playShoot()
 		// }
 	}
 
 	nextLevel() {
-		const nextIndex = this.databus.getLevelIndex() + 1
-		this.databus.setLevelIndex(nextIndex)
+		const nextIndex = DataManager.Instance.getLevelIndex() + 1
+		DataManager.Instance.setLevelIndex(nextIndex)
 	}
 
 	getPlayerInfo() {
-		return this.playerInfo
+		return Player.InstanceInfo
 	}
 
 	setPlayerInfo(playerInfo) {
-		this.playerInfo = playerInfo
-	}
-
-	/***
-	 * 判断角色是否能按预期进行移动
-	 * @param type
-	 */
-	canPlayerMpve(type) {
-		const {x, y, direction} = this.databus.getPlayerInfo()
-		const tileInfo = this.bg.getTileMap()
-		const {row, column} = this.databus.getMapCount()
-		const {x, y} = playerInfo
-
-
-		if (type === CONTROLLER_ENUM.TOP) {  //上
-			//playerNext必须moveable，weaponNext必须turnable
-			const playerNext = y - 1
-			const weaponNext = y - 2
-			if (playerNext < 0) {
-				return false
-			}
-
-			return tileInfo[x][playerNext].moveable && tileInfo[x][weaponNext].turnable
-		} else if (type === CONTROLLER_ENUM.BOTTOM) { //下
-			const playerNext = y - 1
-			const weaponNext = y - 2
-			if (playerNext > column - 1) {
-				return false
-			}
-
-			return tileInfo[x][playerNext].moveable && tileInfo[x][weaponNext].turnable
-		} else if (type === CONTROLLER_ENUM.LEFT) {  //左
-			const playerNext = x - 1
-			const weaponNext = x - 2
-			if (playerNext < 0) {
-				return false
-			}
-			return tileInfo[playerNext][y].moveable && tileInfo[weaponNext][y].turnable
-		} else if (type === CONTROLLER_ENUM.LEFT) {  //右
-			const playerNext = x - 1
-			const weaponNext = x - 2
-			if (playerNext > row - 1) {
-				return false
-			}
-
-			return tileInfo[playerNext][y].moveable && tileInfo[weaponNext][y].turnable
-		} else if (type === CONTROLLER_ENUM.TURNLEFT) {//左转
-
-
-		} else if (type === CONTROLLER_ENUM.TURNRIGHT) {//右转
-
-		}
-
-		//根据Tile判断能否移动
-		return tileInfo[x][y].moveable
-		// }
-
-		return false
+		Player.InstanceInfo = playerInfo
 	}
 
 	/***
 	 * 计算设备宽高把canvas整体偏移到屏幕中央
 	 */
 	calcOffset() {
-		const countObj = this.databus.getMapCount()
+		const countObj = DataManager.Instance.getMapCount()
 
 		const rowCount = countObj.row
 		const columnCount = countObj.column
 		const disX = (screenWidth - (BG_WIDTH * rowCount)) / 2
 		const disY = (screenHeight - (BG_HEIGHT * columnCount)) / 2
-		this.databus.setOffset(disX, disY)
+		DataManager.Instance.setOffset(disX, disY)
 	}
 }

@@ -3,4 +3,4 @@ import './js/libs/symbol'
 
 import Main from './js/Main'
 
-Main.GetInstance()
+Main.Instance

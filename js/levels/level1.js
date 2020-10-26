@@ -413,8 +413,8 @@ const mapInfo = [
 ]
 
 const playerInfo = {
-  x: 1,
-  y: 1,
+  x: 4,
+  y: 7,
   direction: DIRECTION_ENUM.RIGHT
 }
 

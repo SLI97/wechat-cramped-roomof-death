@@ -5,9 +5,9 @@ import Singleton from '../base/Singleton'
  */
 export default class MusicManager extends Singleton {
 
-	static GetInstance() {
-		return super.GetInstance(MusicManager)
-	}
+  static get Instance() {
+    return super.GetInstance(MusicManager)
+  }
 
 
   constructor() {
