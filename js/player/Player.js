@@ -1,316 +1,404 @@
-import Animatior from './Animator'
 import DataManager from '../DataManager'
 import EventManager from '../EventManager'
-import {
-  EVENT_ENUM
-} from '../enums/index'
+import Background from '../runtime/Background'
 import Sprite from '../base/Sprite'
-import Animator from './Animator'
+import PlayerAnimator from './PlayerAnimator'
 import {
-  DIRECTION_ENUM,
-  CONTROLLER_ENUM,
-  PLAYER_STATE
+	EVENT_ENUM,
+	ENEMY_TYPE_ENUM
 } from '../enums/index'
-import Background from "../runtime/Background";
-
-const PLAYER_IMG_SRC = 'images/idle/idle (1).png'
+import {
+	DIRECTION_ENUM,
+	CONTROLLER_ENUM,
+	PLAYER_STATE
+} from '../enums/index'
 
 const PLAYER_WIDTH = 128
 const PLAYER_HEIGHT = 128
-const PLAYER_SPEED = 32
 
 const DIRECTION_ORDER = [
-  DIRECTION_ENUM.RIGHT,
-  DIRECTION_ENUM.BOTTOM,
-  DIRECTION_ENUM.LEFT,
-  DIRECTION_ENUM.TOP,
+	DIRECTION_ENUM.RIGHT,
+	DIRECTION_ENUM.BOTTOM,
+	DIRECTION_ENUM.LEFT,
+	DIRECTION_ENUM.TOP,
 ]
-
-// const __ = {
-//   speed: Symbol('speed')
-// }
 
 export default class Player extends Sprite {
 
-  static _instance
+	static _instance
 
-  static get Instance() {
-    if (this._instance == null) {
-      this._instance = new Player()
-    }
-    return this._instance
-  }
+	static get Instance() {
+		if (this._instance == null) {
+			this._instance = new Player()
+		}
+		return this._instance
+	}
 
-  constructor() {
-    super(PLAYER_IMG_SRC, PLAYER_WIDTH, PLAYER_HEIGHT)
-    this.init()
-    EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.move.bind(this))
-  }
+	constructor() {
+		super(null, PLAYER_WIDTH, PLAYER_HEIGHT)
+		this.init()
+		EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputTrigger.bind(this))
+	}
 
-  init(x, y, direction) {
-    this.speed = PLAYER_SPEED
-    this.direction = DIRECTION_ENUM.RIGHT
-    this.state = PLAYER_STATE.IDLE
-  }
+	update() {
+		if (this.targetX < this.x) {
+			this.x -= this.speed
+		} else if (this.targetX > this.x) {
+			this.x += this.speed
+		}
 
-  /***
-   * 玩家渲染
-   * @param ctx
-   */
-  render(ctx) {
-    Animator.Instance.render(ctx)
-  }
+		if (this.targetY < this.y) {
+			this.y -= this.speed
+		} else if (this.targetY > this.y) {
+			this.y += this.speed
+		}
+	}
 
+	init() {
+		this.targetX = this.x = 0
+		this.targetY = this.y = 0
+		this.speed = 1 / 10
+		this.direction = DIRECTION_ENUM.RIGHT
+		this.state = PLAYER_STATE.IDLE
+		this.animator = new PlayerAnimator()
+	}
 
-  /***
-   * 根据type玩家移动
-   * @param type 控制类型CONTROLLER_ENUM之一
-   */
-  move(type) {
-    if (!this.canPlayerMpve(type)) {
-      console.log("stop")
-      return
-    }
+	/***
+	 * 玩家渲染
+	 * @param ctx
+	 */
+	render(ctx) {
+		this.animator.render(ctx)
+	}
 
-    Animator.Instance.resetIndex()
-    if (type === CONTROLLER_ENUM.TURNLEFT) {
-      this.state = PLAYER_STATE.TURNLEFT
-      const index = DIRECTION_ORDER.findIndex(i => i === this.direction)
-      const next = (index - 1 < 0) ? DIRECTION_ORDER.length - 1 : index - 1
-      this.direction = DIRECTION_ORDER[next]
-    } else if (type === CONTROLLER_ENUM.LEFT) {
-      this.x -= this.speed
-    } else if (type === CONTROLLER_ENUM.TOP) {
-      this.y -= this.speed
-    } else if (type === CONTROLLER_ENUM.BOTTOM) {
-      this.y += this.speed
-    } else if (type === CONTROLLER_ENUM.TURNRIGHT) {
-      this.state = PLAYER_STATE.TURNRIGHT
-      const index = DIRECTION_ORDER.findIndex(i => i === this.direction)
-      const next = index + 1 > (DIRECTION_ORDER.length - 1) ? 0 : index + 1
-      this.direction = DIRECTION_ORDER[next]
-    } else if (type === CONTROLLER_ENUM.RIGHT) {
-      this.x += this.speed
-    }
-  }
+	goDead() {
+		this.state = PLAYER_STATE.DEATH
+	}
 
-  /***
-   * 判断角色是否能按预期进行移动
-   * @param type
-   */
-  canPlayerMpve(type) {
-    const {
-      x,
-      y,
-      direction
-    } = this
-    const tileInfo = Background.Instance.getTileMap()
-    const {
-      row,
-      column
-    } = DataManager.Instance.getMapCount()
+	/***
+	 * 响应玩家操作
+	 * @param type
+	 */
+	inputTrigger(type){
+		if (this.shouldAttackEnemy(type)) {
+			console.log('attack!')
+			this.state = PLAYER_STATE.ATTACK
+			return
+		}
 
-    //按钮方向——向上
-    if (type === CONTROLLER_ENUM.TOP) {
+		if (!this.canMoveOrTurn(type)) {
+			console.log('stop!')
+			return
+		}
 
-      const playerNextY = y - 1
-      if (playerNextY < 0) {
-        return false
-      }
+		this.move()
+	}
 
-      //玩家方向——向上
-      if (direction === DIRECTION_ENUM.TOP) {
-        const weaponNextY = y - 2
-        const nextPlayerTile = tileInfo[x][playerNextY]
-        const nextWeaponTile = tileInfo[x][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+	/***
+	 * 根据type玩家移动
+	 * @param type 控制类型CONTROLLER_ENUM之一
+	 */
+	move(type) {
+		PlayerAnimator.Instance.resetIndex()
+		if (type === CONTROLLER_ENUM.TOP) {
+			this.targetY -= 1
+		} else if (type === CONTROLLER_ENUM.BOTTOM) {
+			this.targetY += 1
+			Pool.Instance.getCas
+		} else if (type === CONTROLLER_ENUM.LEFT) {
+			this.targetX -= 1
+		} else if (type === CONTROLLER_ENUM.RIGHT) {
+			this.targetX += 1
+		} else if (type === CONTROLLER_ENUM.TURNLEFT) {
+			this.state = PLAYER_STATE.TURNLEFT
+			const index = DIRECTION_ORDER.findIndex(i => i === this.direction)
+			const next = (index - 1 < 0) ? DIRECTION_ORDER.length - 1 : index - 1
+			this.direction = DIRECTION_ORDER[next]
+		} else if (type === CONTROLLER_ENUM.TURNRIGHT) {
+			this.state = PLAYER_STATE.TURNRIGHT
+			const index = DIRECTION_ORDER.findIndex(i => i === this.direction)
+			const next = index + 1 > (DIRECTION_ORDER.length - 1) ? 0 : index + 1
+			this.direction = DIRECTION_ORDER[next]
+		}
 
-        //玩家方向——向下
-      } else if (direction === DIRECTION_ENUM.BOTTOM) {
-        const weaponNextY = y
-        const nextPlayerTile = tileInfo[x][playerNextY]
-        const nextWeaponTile = tileInfo[x][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+	}
 
-        //玩家方向——向左
-      } else if (direction === DIRECTION_ENUM.LEFT) {
-        const weaponNextX = x - 1
-        const weaponNextY = y - 1
-        const nextPlayerTile = tileInfo[x][playerNextY]
-        const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+	/***
+	 * 检查枪所在方向是否有敌人，有则演出攻击动画
+	 * @param type
+	 */
+	shouldAttackEnemy(type) {
+		const enemyInfo = DataManager.Instance.getEnemyInfo()
+		for (let i = 0; i < enemyInfo.length; i++) {
+			const enemy = enemyInfo[i]
+			if (enemy.type === ENEMY_TYPE_ENUM.SKELETON_WOODEN || enemy.type === ENEMY_TYPE_ENUM.SKELETON_IRON) {
+				const {x: enemyX, y: enemyY} = enemy
+				if (this.direction === DIRECTION_ENUM.TOP && type === CONTROLLER_ENUM.TOP && enemyY === this.targetY - 2) {
+					return true
+				} else if (this.direction === DIRECTION_ENUM.BOTTOM && type === CONTROLLER_ENUM.BOTTOM && enemyY === this.targetY + 2) {
+					return true
+				} else if (this.direction === DIRECTION_ENUM.LEFT && type === CONTROLLER_ENUM.LEFT && enemyX === this.targetX - 2) {
+					return true
+				} else if (this.direction === DIRECTION_ENUM.RIGHT && type === CONTROLLER_ENUM.RIGHT && enemyX === this.targetX + 2) {
+					return true
+				}
+			}
+		}
 
-        //玩家方向——向右
-      } else if (direction === DIRECTION_ENUM.RIGHT) {
-        const weaponNextX = x + 1
-        const weaponNextY = y - 1
-        const nextPlayerTile = tileInfo[playerNextY][y]
-        const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-      }
+		return false
+	}
 
-      //按钮方向——向下
-    } else if (type === CONTROLLER_ENUM.BOTTOM) {
+	/***
+	 * 判断角色是否能按预期进行移动
+	 * @param type
+	 */
+	canMoveOrTurn(type) {
+		const {
+			targetX: x,
+			targetY: y,
+			direction
+		} = this
+		const tileInfo = Background.Instance.getTileMap()
+		const enemyInfo = DataManager.Instance.getEnemyInfo()
+			.filter(enemy =>
+				enemy.type === ENEMY_TYPE_ENUM.SKELETON_WOODEN ||
+				enemy.type === ENEMY_TYPE_ENUM.SKELETON_IRON)
+		const {
+			row,
+			column
+		} = DataManager.Instance.getMapCount()
 
-      const playerNextY = y + 1
-      if (playerNextY > column - 1) {
-        return false
-      }
+		//按钮方向——向上
+		if (type === CONTROLLER_ENUM.TOP) {
 
-      //玩家方向——向上
-      if (direction === DIRECTION_ENUM.TOP) {
-        const weaponNextY = y
-        const nextPlayerTile = tileInfo[x][playerNextY]
-        const nextWeaponTile = tileInfo[x][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+			const playerNextY = y - 1
+			if (playerNextY < 0) {
+				return false
+			}
 
-        //玩家方向——向下
-      } else if (direction === DIRECTION_ENUM.BOTTOM) {
-        const weaponNextY = y + 2
-        const nextPlayerTile = tileInfo[x][playerNextY]
-        const nextWeaponTile = tileInfo[x][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+			//玩家方向——向上
+			if (direction === DIRECTION_ENUM.TOP) {
+				const weaponNextY = y - 2
+				const nextPlayerTile = tileInfo[x][playerNextY]
+				const nextWeaponTile = tileInfo[x][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
 
-        //玩家方向——向左
-      } else if (direction === DIRECTION_ENUM.LEFT) {
-        const weaponNextX = x - 1
-        const weaponNextY = y + 1
-        const nextPlayerTile = tileInfo[playerNextY][y]
-        const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+				//玩家方向——向下
+			} else if (direction === DIRECTION_ENUM.BOTTOM) {
+				const weaponNextY = y
+				const nextPlayerTile = tileInfo[x][playerNextY]
+				const nextWeaponTile = tileInfo[x][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
 
-        //玩家方向——向右
-      } else if (direction === DIRECTION_ENUM.RIGHT) {
-        const weaponNextX = x + 1
-        const weaponNextY = y + 1
-        const nextPlayerTile = tileInfo[playerNextY][y]
-        const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-      }
+				//玩家方向——向左
+			} else if (direction === DIRECTION_ENUM.LEFT) {
+				const weaponNextX = x - 1
+				const weaponNextY = y - 1
+				const nextPlayerTile = tileInfo[x][playerNextY]
+				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
 
-      //按钮方向——向左
-    } else if (type === CONTROLLER_ENUM.LEFT) {
+				//玩家方向——向右
+			} else if (direction === DIRECTION_ENUM.RIGHT) {
+				const weaponNextX = x + 1
+				const weaponNextY = y - 1
+				const nextPlayerTile = tileInfo[playerNextY][y]
+				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+			}
 
-      const playerNextX = x - 1
-      if (playerNextX < 0) {
-        return false
-      }
+			//按钮方向——向下
+		} else if (type === CONTROLLER_ENUM.BOTTOM) {
 
-      //玩家方向——向上
-      if (direction === DIRECTION_ENUM.TOP) {
-        const weaponNextX = x - 1
-        const weaponNextY = y - 1
-        const nextPlayerTile = tileInfo[playerNextX][y]
-        const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+			const playerNextY = y + 1
+			if (playerNextY > column - 1) {
+				return false
+			}
 
-        //玩家方向——向下
-      } else if (direction === DIRECTION_ENUM.BOTTOM) {
-        const weaponNextX = x - 1
-        const weaponNextY = y + 1
-        const nextPlayerTile = tileInfo[playerNextX][y]
-        const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+			//玩家方向——向上
+			if (direction === DIRECTION_ENUM.TOP) {
+				const weaponNextY = y
+				const nextPlayerTile = tileInfo[x][playerNextY]
+				const nextWeaponTile = tileInfo[x][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
 
-        //玩家方向——向左
-      } else if (direction === DIRECTION_ENUM.LEFT) {
-        const weaponNextX = x - 2
-        const nextPlayerTile = tileInfo[playerNextX][y]
-        const nextWeaponTile = tileInfo[weaponNextX][y]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+				//玩家方向——向下
+			} else if (direction === DIRECTION_ENUM.BOTTOM) {
+				const weaponNextY = y + 2
+				const nextPlayerTile = tileInfo[x][playerNextY]
+				const nextWeaponTile = tileInfo[x][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
 
-        //玩家方向——向右
-      } else if (direction === DIRECTION_ENUM.RIGHT) {
-        const weaponNextX = x + 2
-        const nextPlayerTile = tileInfo[playerNextX][y]
-        const nextWeaponTile = tileInfo[weaponNextX][y]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-      }
+				//玩家方向——向左
+			} else if (direction === DIRECTION_ENUM.LEFT) {
+				const weaponNextX = x - 1
+				const weaponNextY = y + 1
+				const nextPlayerTile = tileInfo[playerNextY][y]
+				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
 
-      //按钮方向——向右
-    } else if (type === CONTROLLER_ENUM.LEFT) {
+				//玩家方向——向右
+			} else if (direction === DIRECTION_ENUM.RIGHT) {
+				const weaponNextX = x + 1
+				const weaponNextY = y + 1
+				const nextPlayerTile = tileInfo[playerNextY][y]
+				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+			}
 
-      const playerNextX = x + 1
-      if (playerNextX > row - 1) {
-        return false
-      }
+			//按钮方向——向左
+		} else if (type === CONTROLLER_ENUM.LEFT) {
 
-      //玩家方向——向上
-      if (direction === DIRECTION_ENUM.TOP) {
-        const weaponNextX = x + 1
-        const weaponNextY = y - 1
-        const nextPlayerTile = tileInfo[playerNextX][y]
-        const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+			const playerNextX = x - 1
+			if (playerNextX < 0) {
+				return false
+			}
 
-        //玩家方向——向下
-      } else if (direction === DIRECTION_ENUM.BOTTOM) {
-        const weaponNextX = x + 1
-        const weaponNextY = y + 1
-        const nextPlayerTile = tileInfo[playerNextX][y]
-        const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+			//玩家方向——向上
+			if (direction === DIRECTION_ENUM.TOP) {
+				const weaponNextX = x - 1
+				const weaponNextY = y - 1
+				const nextPlayerTile = tileInfo[playerNextX][y]
+				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
 
-        //玩家方向——向左
-      } else if (direction === DIRECTION_ENUM.LEFT) {
-        const weaponNextX = x
-        const nextPlayerTile = tileInfo[playerNextX][y]
-        const nextWeaponTile = tileInfo[weaponNextX][y]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+				//玩家方向——向下
+			} else if (direction === DIRECTION_ENUM.BOTTOM) {
+				const weaponNextX = x - 1
+				const weaponNextY = y + 1
+				const nextPlayerTile = tileInfo[playerNextX][y]
+				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
 
-        //玩家方向——向右
-      } else if (direction === DIRECTION_ENUM.RIGHT) {
-        const weaponNextX = x + 2
-        const nextPlayerTile = tileInfo[playerNextX][y]
-        const nextWeaponTile = tileInfo[weaponNextX][y]
-        return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-      }
+				//玩家方向——向左
+			} else if (direction === DIRECTION_ENUM.LEFT) {
+				const weaponNextX = x - 2
+				const nextPlayerTile = tileInfo[playerNextX][y]
+				const nextWeaponTile = tileInfo[weaponNextX][y]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
 
-      //按钮方向——左转
-    } else if (type === CONTROLLER_ENUM.TURNLEFT) {
-      let nextY, nextX
-      if (direction === DIRECTION_ENUM.TOP) {
-        //朝上左转的话，左上角三个tile都必须turnable为true
-        nextY = y - 1
-        nextX = x - 1
-      } else if (direction === DIRECTION_ENUM.BOTTOM) {
-        nextY = y + 1
-        nextX = x + 1
-      } else if (direction === DIRECTION_ENUM.LEFT) {
-        nextY = y + 1
-        nextX = x - 1
-      } else if (direction === DIRECTION_ENUM.RIGHT) {
-        nextY = y - 1
-        nextX = x + 1
-      }
+				//玩家方向——向右
+			} else if (direction === DIRECTION_ENUM.RIGHT) {
+				const weaponNextX = x + 2
+				const nextPlayerTile = tileInfo[playerNextX][y]
+				const nextWeaponTile = tileInfo[weaponNextX][y]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+			}
 
-      return (!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
-        (!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
-        (!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
+			//按钮方向——向右
+		} else if (type === CONTROLLER_ENUM.LEFT) {
 
-      //按钮方向——右转
-    } else if (type === CONTROLLER_ENUM.TURNRIGHT) {
-      let nextX, nextY
-      if (direction === DIRECTION_ENUM.TOP) {
-        //朝上右转的话，右上角三个tile都必须turnable为true
-        nextY = y - 1
-        nextX = x + 1
-      } else if (direction === DIRECTION_ENUM.BOTTOM) {
-        nextY = y + 1
-        nextX = x - 1
-      } else if (direction === DIRECTION_ENUM.LEFT) {
-        nextY = y - 1
-        nextX = x - 1
-      } else if (direction === DIRECTION_ENUM.RIGHT) {
-        nextY = y + 1
-        nextX = x + 1
-      }
+			const playerNextX = x + 1
+			if (playerNextX > row - 1) {
+				return false
+			}
 
-      return (!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
-        (!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
-        (!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
-    }
+			//玩家方向——向上
+			if (direction === DIRECTION_ENUM.TOP) {
+				const weaponNextX = x + 1
+				const weaponNextY = y - 1
+				const nextPlayerTile = tileInfo[playerNextX][y]
+				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
 
-    return false
-  }
+				//玩家方向——向下
+			} else if (direction === DIRECTION_ENUM.BOTTOM) {
+				const weaponNextX = x + 1
+				const weaponNextY = y + 1
+				const nextPlayerTile = tileInfo[playerNextX][y]
+				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+
+				//玩家方向——向左
+			} else if (direction === DIRECTION_ENUM.LEFT) {
+				const weaponNextX = x
+				const nextPlayerTile = tileInfo[playerNextX][y]
+				const nextWeaponTile = tileInfo[weaponNextX][y]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+
+				//玩家方向——向右
+			} else if (direction === DIRECTION_ENUM.RIGHT) {
+				const weaponNextX = x + 2
+				const nextPlayerTile = tileInfo[playerNextX][y]
+				const nextWeaponTile = tileInfo[weaponNextX][y]
+				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+			}
+
+			//按钮方向——左转
+		} else if (type === CONTROLLER_ENUM.TURNLEFT) {
+			let nextY, nextX
+			if (direction === DIRECTION_ENUM.TOP) {
+				//朝上左转的话，左上角三个tile都必须turnable为true，并且没有敌人
+				nextY = y - 1
+				nextX = x - 1
+
+			} else if (direction === DIRECTION_ENUM.BOTTOM) {
+				nextY = y + 1
+				nextX = x + 1
+
+			} else if (direction === DIRECTION_ENUM.LEFT) {
+				nextY = y + 1
+				nextX = x - 1
+			} else if (direction === DIRECTION_ENUM.RIGHT) {
+				nextY = y - 1
+				nextX = x + 1
+			}
+
+			for (let i = 0; i < enemyInfo.length; i++) {
+				const enemy = enemyInfo[i]
+				const {x: enemyX, y: enemyY} = enemy
+
+				//有敌人在左上方
+				if (enemyX === nextX && enemyY === y) {
+					return false
+				} else if (enemyX === nextX && enemyY === nextX) {
+					return false
+				}else if(enemyX === x && enemyY === nextX){
+					return false
+				}
+			}
+
+			return (!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
+				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
+				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
+
+			//按钮方向——右转
+		} else if (type === CONTROLLER_ENUM.TURNRIGHT) {
+			let nextX, nextY
+			if (direction === DIRECTION_ENUM.TOP) {
+				//朝上右转的话，右上角三个tile都必须turnable为true
+				nextY = y - 1
+				nextX = x + 1
+			} else if (direction === DIRECTION_ENUM.BOTTOM) {
+				nextY = y + 1
+				nextX = x - 1
+			} else if (direction === DIRECTION_ENUM.LEFT) {
+				nextY = y - 1
+				nextX = x - 1
+			} else if (direction === DIRECTION_ENUM.RIGHT) {
+				nextY = y + 1
+				nextX = x + 1
+			}
+
+			for (let i = 0; i < enemyInfo.length; i++) {
+				const enemy = enemyInfo[i]
+				const {x: enemyX, y: enemyY} = enemy
+
+				//有敌人在左上方
+				if (enemyX === nextX && enemyY === y) {
+					return false
+				} else if (enemyX === nextX && enemyY === nextX) {
+					return false
+				}else if(enemyX === x && enemyY === nextX){
+					return false
+				}
+			}
+
+			return (!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
+				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
+				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
+		}
+
+		return false
+	}
 }

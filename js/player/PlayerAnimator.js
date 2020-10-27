@@ -1,47 +1,19 @@
 import DataManager from '../DataManager'
 import Player from './Player'
-import Singleton from "../base/Singleton";
+import {PLAYER_STATE} from '../enums/index'
+import ResourceManager from '../runtime/ResourceManager'
+import Animator from '../base/Animator'
 
 const IMG_IDLE_PREFIX = 'images/idle/idle'
 const IMG_TURN_PREFIX = 'images/turn/turn'
 
-const __ = {
-  timer: Symbol('timer'),
-}
 
-
-const PLAYER_STATE = {
-  IDLE: 'IDLE',
-  ATTACK: 'ATTACK',
-  TURNLEFT: 'TURNLEFT',
-  TURNRIGHT: 'TURNRIGHT',
-}
-
-export default class Animatior extends Singleton {
-
-  static get Instance() {
-    return super.GetInstance(Animatior)
-  }
-
+export default class PlayerAnimator extends Animator{
   constructor() {
-    super()
-    // 当前动画是否播放中
-    this.isPlaying = false
-
-    // 动画是否需要循环播放
-    this.loop = false
-
-    // 每一帧的时间间隔
-    this.interval = 1000 / 6
-
-    this.imgCount = 0
-
+  	super()
     this.initFrames()
     this.playAnimation(0, true)
-
-    this.offset = DataManager.Instance.getOffset()
   }
-
 
   initFrames() {
     this.animation = {}
@@ -57,12 +29,8 @@ export default class Animatior extends Singleton {
       this.animation[PLAYER_STATE.IDLE][item] = []
       const offset = index * 4
       for (let i = 0; i < 4; i++) {
-        const img = new Image()
-        img.src = `${IMG_IDLE_PREFIX} (${i + 1 + offset}).png`
-        img.onload = () => {
-          this.imgCount++
-        }
-        this.animation[PLAYER_STATE.IDLE][item].push(img)
+      	const image = ResourceManager.Instance.getImageMap().get(`${IMG_IDLE_PREFIX} (${i + 1 + offset}).png`)
+        this.animation[PLAYER_STATE.IDLE][item][i] = image
       }
     })
 
@@ -71,12 +39,8 @@ export default class Animatior extends Singleton {
       this.animation[PLAYER_STATE.TURNLEFT][item] = []
       const offset = index * 3
       for (let i = 0; i < 3; i++) {
-        const img = new Image()
-        img.src = `${IMG_TURN_PREFIX} (${i + 1 + offset}).png`
-        img.onload = () => {
-          this.imgCount++
-        }
-        this.animation[PLAYER_STATE.TURNLEFT][item].push(img)
+	      const image = ResourceManager.Instance.getImageMap().get(`${IMG_TURN_PREFIX} (${i + 1 + offset}).png`)
+	      this.animation[PLAYER_STATE.IDLE][item][i] = image
       }
     })
 
@@ -85,21 +49,14 @@ export default class Animatior extends Singleton {
       this.animation[PLAYER_STATE.TURNRIGHT][item] = []
       const offset = index * 3 + 12
       for (let i = 0; i < 3; i++) {
-        const img = new Image()
-        img.src = `${IMG_TURN_PREFIX} (${i + 1 + offset}).png`
-        img.onload = () => {
-          this.imgCount++
-        }
-        this.animation[PLAYER_STATE.TURNRIGHT][item].push(img)
+	      const image = ResourceManager.Instance.getImageMap().get(`${IMG_TURN_PREFIX} (${i + 1 + offset}).png`)
+	      this.animation[PLAYER_STATE.IDLE][item][i] = image
       }
     })
   }
 
   // 将播放中的帧绘制到canvas上
   render(ctx) {
-    if (this.imgCount < 40) {
-      return
-    }
     const {
       x,
       y,
@@ -110,13 +67,15 @@ export default class Animatior extends Singleton {
     } = Player.Instance
 
     const image = this.animation[state][direction][this.index]
-    ctx.drawImage(
-      image,
-      (x * 32) + this.offset.width - 32 - 15,
-      (y * 32) + this.offset.height - 32 - 18,
-      width,
-      height
-    )
+	  if(image){
+		  ctx.drawImage(
+			  image,
+			  (x * 32) + this.offset.width - 32 - 15,
+			  (y * 32) + this.offset.height - 32 - 18,
+			  width,
+			  height
+		  )
+	  }
   }
 
   // 播放预定的帧动画
@@ -136,7 +95,7 @@ export default class Animatior extends Singleton {
     this.index = index
 
     if (this.interval > 0 && currentList.length) {
-      this[__.timer] = setInterval(
+      this.timer = setInterval(
         this.frameLoop.bind(this),
         this.interval
       )
@@ -165,17 +124,5 @@ export default class Animatior extends Singleton {
         this.stop()
       }
     }
-  }
-
-  resetIndex() {
-    this.index = 0
-  }
-
-  // 停止帧动画播放
-  stop() {
-    this.isPlaying = false
-
-    if (this[__.timer])
-      clearInterval(this[__.timer])
   }
 }

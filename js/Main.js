@@ -1,15 +1,13 @@
 import Player from './player/Player'
-import Animator from './player/Animator'
-import Enemy from './npc/enemy'
+import Enemy from './npc/Enemy'
 import Background from './runtime/Background'
-import GameInfo from './runtime/gameinfo'
-import Controller from './runtime/Controller'
+import UIManager from './runtime/UIManager'
 import Music from './runtime/MusicManager'
 import DataManager from './DataManager'
 import Singleton from './base/Singleton'
 
-import {CONTROLLER_ENUM} from './enums/index'
 import EventManager from './EventManager'
+import ResourceManager from './runtime/ResourceManager'
 
 let ctx = canvas.getContext('2d')
 
@@ -35,18 +33,25 @@ export default class Main extends Singleton {
 		// this.aniId    = 0
 		// this.eventbus = EventManager.Instance
 		// this.music = Music.Instance
+		this.calcOffset()
 
 		this.restart()
 	}
 
 	restart() {
-		this.calcOffset()
 		DataManager.Instance.reset()
 
-		const {playerInfo}= DataManager.Instance.getLevel()
-		Player.Instance.x = playerInfo.x
-		Player.Instance.y = playerInfo.y
+		const {playerInfo, enemyInfo} = DataManager.Instance.getLevel()
+		Player.Instance.targetX = Player.Instance.x = playerInfo.x
+		Player.Instance.targetY = Player.Instance.y = playerInfo.y
 		Player.Instance.direction = playerInfo.direction
+
+		this.enemiesList = enemyInfo.map(enemy => {
+			const obj = new Enemy()
+			obj.x = enemy.x
+			obj.y = enemy.y
+			obj.direction = enemy.direction
+		})
 
 		// this.hasEventBind = false
 
@@ -57,10 +62,11 @@ export default class Main extends Singleton {
 		//   this.bindLoop,
 		//   canvas
 		// )
-		console.log(Player.Instance)
 
 		this.bindLoop = this.loop.bind(this)
-		this.loop()
+		ResourceManager.Instance.load().then(() => {
+			this.loop()
+		})
 	}
 
 	// 实现游戏帧循环
@@ -88,7 +94,11 @@ export default class Main extends Singleton {
 		ctx.fillRect(0, 0, width, height)
 
 		Background.Instance.render(ctx)
-		Controller.Instance.render(ctx)
+		UIManager.Instance.render(ctx)
+
+		this.enemiesList.forEach(enemy => {
+			enemy.render()
+		})
 
 		// databus.bullets
 		//   .concat(databus.enemys)
@@ -99,11 +109,6 @@ export default class Main extends Singleton {
 		// Player.Instance.drawToCanvas(ctx, this.offset)
 		Player.Instance.render(ctx)
 
-		// databus.animations.forEach((ani) => {
-		if (Player.Instance.isPlaying) {
-			Player.Instance.aniRender(ctx)
-		}
-		// })
 	}
 
 	// 游戏逻辑更新主函数
@@ -111,6 +116,7 @@ export default class Main extends Singleton {
 		// if (databus.gameOver)
 		//   return;
 
+		Player.Instance.update()
 		// Background.Instance.update()
 
 		// databus.bullets
@@ -118,6 +124,8 @@ export default class Main extends Singleton {
 		//   .forEach((item) => {
 		//     item.update()
 		//   })
+		//
+		this.checkEnemyAttackPlayer()
 
 		// this.enemyGenerate()
 
@@ -127,6 +135,17 @@ export default class Main extends Singleton {
 		//   Player.Instance.shoot()
 		//   this.music.playShoot()
 		// }
+	}
+
+	checkEnemyAttackPlayer(){
+		const {x:px,y:py} = DataManager.Instance.getPlayerInfo()
+		const enemyInfo = DataManager.Instance.getEnemyInfo()
+		for (let i = 0; i < enemyInfo.length; i++) {
+
+		}
+		if(true){
+			Player.Instance.goDead()
+		}
 	}
 
 	nextLevel() {

@@ -1,4 +1,4 @@
-import Pool from './base/pool'
+import Pool from './base/Pool'
 import {
   level1,
   level2
@@ -27,8 +27,8 @@ export default class DataManager extends Singleton {
       height: 0
     }
 
-    this.enemiesInfo = this.level.enemiesInfo
-    this.playerInfo = this.level.playerInfo
+    this.enemyInfo = this.level.enemyInfo
+    this.playerInfo = Object.assign({},this.level.playerInfo)
     this.mapInfo = this.level.mapInfo
 
     this.mapRowCount = this.mapInfo.length
@@ -114,6 +114,10 @@ export default class DataManager extends Singleton {
 
   setPlayerInfo(info) {
     this.playerInfo = info
+  }
+
+  getEnemyInfo(){
+	  return this.enemyInfo
   }
 
   getLevel() {

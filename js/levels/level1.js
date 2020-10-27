@@ -418,7 +418,7 @@ const playerInfo = {
   direction: DIRECTION_ENUM.RIGHT
 }
 
-const enemiesInfo = [
+const enemyInfo = [
 	{
 		x:1,
 		y:1,
@@ -427,10 +427,16 @@ const enemiesInfo = [
 	}
 ]
 
+const doorInfo = {
+	x: 4,
+	y: 7,
+	direction: DIRECTION_ENUM.RIGHT
+}
+
 const level1 = {
 	mapInfo,
   playerInfo,
-	enemiesInfo
+	enemyInfo
 }
 
 

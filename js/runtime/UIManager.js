@@ -7,10 +7,10 @@ import Button from './Button'
 /***
  * 控制器，管理所有按钮的类
  */
-export default class Controller  extends Singleton {
+export default class UIManager  extends Singleton {
 
   static get Instance() {
-    return super.GetInstance(Controller)
+    return super.GetInstance(UIManager)
   }
 
 	constructor() {

@@ -1,3 +1,5 @@
+import Singleton from './Singleton'
+
 const __ = {
   poolDic: Symbol('poolDic')
 }
@@ -8,8 +10,13 @@ const __ = {
  * 可以有效减少对象创建开销和避免频繁的垃圾回收
  * 提高游戏性能
  */
-export default class Pool {
+export default class Pool extends Singleton{
+	static get Instance() {
+		return super.GetInstance(Pool)
+	}
+
   constructor() {
+  	super()
     this[__.poolDic] = {}
   }
 
