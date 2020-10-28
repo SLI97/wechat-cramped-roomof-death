@@ -8,16 +8,16 @@ const ENEMY_WIDTH = 128
 const ENEMY_HEIGHT = 128
 
 const __ = {
-  speed: Symbol('speed')
+	speed: Symbol('speed')
 }
 
 /***
  * 敌人基类
  */
 export default class Enemy extends Sprite  {
-  constructor() {
-    super(null,ENEMY_WIDTH, ENEMY_HEIGHT)
-  }
+	constructor() {
+		super(null,ENEMY_WIDTH, ENEMY_HEIGHT)
+	}
 
 	init() {
 		this.x = 0
