@@ -9,6 +9,7 @@ import Singleton from './base/Singleton'
 import EventManager from './runtime/EventManager'
 import ResourceManager from './runtime/ResourceManager'
 import CanvasManager from './runtime/CanvasManager'
+import {EVENT_ENUM} from './enums'
 
 const screenWidth = window.innerWidth
 const screenHeight = window.innerHeight
@@ -39,6 +40,7 @@ export default class Main extends Singleton {
 
 	restart() {
 		DataManager.Instance.reset()
+		EventManager.Instance.on(EVENT_ENUM.RECORD_STEP,this.record.bind(this))
 
 		const {playerInfo, enemyInfo} = DataManager.Instance.getLevel()
 		Player.Instance.targetX = Player.Instance.x = playerInfo.x
@@ -144,6 +146,10 @@ export default class Main extends Singleton {
 		if (true) {
 			Player.Instance.goDead()
 		}
+	}
+
+	record(){
+		// DataManager.Instance.
 	}
 
 	nextLevel() {

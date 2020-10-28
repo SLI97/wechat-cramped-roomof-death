@@ -1,4 +1,3 @@
-import {EVENT_ENUM} from '../enums/index'
 import Singleton from '../base/Singleton'
 
 export default class EventManager extends Singleton {
@@ -10,10 +9,6 @@ export default class EventManager extends Singleton {
 	constructor() {
 		super()
 		this.eventDic = new Map()
-
-		// Object.keys(EVENT_ENUM).forEach(event => {
-		// 	this.eventDic.put(event, [])
-		// })
 	}
 
 	on(event, action) {

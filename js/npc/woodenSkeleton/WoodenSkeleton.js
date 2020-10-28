@@ -1,8 +1,9 @@
 import Sprite from '../../base/Sprite'
-import {DIRECTION_ENUM, PLAYER_STATE} from '../../enums'
+import {DIRECTION_ENUM, EVENT_ENUM, PLAYER_STATE} from '../../enums'
 import DataManager from '../../runtime/DataManager'
 import WoodenSkeletonAnimator from './WoodenSkeletonAnimator'
 import Enemy from '../Enemy'
+import EventManager from '../../runtime/EventManager'
 
 export default class WoodenSkeleton extends Enemy {
 	constructor() {
@@ -27,8 +28,10 @@ export default class WoodenSkeleton extends Enemy {
 		const {x: playerX, y: playerY} = DataManager.Instance.getPlayerInfo()
 		if (playerX === this.x && Math.abs(playerY - this.y) < 1) {
 			this.state = PLAYER_STATE.ATTACK
+			EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
 		} else if (playerY === this.x && Math.abs(playerX - this.y) < 1) {
 			this.state = PLAYER_STATE.ATTACK
+			EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
 		}
 	}
 

@@ -38,6 +38,7 @@ export default class Player extends Sprite {
 		super(null, PLAYER_WIDTH, PLAYER_HEIGHT)
 		this.init()
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputTrigger.bind(this))
+		EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER,this.goDead.bind(this))
 	}
 
 	update() {
@@ -70,6 +71,8 @@ export default class Player extends Sprite {
 
 	goDead() {
 		this.state = PLAYER_STATE.DEATH
+		this.fsm.setParams(PARAMS_NAME.DIRECTION, DIRECTION_ORDER.findIndex(this.direction))
+		this.fsm.setParams(PARAMS_NAME.DEATH, true)
 	}
 
 	/***
@@ -77,18 +80,26 @@ export default class Player extends Sprite {
 	 * @param type
 	 */
 	inputTrigger(type) {
-		if(this.state === PLAYER_STATE.DEATH){
+		if (this.state === PLAYER_STATE.DEATH) {
 			console.log('death!!')
+			EventManager.Instance.emit(EVENT_ENUM.GAME_OVER)
 			return
 		}
 		if (this.shouldAttackEnemy(type)) {
 			console.log('attack!')
 			this.state = PLAYER_STATE.ATTACK
+			this.fsm.setParams(PARAMS_NAME.DIRECTION, DIRECTION_ORDER.findIndex(this.direction))
+			this.fsm.setParams(PARAMS_NAME.ATTACK, true)
+			EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
 			return
 		}
 
 		if (!this.canMoveOrTurn(type)) {
 			console.log('stop!')
+			this.state = PLAYER_STATE.BLOCK
+			this.fsm.setParams(PARAMS_NAME.DIRECTION, DIRECTION_ORDER.findIndex(this.direction))
+			this.fsm.setParams(PARAMS_NAME.BLOCK, true)
+			EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
 			return
 		}
 
@@ -127,10 +138,11 @@ export default class Player extends Sprite {
 			this.fsm.setParams(PARAMS_NAME.DIRECTION, next)
 			this.fsm.setParams(PARAMS_NAME.TURNRIGHT, true)
 		}
+		EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
 	}
 
 	/***
-	 * 检查枪所在方向是否有敌人，有则演出攻击动画
+	 * 检查枪所在方向是否有敌人，有则攻击
 	 * @param type
 	 */
 	shouldAttackEnemy(type) {
