@@ -1,7 +1,7 @@
 import Enemy from '../Enemy'
 import {DIRECTION_ENUM, PLAYER_STATE} from '../../enums'
 import WoodenSkeletonAnimator from '../woodenSkeleton/WoodenSkeletonAnimator'
-import DataManager from '../../DataManager'
+import DataManager from '../../runtime/DataManager'
 
 
 export default class IronSkeleton extends Enemy{
@@ -17,7 +17,7 @@ export default class IronSkeleton extends Enemy{
 		this.animator = new WoodenSkeletonAnimator()
 	}
 
-	render(ctx) {
-		this.animator.render(ctx)
+	render() {
+		this.animator.render()
 	}
 }

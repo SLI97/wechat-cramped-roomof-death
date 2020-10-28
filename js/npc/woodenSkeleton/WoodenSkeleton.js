@@ -1,6 +1,6 @@
 import Sprite from '../../base/Sprite'
 import {DIRECTION_ENUM, PLAYER_STATE} from '../../enums'
-import DataManager from '../../DataManager'
+import DataManager from '../../runtime/DataManager'
 import WoodenSkeletonAnimator from './WoodenSkeletonAnimator'
 import Enemy from '../Enemy'
 
@@ -32,7 +32,7 @@ export default class WoodenSkeleton extends Enemy {
 		}
 	}
 
-	render(ctx) {
-		this.animator.render(ctx)
+	render() {
+		this.animator.render()
 	}
 }

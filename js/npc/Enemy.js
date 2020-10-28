@@ -1,4 +1,4 @@
-import DataManager   from '../DataManager'
+import DataManager   from '../runtime/DataManager'
 import Sprite from '../base/Sprite'
 import PlayerAnimator from '../player/PlayerAnimator'
 import {DIRECTION_ENUM, PLAYER_STATE} from '../enums'

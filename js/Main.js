@@ -1,15 +1,14 @@
 import Player from './player/Player'
 import Enemy from './npc/Enemy'
-import Background from './runtime/Background'
-import UIManager from './runtime/UIManager'
+import Background from './background/Background'
+import UIManager from './ui/UIManager'
 import Music from './runtime/MusicManager'
-import DataManager from './DataManager'
+import DataManager from './runtime/DataManager'
 import Singleton from './base/Singleton'
 
-import EventManager from './EventManager'
+import EventManager from './runtime/EventManager'
 import ResourceManager from './runtime/ResourceManager'
-
-let ctx = canvas.getContext('2d')
+import CanvasManager from './runtime/CanvasManager'
 
 const screenWidth = window.innerWidth
 const screenHeight = window.innerHeight
@@ -87,14 +86,13 @@ export default class Main extends Singleton {
 	 * 每一帧重新绘制所有的需要展示的元素
 	 */
 	render() {
-		const {width, height} = canvas
-		ctx.clearRect(0, 0, width, height)
+		CanvasManager.Ctx.clearRect(0, 0, screenWidth, screenHeight)
 
-		ctx.fillStyle = BG_COLOR
-		ctx.fillRect(0, 0, width, height)
+		CanvasManager.Ctx.fillStyle = BG_COLOR
+		CanvasManager.Ctx.fillRect(0, 0, width, height)
 
-		Background.Instance.render(ctx)
-		UIManager.Instance.render(ctx)
+		Background.Instance.render()
+		UIManager.Instance.render()
 
 		this.enemiesList.forEach(enemy => {
 			enemy.render()
@@ -107,7 +105,7 @@ export default class Main extends Singleton {
 		//   })
 
 		// Player.Instance.drawToCanvas(ctx, this.offset)
-		Player.Instance.render(ctx)
+		Player.Instance.render()
 
 	}
 
@@ -137,13 +135,13 @@ export default class Main extends Singleton {
 		// }
 	}
 
-	checkEnemyAttackPlayer(){
-		const {x:px,y:py} = DataManager.Instance.getPlayerInfo()
+	checkEnemyAttackPlayer() {
+		const {x: px, y: py} = DataManager.Instance.getPlayerInfo()
 		const enemyInfo = DataManager.Instance.getEnemyInfo()
 		for (let i = 0; i < enemyInfo.length; i++) {
 
 		}
-		if(true){
+		if (true) {
 			Player.Instance.goDead()
 		}
 	}
@@ -151,14 +149,6 @@ export default class Main extends Singleton {
 	nextLevel() {
 		const nextIndex = DataManager.Instance.getLevelIndex() + 1
 		DataManager.Instance.setLevelIndex(nextIndex)
-	}
-
-	getPlayerInfo() {
-		return Player.InstanceInfo
-	}
-
-	setPlayerInfo(playerInfo) {
-		Player.InstanceInfo = playerInfo
 	}
 
 	/***

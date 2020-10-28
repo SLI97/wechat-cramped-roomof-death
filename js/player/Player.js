@@ -1,8 +1,8 @@
-import DataManager from '../DataManager'
-import EventManager from '../EventManager'
-import Background from '../runtime/Background'
+import DataManager from '../runtime/DataManager'
+import EventManager from '../runtime/EventManager'
+import Background from '../background/Background'
 import Sprite from '../base/Sprite'
-import PlayerAnimator from './PlayerAnimator'
+import PlayerStateMachine, {PARAMS_NAME} from './Animator/PlayerStateMachine'
 import {
 	EVENT_ENUM,
 	ENEMY_TYPE_ENUM
@@ -60,15 +60,12 @@ export default class Player extends Sprite {
 		this.speed = 1 / 10
 		this.direction = DIRECTION_ENUM.RIGHT
 		this.state = PLAYER_STATE.IDLE
-		this.animator = new PlayerAnimator()
+		this.fsm = new PlayerStateMachine()
+		this.fsm = new PlayerStateMachine(this)
 	}
 
-	/***
-	 * 玩家渲染
-	 * @param ctx
-	 */
-	render(ctx) {
-		this.animator.render(ctx)
+	render() {
+		this.fsm.render()
 	}
 
 	goDead() {
@@ -79,7 +76,11 @@ export default class Player extends Sprite {
 	 * 响应玩家操作
 	 * @param type
 	 */
-	inputTrigger(type){
+	inputTrigger(type) {
+		if(this.state === PLAYER_STATE.DEATH){
+			console.log('death!!')
+			return
+		}
 		if (this.shouldAttackEnemy(type)) {
 			console.log('attack!')
 			this.state = PLAYER_STATE.ATTACK
@@ -99,28 +100,33 @@ export default class Player extends Sprite {
 	 * @param type 控制类型CONTROLLER_ENUM之一
 	 */
 	move(type) {
-		PlayerAnimator.Instance.resetIndex()
 		if (type === CONTROLLER_ENUM.TOP) {
 			this.targetY -= 1
+			this.fsm.setParams(PARAMS_NAME.IDLE, true)
 		} else if (type === CONTROLLER_ENUM.BOTTOM) {
 			this.targetY += 1
-			Pool.Instance.getCas
+			this.fsm.setParams(PARAMS_NAME.IDLE, true)
 		} else if (type === CONTROLLER_ENUM.LEFT) {
 			this.targetX -= 1
+			this.fsm.setParams(PARAMS_NAME.IDLE, true)
 		} else if (type === CONTROLLER_ENUM.RIGHT) {
 			this.targetX += 1
+			this.fsm.setParams(PARAMS_NAME.IDLE, true)
 		} else if (type === CONTROLLER_ENUM.TURNLEFT) {
 			this.state = PLAYER_STATE.TURNLEFT
 			const index = DIRECTION_ORDER.findIndex(i => i === this.direction)
 			const next = (index - 1 < 0) ? DIRECTION_ORDER.length - 1 : index - 1
 			this.direction = DIRECTION_ORDER[next]
+			this.fsm.setParams(PARAMS_NAME.DIRECTION, next)
+			this.fsm.setParams(PARAMS_NAME.TURNLEFT, true)
 		} else if (type === CONTROLLER_ENUM.TURNRIGHT) {
 			this.state = PLAYER_STATE.TURNRIGHT
 			const index = DIRECTION_ORDER.findIndex(i => i === this.direction)
 			const next = index + 1 > (DIRECTION_ORDER.length - 1) ? 0 : index + 1
 			this.direction = DIRECTION_ORDER[next]
+			this.fsm.setParams(PARAMS_NAME.DIRECTION, next)
+			this.fsm.setParams(PARAMS_NAME.TURNRIGHT, true)
 		}
-
 	}
 
 	/***
@@ -353,7 +359,7 @@ export default class Player extends Sprite {
 					return false
 				} else if (enemyX === nextX && enemyY === nextX) {
 					return false
-				}else if(enemyX === x && enemyY === nextX){
+				} else if (enemyX === x && enemyY === nextX) {
 					return false
 				}
 			}
@@ -389,7 +395,7 @@ export default class Player extends Sprite {
 					return false
 				} else if (enemyX === nextX && enemyY === nextX) {
 					return false
-				}else if(enemyX === x && enemyY === nextX){
+				} else if (enemyX === x && enemyY === nextX) {
 					return false
 				}
 			}

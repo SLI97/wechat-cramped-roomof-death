@@ -1,3 +1,5 @@
+import CanvasManager from './CanvasManager'
+
 const screenWidth  = window.innerWidth
 const screenHeight = window.innerHeight
 
@@ -9,7 +11,7 @@ let atlas = new Image()
 export default class GameInfo {
 
   renderController(){
-    ctx.drawImage(
+	  CanvasManager.Ctx.drawImage(
       atlas,
       120, 6, 39, 24,
       screenWidth / 2 - 60,
