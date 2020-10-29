@@ -38,7 +38,7 @@ export default class Player extends Sprite {
 		super(null, PLAYER_WIDTH, PLAYER_HEIGHT)
 		this.init()
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputTrigger.bind(this))
-		EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER,this.goDead.bind(this))
+		EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.goDead.bind(this))
 	}
 
 	update() {
@@ -85,6 +85,7 @@ export default class Player extends Sprite {
 			EventManager.Instance.emit(EVENT_ENUM.GAME_OVER)
 			return
 		}
+
 		if (this.shouldAttackEnemy(type)) {
 			console.log('attack!')
 			this.state = PLAYER_STATE.ATTACK
@@ -94,12 +95,10 @@ export default class Player extends Sprite {
 			return
 		}
 
-		if (!this.canMoveOrTurn(type)) {
+		if (this.WillBlock(type)) {
 			console.log('stop!')
 			this.state = PLAYER_STATE.BLOCK
 			this.fsm.setParams(PARAMS_NAME.DIRECTION, DIRECTION_ORDER.findIndex(this.direction))
-			this.fsm.setParams(PARAMS_NAME.BLOCK, true)
-			EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
 			return
 		}
 
@@ -170,7 +169,7 @@ export default class Player extends Sprite {
 	 * 判断角色是否能按预期进行移动
 	 * @param type
 	 */
-	canMoveOrTurn(type) {
+	WillBlock(type) {
 		const {
 			targetX: x,
 			targetY: y,
@@ -190,156 +189,354 @@ export default class Player extends Sprite {
 		if (type === CONTROLLER_ENUM.TOP) {
 
 			const playerNextY = y - 1
-			if (playerNextY < 0) {
-				return false
-			}
+			// if (playerNextY < 0) {
+			// 	this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
+			// 	EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+			// 	return true
+			// }
 
 			//玩家方向——向上
 			if (direction === DIRECTION_ENUM.TOP) {
+				if (playerNextY < 0) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextY = y - 2
 				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[x][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向下
 			} else if (direction === DIRECTION_ENUM.BOTTOM) {
+				if (playerNextY < 0) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextY = y
 				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[x][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向左
 			} else if (direction === DIRECTION_ENUM.LEFT) {
+				if (playerNextY < 0) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x - 1
 				const weaponNextY = y - 1
 				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向右
 			} else if (direction === DIRECTION_ENUM.RIGHT) {
+				if (playerNextY < 0) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x + 1
 				const weaponNextY = y - 1
 				const nextPlayerTile = tileInfo[playerNextY][y]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 			}
 
 			//按钮方向——向下
 		} else if (type === CONTROLLER_ENUM.BOTTOM) {
 
 			const playerNextY = y + 1
-			if (playerNextY > column - 1) {
-				return false
-			}
+			// if (playerNextY > column - 1) {
+			// 	this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
+			// 	EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+			// 	return true
+			// }
 
 			//玩家方向——向上
 			if (direction === DIRECTION_ENUM.TOP) {
+				if (playerNextY > column - 1) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextY = y
 				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[x][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向下
 			} else if (direction === DIRECTION_ENUM.BOTTOM) {
+				if (playerNextY > column - 1) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextY = y + 2
 				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[x][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向左
 			} else if (direction === DIRECTION_ENUM.LEFT) {
+				if (playerNextY > column - 1) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x - 1
 				const weaponNextY = y + 1
 				const nextPlayerTile = tileInfo[playerNextY][y]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向右
 			} else if (direction === DIRECTION_ENUM.RIGHT) {
+				if (playerNextY > column - 1) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x + 1
 				const weaponNextY = y + 1
 				const nextPlayerTile = tileInfo[playerNextY][y]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 			}
 
 			//按钮方向——向左
 		} else if (type === CONTROLLER_ENUM.LEFT) {
 
 			const playerNextX = x - 1
-			if (playerNextX < 0) {
-				return false
-			}
+			// if (playerNextX < 0) {
+			// 	this.fsm.setParams(PARAMS_NAME.BLOCK, true)
+			// 	EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+			// 	return false
+			// }
 
 			//玩家方向——向上
 			if (direction === DIRECTION_ENUM.TOP) {
+				if (playerNextX < 0) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x - 1
 				const weaponNextY = y - 1
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向下
 			} else if (direction === DIRECTION_ENUM.BOTTOM) {
+				if (playerNextX < 0) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x - 1
 				const weaponNextY = y + 1
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向左
 			} else if (direction === DIRECTION_ENUM.LEFT) {
+				if (playerNextX < 0) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x - 2
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][y]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向右
 			} else if (direction === DIRECTION_ENUM.RIGHT) {
+				if (playerNextX < 0) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x + 2
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][y]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 			}
 
 			//按钮方向——向右
 		} else if (type === CONTROLLER_ENUM.LEFT) {
 
 			const playerNextX = x + 1
-			if (playerNextX > row - 1) {
-				return false
-			}
+			// if (playerNextX > row - 1) {
+			// 	return false
+			// }
 
 			//玩家方向——向上
 			if (direction === DIRECTION_ENUM.TOP) {
+				if (playerNextX > row - 1) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x + 1
 				const weaponNextY = y - 1
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向下
 			} else if (direction === DIRECTION_ENUM.BOTTOM) {
+				if (playerNextX > row - 1) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x + 1
 				const weaponNextY = y + 1
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向左
 			} else if (direction === DIRECTION_ENUM.LEFT) {
+				if (playerNextX > row - 1) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][y]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 
 				//玩家方向——向右
 			} else if (direction === DIRECTION_ENUM.RIGHT) {
+				if (playerNextX > row - 1) {
+					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
+
 				const weaponNextX = x + 2
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][y]
-				return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
+					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
+					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					return true
+				}
 			}
 
 			//按钮方向——左转
@@ -376,9 +573,20 @@ export default class Player extends Sprite {
 				}
 			}
 
-			return (!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
+			if (
+				(!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
 				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
 				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
+			) {
+			} else {
+				this.fsm.setParams(PARAMS_NAME.BLOCKTURNLEFT, true)
+				EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				return true
+			}
+
+			// return (!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
+			// 	(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
+			// 	(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
 
 			//按钮方向——右转
 		} else if (type === CONTROLLER_ENUM.TURNRIGHT) {
@@ -412,9 +620,20 @@ export default class Player extends Sprite {
 				}
 			}
 
-			return (!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
+			if (
+				(!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
 				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
 				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
+			) {
+			} else {
+				this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
+				EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				return true
+			}
+
+			// return (!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
+			// 	(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
+			// 	(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
 		}
 
 		return false

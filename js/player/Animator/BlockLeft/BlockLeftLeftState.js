@@ -1,7 +1,7 @@
-import BlockState from './BlockState'
+import BlockLeftState from './BlockLeftState'
 
 
-export default class BlockLeftState extends BlockState {
+export default class BlockLeftLeftState extends BlockLeftState {
 	constructor(owner, fsm, animations) {
 		super(owner, fsm, animations)
 	}

@@ -2,10 +2,10 @@ import SubStateMachine from '../../base/SubStateMachine'
 import {PLAYER_STATE} from '../../enums/index'
 
 import {DIRECTION_ENUM} from '../../enums/index'
-import BlockTopState from './Block/BlockTopState'
-import BlockBottomState from './Block/BlockBottomState'
-import BlockLeftState from './Block/BlockLeftState'
-import BlockRightState from './Block/BlockRightState'
+import BlockTopState from './BlockTurnLeft/BlockTurnLeftTopState'
+import BlockBottomState from './BlockTurnLeft/BlockTurnLeftBottomState'
+import BlockLeftState from './BlockTurnLeft/BlockTurnLeftLeftState'
+import BlockRightState from './BlockTurnLeft/BlockTurnLeftRightState'
 
 export default class DeathSubStateMachine extends SubStateMachine {
 	constructor(owner, fsm) {

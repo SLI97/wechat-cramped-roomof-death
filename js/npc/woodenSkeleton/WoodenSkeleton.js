@@ -26,10 +26,10 @@ export default class WoodenSkeleton extends Enemy {
 
 	checkAttack() {
 		const {x: playerX, y: playerY} = DataManager.Instance.getPlayerInfo()
-		if (playerX === this.x && Math.abs(playerY - this.y) < 1) {
+		if (playerX === this.x && Math.abs(playerY - this.y) <= 1) {
 			this.state = PLAYER_STATE.ATTACK
 			EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
-		} else if (playerY === this.x && Math.abs(playerX - this.y) < 1) {
+		} else if (playerY === this.x && Math.abs(playerX - this.y) <= 1) {
 			this.state = PLAYER_STATE.ATTACK
 			EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
 		}

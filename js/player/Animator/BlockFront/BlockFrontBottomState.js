@@ -1,7 +1,7 @@
-import BlockState from './BlockState'
+import BlockFrontState from './BlockFrontState'
 
 
-export default class BlockRightState extends BlockState {
+export default class BlockFrontBottomState extends BlockFrontState {
 	constructor(owner, fsm, animations) {
 		super(owner, fsm, animations)
 	}

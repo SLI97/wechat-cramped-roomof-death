@@ -2,13 +2,17 @@ import SubStateMachine from '../../base/SubStateMachine'
 import {PLAYER_STATE} from '../../enums/index'
 
 import {DIRECTION_ENUM} from '../../enums/index'
-import BlockTurnLeftTopState from './BlockTurnLeft/BlockTurnLeftTopState'
-import BlockTurnLeftBottomState from './BlockTurnLeft/BlockTurnLeftBottomState'
-import BlockTurnLeftLeftState from './BlockTurnLeft/BlockTurnLeftLeftState'
-import BlockTurnLeftRightState from './BlockTurnLeft/BlockTurnLeftRightState'
 import {PARAMS_NAME} from './PlayerStateMachine'
+import BlockFrontTopState from './BlockFront/BlockFrontTopState'
+import BlockFrontBottomState from './BlockFront/BlockFrontBottomState'
+import BlocFrontLeftState from './BlockFront/BlocFrontLeftState'
+import BlockFrontRightState from './BlockFront/BlockFrontRightState'
+import BlockBackTopState from './BlockBack/BlockBackTopState'
+import BlockBackBottomState from './BlockBack/BlockBackBottomState'
+import BlockBackLeftState from './BlockBack/BlockBackLeftState'
+import BlockBackRightState from './BlockBack/BlockBackRightState'
 
-export default class DeathSubStateMachine extends SubStateMachine {
+export default class BlockBackSubStateMachine extends SubStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
 		this.init()
@@ -19,10 +23,10 @@ export default class DeathSubStateMachine extends SubStateMachine {
 	}
 
 	initState() {
-		this.states.set(DIRECTION_ENUM.TOP, new BlockTurnLeftTopState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.BOTTOM, new BlockTurnLeftBottomState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.LEFT, new BlockTurnLeftLeftState(this.owner, this, []))
-		this.states.set(PLAYER_STATE.RIGHT, new BlockTurnLeftRightState(this.owner, this, []))
+		this.states.set(DIRECTION_ENUM.TOP, new BlockBackTopState(this.owner, this, []))
+		this.states.set(DIRECTION_ENUM.BOTTOM, new BlockBackBottomState(this.owner, this, []))
+		this.states.set(DIRECTION_ENUM.LEFT, new BlockBackLeftState(this.owner, this, []))
+		this.states.set(PLAYER_STATE.RIGHT, new BlockBackRightState(this.owner, this, []))
 		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
 	}
 

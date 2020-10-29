@@ -8,7 +8,7 @@ import BlockTurnLeftLeftState from './BlockTurnLeft/BlockTurnLeftLeftState'
 import BlockTurnLeftRightState from './BlockTurnLeft/BlockTurnLeftRightState'
 import {PARAMS_NAME} from './PlayerStateMachine'
 
-export default class DeathSubStateMachine extends SubStateMachine {
+export default class BlockLeftSubStateMachine extends SubStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
 		this.init()
