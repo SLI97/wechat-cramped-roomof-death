@@ -16,11 +16,13 @@ export default class BattleScene extends Scene {
 		super(sceneManager)
 		this.sceneName = 'BattleScene'
 		this.recordHandler = this.record.bind(this)
+		this.revokeHandler = this.revoke.bind(this)
 		this.restartHandler = this.restart.bind(this)
 	}
 
 	beginScene() {
 		EventManager.Instance.on(EVENT_ENUM.RECORD_STEP, this.recordHandler)
+		EventManager.Instance.on(EVENT_ENUM.REVOKE_STEP, this.revokeHandler)
 		EventManager.Instance.on(EVENT_ENUM.RESTART_LEVEL, this.restartHandler)
 	}
 
@@ -29,12 +31,14 @@ export default class BattleScene extends Scene {
 
 		this.checkEnemyAttackPlayer()
 
-		this.enemiesList = enemyInfo.map(enemy => {
+		this.enemiesList = DataManager.Instance.getenemyInfo.map(enemy => {
 			const obj = new Enemy()
 			obj.x = enemy.x
 			obj.y = enemy.y
 			obj.direction = enemy.direction
 		})
+
+		this.render()
 	}
 
 	render() {
@@ -50,7 +54,11 @@ export default class BattleScene extends Scene {
 	}
 
 	record() {
-		// DataManager.Instance.
+		DataManager.Instance.record()
+	}
+
+	revoke(){
+		DataManager.Instance.record()
 	}
 
 	restart() {
@@ -60,21 +68,10 @@ export default class BattleScene extends Scene {
 		Player.Instance.targetX = Player.Instance.x = playerInfo.x
 		Player.Instance.targetY = Player.Instance.y = playerInfo.y
 		Player.Instance.direction = playerInfo.direction
-
-		// this.hasEventBind = false
-
-		// 清除上一局的动画
-		// window.cancelAnimationFrame(this.aniId);
-
-		this.bindLoop = this.loop.bind(this)
-		// ResourceManager.Instance.load().then(() => {
-		// 	this.loop()
-		// })
 	}
 
 	nextLevel() {
-		const nextIndex = DataManager.Instance.getLevelIndex() + 1
-		DataManager.Instance.setLevelIndex(nextIndex)
+		DataManager.Instance.levelIndex = DataManager.Instance.levelIndex + 1
 	}
 
 	checkEnemyAttackPlayer() {

@@ -1,9 +1,9 @@
 import Pool from './Pool'
 import {
-  level1,
-  level2
+	level1,
+	level2
 } from '../levels/level1'
-import {DIRECTION_ENUM} from '../enums/index'
+import {DIRECTION_ENUM, ENEMY_TYPE_ENUM} from '../enums/index'
 import Singleton from '../base/Singleton'
 
 /**
@@ -11,137 +11,113 @@ import Singleton from '../base/Singleton'
  */
 export default class DataManager extends Singleton {
 
-  static get Instance() {
-    return super.GetInstance(DataManager)
-  }
+	static get Instance() {
+		return super.GetInstance(DataManager)
+	}
 
-  constructor() {
-    super()
-    this.levelIndex = 1
+	constructor() {
+		super()
+		this.levelIndex = 1
 
-    // console.log(this.level)
-    this.level = level1
+		// console.log(this.level)
+		this.level = level1
 
-    this.offset = {
-      width: 0,
-      height: 0
-    }
+		this.offset = {
+			width: 0,
+			height: 0
+		}
 
-    this.enemyInfo = this.level.enemyInfo
-    this.playerInfo = Object.assign({},this.level.playerInfo)
-    this.mapInfo = this.level.mapInfo
+		this.enemyInfo = this.level.enemyInfo
+		this.playerInfo = Object.assign({}, this.level.playerInfo)
+		this.mapInfo = this.level.mapInfo
 
-    this.mapRowCount = this.mapInfo.length
-    this.mapColumnCount = this.mapInfo[0].length || 0
-
-
-    this.histroyStack = [
-      {
-        playerInfo: {
-          x: 1,
-          y: 1,
-          direction: DIRECTION_ENUM.RIGHT
-        },
-        enemies: []
-      }
-    ]
+		this.mapRowCount = this.mapInfo.length
+		this.mapColumnCount = this.mapInfo[0].length || 0
 
 
-    // this.pool = new Pool()
+		this.records = [
+			{
+				playerInfo: {
+					x: 1,
+					y: 1,
+					direction: DIRECTION_ENUM.RIGHT
+				},
+				enemyInfo: [],
+				spkiesInfo: [],
+				brustsInfo: [],
+				doorInfo: {
 
-    this.reset()
-  }
+				}
+			}
+		]
 
-  reset() {
-    // this.level = [`level${this.levelIndex}`]
-    this.playerInfo = this.level.playerInfo
-    // this.frame = 0
-    // this.score = 0
-    // this.bullets = []
-    // this.enemys = []
-    // this.animations = []
-    // this.gameOver = false
-  }
 
-  Revoke() {
-    const info = this.histroyStack.pop()
-    this.playerInfo = info.playerInfo
-    this.enemies = info.enemies
-  }
+		// this.pool = new Pool()
 
-  /**
-   * 回收敌人，进入对象池
-   * 此后不进入帧循环
-   */
-  // removeEnemey(enemy) {
-  //   let temp = this.enemys.shift()
+		this.reset()
+	}
 
-  //   temp.visible = false
+	reset() {
+		// this.level = [`level${this.levelIndex}`]
+		this.playerInfo = this.level.playerInfo
+		// this.frame = 0
+		// this.score = 0
+		// this.bullets = []
+		// this.enemys = []
+		// this.animations = []
+		// this.gameOver = false
+	}
 
-  //   this.pool.recover('enemy', enemy)
-  // }
+	Revoke() {
+		const info = this.records.pop()
+		this.playerInfo = info.playerInfo
+		this.enemies = info.enemies
+		this.spkiesInfo = info.spkiesInfo
+		this.brustsInfo = info.brustsInfo
+		this.doorInfo = info.doorInfo
+	}
 
-  /**
-   * 回收子弹，进入对象池
-   * 此后不进入帧循环
-   */
-  // removeBullets(bullet) {
-  //   let temp = this.bullets.shift()
+	getMapInfo() {
+		return this.mapInfo
+	}
 
-  //   temp.visible = false
+	setMapInfo(info) {
+		this.mapInfo = info
+	}
 
-  //   this.pool.recover('bullet', bullet)
-  // }
+	getMapCount() {
+		return {
+			row: this.mapRowCount,
+			column: this.mapColumnCount,
+		}
+	}
 
-  getMapInfo() {
-    return this.mapInfo
-  }
+	getPlayerInfo(info) {
+		return this.playerInfo
+	}
 
-  setMapInfo(info) {
-    this.mapInfo = info
-  }
+	setPlayerInfo(info) {
+		this.playerInfo = info
+	}
 
-  getMapCount() {
-    return {
-      row: this.mapRowCount,
-      column: this.mapColumnCount,
-    }
-  }
+	getEnemyInfo() {
+		return this.enemyInfo
+	}
 
-  getPlayerInfo(info) {
-    return this.playerInfo
-  }
+	getLevel() {
+		return this.level
+	}
 
-  setPlayerInfo(info) {
-    this.playerInfo = info
-  }
+	setLevel(level1) {
+		this.level = level1
+	}
 
-  getEnemyInfo(){
-	  return this.enemyInfo
-  }
+	getOffset() {
+		return this.offset
+	}
 
-  getLevel() {
-    return this.level
-  }
-
-  setLevel(level1) {
-    this.level = level1
-  }
-
-  getLevelIndex() {
-    return this.levelIndex
-  }
-
-  setLevelIndex(index) {
-    this.levelIndex = index
-  }
-
-  getOffset() {
-    return this.offset
-  }
-
-  setOffset(disX, disY) {
-    this.offset.width = disX
-    this.offset.height = disY
-  }
+	setOffset(disX, disY) {
+		this.offset.width = disX
+		this.offset.height = disY
+	}
 }

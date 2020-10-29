@@ -32,6 +32,10 @@ export default class Main extends Singleton {
 		this.loop()
 	}
 
+	stop() {
+		window.cancelAnimationFrame(this.aniId)
+	}
+
 	// 实现游戏帧循环
 	loop() {
 		DataManager.Instance.frame++
@@ -39,16 +43,7 @@ export default class Main extends Singleton {
 		this.update()
 		this.render()
 
-		// 清除上一局的动画
-		// window.cancelAnimationFrame(this.aniId);
-
-		// 维护当前requestAnimationFrame的id
-		// this.aniId    = 0
-
-		this.aniId = window.requestAnimationFrame(
-			this.bindLoop,
-			canvas
-		)
+		this.aniId = window.requestAnimationFrame(this.bindLoop, canvas)
 	}
 
 	/**

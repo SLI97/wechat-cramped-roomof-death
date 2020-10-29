@@ -21,9 +21,8 @@ export default class Background extends Singleton {
 
 	initTile() {
 		this.tileMap = []
-		const DM = DataManager.Instance
-		const mapInfo = DM.getMapInfo()
-		const offset = DM.getOffset()
+		const mapInfo = DataManager.Instance.getMapInfo()
+		const offset = DataManager.Instance.getOffset()
 
 		for (let i = 0; i < mapInfo.length; i++) {
 			const colum = mapInfo[i]
