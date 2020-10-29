@@ -19,10 +19,10 @@ export default class ResourceManager extends Singleton {
 		return super.GetInstance(ResourceManager)
 	}
 
-	// constructor() {
-	// 	super()
+	constructor() {
+		super()
 	// 	this.init()
-	// }
+	}
 
 	load() {
 		return new Promise(async (res, rej) => {

@@ -1,22 +1,16 @@
-import Player from './player/Player'
-import Enemy from './npc/Enemy'
-import Background from './background/Background'
 import UIManager from './ui/UIManager'
 import Music from './runtime/MusicManager'
 import DataManager from './runtime/DataManager'
 import Singleton from './base/Singleton'
 
-import EventManager from './runtime/EventManager'
-import ResourceManager from './runtime/ResourceManager'
-import CanvasManager from './runtime/CanvasManager'
-import {EVENT_ENUM} from './enums'
+import SceneManager from './scene/SceneManager'
+import StartScene from './scene/StartScene'
 
 const screenWidth = window.innerWidth
 const screenHeight = window.innerHeight
 
 const BG_WIDTH = 32
 const BG_HEIGHT = 32
-const BG_COLOR = '#140B28'
 
 /**
  * 游戏主函数
@@ -29,45 +23,13 @@ export default class Main extends Singleton {
 
 	constructor() {
 		super()
-		// 维护当前requestAnimationFrame的id
-		// this.aniId    = 0
-		// this.eventbus = EventManager.Instance
-		// this.music = Music.Instance
-		this.calcOffset()
-
-		this.restart()
+		this.bindLoop = this.loop.bind(this)
 	}
 
-	restart() {
-		DataManager.Instance.reset()
-		EventManager.Instance.on(EVENT_ENUM.RECORD_STEP,this.record.bind(this))
-
-		const {playerInfo, enemyInfo} = DataManager.Instance.getLevel()
-		Player.Instance.targetX = Player.Instance.x = playerInfo.x
-		Player.Instance.targetY = Player.Instance.y = playerInfo.y
-		Player.Instance.direction = playerInfo.direction
-
-		this.enemiesList = enemyInfo.map(enemy => {
-			const obj = new Enemy()
-			obj.x = enemy.x
-			obj.y = enemy.y
-			obj.direction = enemy.direction
-		})
-
-		// this.hasEventBind = false
-
-		// 清除上一局的动画
-		// window.cancelAnimationFrame(this.aniId);
-
-		// this.aniId = window.requestAnimationFrame(
-		//   this.bindLoop,
-		//   canvas
-		// )
-
-		this.bindLoop = this.loop.bind(this)
-		ResourceManager.Instance.load().then(() => {
-			this.loop()
-		})
+	start() {
+		this.calcOffset()
+		SceneManager.Instance.setScene(new StartScene())
+		this.loop()
 	}
 
 	// 实现游戏帧循环
@@ -76,6 +38,12 @@ export default class Main extends Singleton {
 
 		this.update()
 		this.render()
+
+		// 清除上一局的动画
+		// window.cancelAnimationFrame(this.aniId);
+
+		// 维护当前requestAnimationFrame的id
+		// this.aniId    = 0
 
 		this.aniId = window.requestAnimationFrame(
 			this.bindLoop,
@@ -88,73 +56,12 @@ export default class Main extends Singleton {
 	 * 每一帧重新绘制所有的需要展示的元素
 	 */
 	render() {
-		CanvasManager.Ctx.clearRect(0, 0, screenWidth, screenHeight)
-
-		CanvasManager.Ctx.fillStyle = BG_COLOR
-		CanvasManager.Ctx.fillRect(0, 0, width, height)
-
-		Background.Instance.render()
 		UIManager.Instance.render()
-
-		this.enemiesList.forEach(enemy => {
-			enemy.render()
-		})
-
-		// databus.bullets
-		//   .concat(databus.enemys)
-		//   .forEach((item) => {
-		//     item.drawToCanvas(ctx)
-		//   })
-
-		// Player.Instance.drawToCanvas(ctx, this.offset)
-		Player.Instance.render()
-
 	}
 
 	// 游戏逻辑更新主函数
 	update() {
-		// if (databus.gameOver)
-		//   return;
-
-		Player.Instance.update()
-		// Background.Instance.update()
-
-		// databus.bullets
-		//   .concat(databus.enemys)
-		//   .forEach((item) => {
-		//     item.update()
-		//   })
-		//
-		this.checkEnemyAttackPlayer()
-
-		// this.enemyGenerate()
-
-		// this.collisionDetection()
-
-		// if (databus.frame % 20 === 0) {
-		//   Player.Instance.shoot()
-		//   this.music.playShoot()
-		// }
-	}
-
-	checkEnemyAttackPlayer() {
-		const {x: px, y: py} = DataManager.Instance.getPlayerInfo()
-		const enemyInfo = DataManager.Instance.getEnemyInfo()
-		for (let i = 0; i < enemyInfo.length; i++) {
-
-		}
-		if (true) {
-			Player.Instance.goDead()
-		}
-	}
-
-	record(){
-		// DataManager.Instance.
-	}
-
-	nextLevel() {
-		const nextIndex = DataManager.Instance.getLevelIndex() + 1
-		DataManager.Instance.setLevelIndex(nextIndex)
+		SceneManager.Instance.updateScene()
 	}
 
 	/***

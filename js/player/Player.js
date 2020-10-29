@@ -37,7 +37,7 @@ export default class Player extends Sprite {
 	constructor() {
 		super(null, PLAYER_WIDTH, PLAYER_HEIGHT)
 		this.init()
-		EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputTrigger.bind(this))
+		EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputProcess.bind(this))
 		EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.goDead.bind(this))
 	}
 
@@ -79,7 +79,7 @@ export default class Player extends Sprite {
 	 * 响应玩家操作
 	 * @param type
 	 */
-	inputTrigger(type) {
+	inputProcess(type) {
 		if (this.state === PLAYER_STATE.DEATH) {
 			console.log('death!!')
 			EventManager.Instance.emit(EVENT_ENUM.GAME_OVER)

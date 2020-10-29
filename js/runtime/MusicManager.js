@@ -26,9 +26,9 @@ export default class MusicManager extends Singleton {
     // this.playBgm()
   }
 
-  // playBgm() {
-  //   this.bgmAudio.play()
-  // }
+  playBgm() {
+    // this.bgmAudio.play()
+  }
 	//
   // playShoot() {
   //   this.shootAudio.currentTime = 0

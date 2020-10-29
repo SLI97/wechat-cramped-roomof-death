@@ -1,8 +1,10 @@
 import {
-	CONTROLLER_ENUM
+	CONTROLLER_ENUM,
+	UI_ENUM,
 } from '../enums/index'
 import Singleton from '../base/Singleton'
 import Button from './Button'
+import StartButton from './StartButton'
 
 /***
  * 控制器，管理所有按钮的类
@@ -15,11 +17,12 @@ export default class UIManager  extends Singleton {
 
 	constructor() {
 		super()
-		this.init()
 	}
 
 	init() {
 		this.buttonList = []
+		this.uis = new Map()
+		this.uis.set(UI_ENUM.GAME_START,new StartButton())
 		this.touchHandler = this.touchEventHandler.bind(this)
 		this.initButton()
 		this.unBind()
@@ -76,5 +79,9 @@ export default class UIManager  extends Singleton {
 		this.buttonList.forEach((button) => {
 			button.render()
 		})
+	}
+
+	get(type){
+		return this.uis.get(type)
 	}
 }
