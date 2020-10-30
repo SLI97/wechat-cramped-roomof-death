@@ -1,11 +1,10 @@
-import SubStateMachine from '../../base/SubStateMachine'
-import {PLAYER_STATE} from '../../enums/index'
+import SubStateMachine from '../../../base/SubStateMachine'
+import {PLAYER_STATE,DIRECTION_ENUM} from '../../../enums/index'
 
-import {DIRECTION_ENUM} from '../../enums/index'
-import BlockTopState from './BlockTurnLeft/BlockTurnLeftTopState'
-import BlockBottomState from './BlockTurnLeft/BlockTurnLeftBottomState'
-import BlockLeftState from './BlockTurnLeft/BlockTurnLeftLeftState'
-import BlockRightState from './BlockTurnLeft/BlockTurnLeftRightState'
+import DeathTopState from './Death/DeathTopState'
+import DeathBottomState from './Death/DeathBottomState'
+import DeathLeftState from './Death/DeathLeftState'
+import DeathRightState from './Death/DeathRightState'
 
 export default class DeathSubStateMachine extends SubStateMachine {
 	constructor(owner, fsm) {
@@ -18,14 +17,14 @@ export default class DeathSubStateMachine extends SubStateMachine {
 	}
 
 	initState() {
-		this.states.set(DIRECTION_ENUM.TOP, new BlockTopState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.BOTTOM, new BlockBottomState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.LEFT, new BlockLeftState(this.owner, this, []))
-		this.states.set(PLAYER_STATE.RIGHT, new BlockRightState(this.owner, this, []))
+		this.states.set(DIRECTION_ENUM.TOP, new DeathTopState(this.owner, this, []))
+		this.states.set(DIRECTION_ENUM.BOTTOM, new DeathBottomState(this.owner, this, []))
+		this.states.set(DIRECTION_ENUM.LEFT, new DeathLeftState(this.owner, this, []))
+		this.states.set(PLAYER_STATE.RIGHT, new DeathRightState(this.owner, this, []))
 		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
 	}
 
-	render(){
+	render() {
 		this.currentState.render()
 	}
 }

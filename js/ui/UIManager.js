@@ -5,24 +5,31 @@ import {
 import Singleton from '../base/Singleton'
 import Button from './Button'
 import StartButton from './StartButton'
+import CanvasManager from '../runtime/CanvasManager'
+import DataManager from '../runtime/DataManager'
+
+const SCREEN_WIDTH = window.innerWidth
+const SCREEN_HEIGHT = window.innerHeight
 
 /***
  * 控制器，管理所有按钮的类
  */
-export default class UIManager  extends Singleton {
+export default class UIManager extends Singleton {
 
-  static get Instance() {
-    return super.GetInstance(UIManager)
-  }
+	static get Instance() {
+		return super.GetInstance(UIManager)
+	}
 
 	constructor() {
 		super()
+		this.oldFrame = 0
+		this.aniId = 0
 	}
 
 	init() {
 		this.buttonList = []
 		this.uis = new Map()
-		this.uis.set(UI_ENUM.GAME_START,new StartButton())
+		this.uis.set(UI_ENUM.GAME_START, new StartButton())
 		this.touchHandler = this.touchEventHandler.bind(this)
 		this.initButton()
 		this.unBind()
@@ -50,10 +57,9 @@ export default class UIManager  extends Singleton {
 		canvas.addEventListener('touchstart', this.touchHandler)
 	}
 
-	unBind(){
+	unBind() {
 		canvas.removeEventListener('touchstart', this.touchHandler)
 	}
-
 
 
 	touchEventHandler(e) {
@@ -81,7 +87,42 @@ export default class UIManager  extends Singleton {
 		})
 	}
 
-	get(type){
+	get(type) {
 		return this.uis.get(type)
+	}
+
+	fadeIn() {
+		this.oldFrame = DataManager.Instance.frame
+		this.aniId = window.requestAnimationFrame(this.fadeInHandler, canvas)
+	}
+
+	fadeOut() {
+		this.oldFrame = DataManager.Instance.frame
+		this.aniId = window.requestAnimationFrame(this.fadeOutHandler, canvas)
+	}
+
+	fadeInHandler() {
+		const fadePercent = DataManager.Instance.frame - this.oldFrame / 100
+		CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+		CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${fadePercent})`
+		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+		if (fadePercent > 1) {
+			window.cancelAnimationFrame(this.aniId)
+			this.fadeOut()
+		} else {
+			this.aniId = window.requestAnimationFrame(this.fadeInHandler, canvas)
+		}
+	}
+
+	fadeOutHandler(){
+		const fadePercent = DataManager.Instance.frame - this.oldFrame / 100
+		CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+		CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${1- fadePercent})`
+		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+		if (fadePercent > 1) {
+			window.cancelAnimationFrame(this.aniId)
+		} else {
+			this.aniId = window.requestAnimationFrame(this.fadeOutHandler, canvas)
+		}
 	}
 }

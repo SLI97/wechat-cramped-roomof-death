@@ -1,7 +1,5 @@
-import Sprite from '../../base/Sprite'
 import {DIRECTION_ENUM, EVENT_ENUM, PLAYER_STATE} from '../../enums'
 import DataManager from '../../runtime/DataManager'
-import WoodenSkeletonAnimator from './WoodenSkeletonAnimator'
 import Enemy from '../Enemy'
 import EventManager from '../../runtime/EventManager'
 
@@ -15,7 +13,7 @@ export default class WoodenSkeleton extends Enemy {
 		this.y = 0
 		this.direction = DIRECTION_ENUM.BOTTOM
 		this.state = PLAYER_STATE.IDLE
-		this.animator = new WoodenSkeletonAnimator()
+		this.fsm = new WoodenSkeletonAnimator()
 	}
 
 	update() {
@@ -23,9 +21,8 @@ export default class WoodenSkeleton extends Enemy {
 		this.checkAttack()
 	}
 
-
 	checkAttack() {
-		const {x: playerX, y: playerY} = DataManager.Instance.getPlayerInfo()
+		const {x: playerX, y: playerY} = DataManager.Instance.player
 		if (playerX === this.x && Math.abs(playerY - this.y) <= 1) {
 			this.state = PLAYER_STATE.ATTACK
 			EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
@@ -36,6 +33,6 @@ export default class WoodenSkeleton extends Enemy {
 	}
 
 	render() {
-		this.animator.render()
+		this.fsm.render()
 	}
 }

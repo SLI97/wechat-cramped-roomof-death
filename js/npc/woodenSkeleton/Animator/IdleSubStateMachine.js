@@ -25,7 +25,7 @@ export default class IdleSubStateMachine extends SubStateMachine {
 		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
 	}
 
-	render(){
+	render() {
 		this.currentState.render()
 	}
 }

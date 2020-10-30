@@ -412,13 +412,13 @@ const mapInfo = [
 	]
 ]
 
-const playerInfo = {
+const player = {
 	x: 4,
 	y: 7,
 	direction: DIRECTION_ENUM.RIGHT
 }
 
-const enemyInfo = [
+const enemies = [
 	{
 		x: 1,
 		y: 1,
@@ -427,7 +427,7 @@ const enemyInfo = [
 	}
 ]
 
-const spkiesInfo = [
+const spkies = [
 	{
 		x: 1,
 		y: 1,
@@ -436,7 +436,7 @@ const spkiesInfo = [
 	}
 ]
 
-const brustsInfo = [
+const bursts = [
 	{
 		x: 1,
 		y: 1,
@@ -445,7 +445,7 @@ const brustsInfo = [
 	}
 ]
 
-const doorInfo = {
+const door = {
 	x: 4,
 	y: 7,
 	type: ENEMY_TYPE_ENUM.DOOR_ROW,
@@ -454,11 +454,11 @@ const doorInfo = {
 
 const level1 = {
 	mapInfo,
-	playerInfo,
-	enemyInfo,
-	spkiesInfo,
-	brustsInfo,
-	doorInfo
+	player,
+	enemies,
+	spkies,
+	bursts,
+	door
 }
 
 

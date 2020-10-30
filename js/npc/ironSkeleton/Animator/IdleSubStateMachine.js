@@ -1,11 +1,10 @@
-import SubStateMachine from '../../base/SubStateMachine'
-import {PLAYER_STATE} from '../../enums/index'
+import SubStateMachine from '../../../base/SubStateMachine'
 import IdleTopState from './Idle/IdleTopState'
 import IdleBottomState from './Idle/IdleBottomState'
 import IdleLeftState from './Idle/IdleLeftState'
 import IdleRightState from './Idle/IdleRightState'
 
-import {DIRECTION_ENUM} from '../../enums/index'
+import {PLAYER_STATE, DIRECTION_ENUM} from '../../../enums/index'
 
 export default class IdleSubStateMachine extends SubStateMachine {
 	constructor(owner, fsm) {
@@ -25,7 +24,7 @@ export default class IdleSubStateMachine extends SubStateMachine {
 		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
 	}
 
-	render(){
+	render() {
 		this.currentState.render()
 	}
 }

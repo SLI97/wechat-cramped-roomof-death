@@ -39,6 +39,5 @@ export default class OpenState extends State {
 	}
 
 	callback(){
-		this.fsm.currentState = this.fsm.states.get(PLAYER_STATE.IDLE)
 	}
 }

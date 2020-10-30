@@ -69,6 +69,9 @@ export default class Main extends Singleton {
 		const columnCount = countObj.column
 		const disX = (screenWidth - (BG_WIDTH * rowCount)) / 2
 		const disY = (screenHeight - (BG_HEIGHT * columnCount)) / 2
-		DataManager.Instance.setOffset(disX, disY)
+		DataManager.Instance.offset = {
+			width: disX,
+			height: disY
+		}
 	}
 }

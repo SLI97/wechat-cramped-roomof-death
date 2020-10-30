@@ -1,23 +1,16 @@
-import StateMachine from '../../base/StateMachine'
-import {DIRECTION_ENUM, FSM_PARAM_TYPE_ENUM} from '../../../enums/index'
-import IdleSubStateMachine from './IdleSubStateMachine'
-import AttackSubStateMachine from './AttackSubStateMachine'
-import DeathSubStateMachine from './DeathSubStateMachine'
-import OpenTopState from './Open/OpenTopState'
-import OpenBottomState from './Open/OpenBottomState'
-import OpenLeftState from './Open/OpenLeftState'
-import OpenRightState from './Open/OpenRightState'
+import StateMachine from '../../../base/StateMachine'
+import {FSM_PARAM_TYPE_ENUM} from '../../../enums/index'
 import DoorOpenSubStateMachine from './DoorOpenSubStateMachine'
 import DoorCloseSubStateMachine from './DoorCloseSubStateMachine'
 
 export const PARAMS_NAME = {
-	OPEN:'OPEN',
-	DIRECTION:'DIRECTION'
+	OPEN: 'OPEN',
+	DIRECTION: 'DIRECTION'
 }
 
 const DOOR_STATE_ENUM = {
-	OPEN:'OPEN',
-	CLOSE:'CLOSE',
+	OPEN: 'OPEN',
+	CLOSE: 'CLOSE',
 }
 
 export default class DoorStateMachine extends StateMachine {
@@ -59,7 +52,7 @@ export default class DoorStateMachine extends StateMachine {
 				}
 				break
 			case this.states.get(DOOR_STATE_ENUM.CLOSE):
-				if (!this.params.get(PARAMS_NAME.OPEN).value) {
+				if (this.params.get(PARAMS_NAME.OPEN).value) {
 					this.currentState = this.states.get(DOOR_STATE_ENUM.OPEN)
 				}
 				break

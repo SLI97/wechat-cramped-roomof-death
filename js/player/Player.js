@@ -23,16 +23,8 @@ const DIRECTION_ORDER = [
 	DIRECTION_ENUM.TOP,
 ]
 
+
 export default class Player extends Sprite {
-
-	static _instance
-
-	static get Instance() {
-		if (this._instance == null) {
-			this._instance = new Player()
-		}
-		return this._instance
-	}
 
 	constructor() {
 		super(null, PLAYER_WIDTH, PLAYER_HEIGHT)
@@ -61,7 +53,6 @@ export default class Player extends Sprite {
 		this.speed = 1 / 10
 		this.direction = DIRECTION_ENUM.RIGHT
 		this.state = PLAYER_STATE.IDLE
-		this.fsm = new PlayerStateMachine()
 		this.fsm = new PlayerStateMachine(this)
 	}
 
@@ -82,16 +73,19 @@ export default class Player extends Sprite {
 	inputProcess(type) {
 		if (this.state === PLAYER_STATE.DEATH) {
 			console.log('death!!')
-			EventManager.Instance.emit(EVENT_ENUM.GAME_OVER)
+			// EventManager.Instance.emit(EVENT_ENUM.GAME_OVER)
 			return
 		}
 
-		if (this.shouldAttackEnemy(type)) {
+		const id = this.attackEnemy(type)
+		if (id !== -1) {
 			console.log('attack!')
 			this.state = PLAYER_STATE.ATTACK
 			this.fsm.setParams(PARAMS_NAME.DIRECTION, DIRECTION_ORDER.findIndex(this.direction))
 			this.fsm.setParams(PARAMS_NAME.ATTACK, true)
+			EventManager.Instance.emit(EVENT_ENUM.ATTACK_ENEMY, id)
 			EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
+			EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
 			return
 		}
 
@@ -138,31 +132,32 @@ export default class Player extends Sprite {
 			this.fsm.setParams(PARAMS_NAME.TURNRIGHT, true)
 		}
 		EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
+		EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
 	}
 
 	/***
 	 * 检查枪所在方向是否有敌人，有则攻击
 	 * @param type
 	 */
-	shouldAttackEnemy(type) {
-		const enemyInfo = DataManager.Instance.getEnemyInfo()
-		for (let i = 0; i < enemyInfo.length; i++) {
-			const enemy = enemyInfo[i]
+	attackEnemy(type) {
+		const enemies = DataManager.Instance.enemies
+		for (let i = 0; i < enemies.length; i++) {
+			const enemy = enemies[i]
 			if (enemy.type === ENEMY_TYPE_ENUM.SKELETON_WOODEN || enemy.type === ENEMY_TYPE_ENUM.SKELETON_IRON) {
-				const {x: enemyX, y: enemyY} = enemy
+				const {x: enemyX, y: enemyY, id: enemyId} = enemy
 				if (this.direction === DIRECTION_ENUM.TOP && type === CONTROLLER_ENUM.TOP && enemyY === this.targetY - 2) {
-					return true
+					return enemyId
 				} else if (this.direction === DIRECTION_ENUM.BOTTOM && type === CONTROLLER_ENUM.BOTTOM && enemyY === this.targetY + 2) {
-					return true
+					return enemyId
 				} else if (this.direction === DIRECTION_ENUM.LEFT && type === CONTROLLER_ENUM.LEFT && enemyX === this.targetX - 2) {
-					return true
+					return enemyId
 				} else if (this.direction === DIRECTION_ENUM.RIGHT && type === CONTROLLER_ENUM.RIGHT && enemyX === this.targetX + 2) {
-					return true
+					return enemyId
 				}
 			}
 		}
 
-		return false
+		return -1
 	}
 
 	/***
@@ -176,7 +171,7 @@ export default class Player extends Sprite {
 			direction
 		} = this
 		const tileInfo = Background.Instance.getTileMap()
-		const enemyInfo = DataManager.Instance.getEnemyInfo()
+		const enemies = DataManager.Instance.enemies
 			.filter(enemy =>
 				enemy.type === ENEMY_TYPE_ENUM.SKELETON_WOODEN ||
 				enemy.type === ENEMY_TYPE_ENUM.SKELETON_IRON)
@@ -559,8 +554,8 @@ export default class Player extends Sprite {
 				nextX = x + 1
 			}
 
-			for (let i = 0; i < enemyInfo.length; i++) {
-				const enemy = enemyInfo[i]
+			for (let i = 0; i < enemies.length; i++) {
+				const enemy = enemies[i]
 				const {x: enemyX, y: enemyY} = enemy
 
 				//有敌人在左上方
@@ -606,8 +601,8 @@ export default class Player extends Sprite {
 				nextX = x + 1
 			}
 
-			for (let i = 0; i < enemyInfo.length; i++) {
-				const enemy = enemyInfo[i]
+			for (let i = 0; i < enemies.length; i++) {
+				const enemy = enemies[i]
 				const {x: enemyX, y: enemyY} = enemy
 
 				//有敌人在左上方

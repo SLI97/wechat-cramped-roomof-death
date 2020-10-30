@@ -1,12 +1,12 @@
-import SubStateMachine from '../../base/SubStateMachine'
-import {DIRECTION_ENUM, PLAYER_STATE} from '../../enums/index'
+import SubStateMachine from '../../../base/SubStateMachine'
+import {DIRECTION_ENUM, PLAYER_STATE} from '../../../enums/index'
 import AttackTopState from './Attack/AttackTopState'
 import AttackBottomState from './Attack/AttackBottomState'
 import AttackLeftState from './Attack/AttackLeftState'
 import AttackRightState from './Attack/AttackRightState'
 
 
-export default class AttackSubStateMachine extends SubStateMachine{
+export default class AttackSubStateMachine extends SubStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
 		this.init()
@@ -24,7 +24,7 @@ export default class AttackSubStateMachine extends SubStateMachine{
 		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
 	}
 
-	render(){
+	render() {
 		this.currentState.render()
 	}
 }
