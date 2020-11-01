@@ -62,6 +62,15 @@ export default class BattleScene extends Scene {
 			this.calcOffset()
 			// this.sceneManager.setScene(new MainMenuScene())
 			this.isLoaded = true
+			this.useFade = false
+			canvas.addEventListener('touchstart', () => {
+				// UIManager.Instance.fadeIn()
+				this.useFade = true
+				this.oldFrame = DataManager.Instance.frame
+				setTimeout(() => {
+					this.useFade = false
+				}, 100000)
+			})
 		})
 
 	}
@@ -107,6 +116,23 @@ export default class BattleScene extends Scene {
 		DataManager.Instance.player.render()
 		UIManager.Instance.render()
 
+
+		if (this.useFade) {
+			console.log(999)
+			// UIManager.Instance.fadeIn()
+			const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 1000
+			CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+			CanvasManager.Ctx.fillStyle = `rgba(255, 255, 0,${ fadePercent})`
+
+			CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+			// console.log(fadePercent, 1)
+			// if (fadePercent > 1) {
+			// 	window.cancelAnimationFrame(this.aniId)
+			// 	this.fadeOut()
+			// } else {
+			// 	this.aniId = window.requestAnimationFrame(this.fadeInHandler.bind(this), canvas)
+			// }
+		}
 	}
 
 	restart() {
