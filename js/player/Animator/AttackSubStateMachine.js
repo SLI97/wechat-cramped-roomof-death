@@ -56,6 +56,5 @@ export default class AttackSubStateMachine extends DirectionStateMachine {
 		this.states.set(DIRECTION_ENUM.LEFT, new AttackLeftState(this.owner, this.fsm, this.attackFrontLeftAnimations))
 		this.states.set(DIRECTION_ENUM.RIGHT, new AttackRightState(this.owner, this.fsm, this.attackFrontRightAnimations))
 		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
-		console.log(this.currentState)
 	}
 }

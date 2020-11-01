@@ -78,13 +78,11 @@ export default class BattleScene extends Scene {
 			})
 		}
 
-
-		// this.enemiesList = DataManager.Instance.enemies.map(enemy => {
-		// 	const obj = new Enemy()
-		// 	obj.x = enemy.x
-		// 	obj.y = enemy.y
-		// 	obj.direction = enemy.direction
-		// })
+		if (DataManager.Instance.smokes instanceof Array && DataManager.Instance.smokes.length) {
+			DataManager.Instance.smokes.forEach(smoke => {
+				smoke.update()
+			})
+		}
 
 		this.render()
 	}
@@ -97,6 +95,10 @@ export default class BattleScene extends Scene {
 		CanvasManager.Ctx.fillStyle = BG_COLOR
 		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		Background.Instance.render()
+
+		DataManager.Instance.smokes.forEach(smoke => {
+			smoke.render()
+		})
 
 		DataManager.Instance.enemies.forEach(enemy => {
 			enemy.render()

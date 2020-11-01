@@ -40,7 +40,11 @@ export default class StateMachine {
 
 	}
 
-	render() {}
+	render() {
+		if (this.currentState) {
+			this.currentState.render()
+		}
+	}
 
 	stop() {
 		for (const [key, value] of this.states) {

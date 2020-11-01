@@ -117,13 +117,7 @@ export default class PlayerStateMachine extends StateMachine {
 		// this.states.set(PARAMS_NAME.DEATH, new DeathSubStateMachine(this.owner, this))
 		this.currentState = this.states.get(PARAMS_NAME.IDLE)
 	}
-
-	render() {
-		if (this.currentState) {
-			this.currentState.render()
-		}
-	}
-
+	
 	run() {
 		const currentState = this.currentState
 		switch (currentState) {

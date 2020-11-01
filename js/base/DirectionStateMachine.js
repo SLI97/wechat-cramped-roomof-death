@@ -38,6 +38,7 @@ export default class DirectionStateMachine extends SubStateMachine {
     if (DIRECTION_ORDER.findIndex(i => i === type) === this.params.get(PARAMS_NAME.DIRECTION).value) {
       return
     }
+    // console.log(this.params.get(PARAMS_NAME.DIRECTION).value, type)
 
     if (this.params.get(PARAMS_NAME.DIRECTION).value === 0) {
       this.currentState = this.states.get(DIRECTION_ENUM.TOP)

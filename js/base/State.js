@@ -1,6 +1,3 @@
-import Player from '../player/Player'
-import CanvasManager from '../runtime/CanvasManager'
-
 /***
  * 使用es6的symbol模拟私有成员
  * @type {symbol}
@@ -27,6 +24,7 @@ export default class State {
 		this.isPlaying = true
 
 		if (this.interval > 0 && this.animations.length) {
+			// console.log("play!")
 			this[timer] = setInterval(
 				this.frameLoop.bind(this),
 				this.interval
@@ -38,7 +36,6 @@ export default class State {
 
 	frameLoop() {
 		this.index++
-		// console.log(this.index)
 		if (this.index > this.animations.length - 1) {
 			if (this.isLoop) {
 				this.index = 0

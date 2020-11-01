@@ -33,6 +33,7 @@ export default class DataManager extends Singleton {
 		this.spikes = []
 		this.bursts = []
 		this.door = null
+		this.smokes = []
 
 		this.records = []
 

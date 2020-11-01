@@ -1,8 +1,7 @@
 import Singleton from '../base/Singleton'
 
-const __ = {
-  poolDic: Symbol('poolDic')
-}
+const poolDic =  Symbol('poolDic')
+
 
 /**
  * 简易的对象池实现
@@ -17,7 +16,7 @@ export default class Pool extends Singleton{
 
   constructor() {
   	super()
-    this[__.poolDic] = {}
+    this[poolDic] = new Map()
   }
 
   /**
@@ -25,7 +24,7 @@ export default class Pool extends Singleton{
    * 获取对应的对象池
    */
   getPoolBySign(name) {
-    return this[__.poolDic][name] || ( this[__.poolDic][name] = [] )
+    return this[poolDic].get(name) || ( this[poolDic].set(name,[]) )
   }
 
   /**

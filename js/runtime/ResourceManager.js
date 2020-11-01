@@ -28,6 +28,10 @@ const IMG_IRONSKELETOE_COUNT = 72
 const IMG_ATTACK_PREFIX = 'images/attack/attack'
 const IMG_ATTACK_COUNT = 32
 
+const IMG_SMOKE_PREFIX = 'images/smoke/smoke'
+const IMG_SMOKE_COUNT = 48
+
+
 export default class ResourceManager extends Singleton {
 
 	static get Instance() {
@@ -51,8 +55,9 @@ export default class ResourceManager extends Singleton {
 			const blockside = this.loadBlockSideImage()
 			const blockface = this.loadBlockFaceImage()
 			const ironskeleton = this.loadIronSkeletonImage()
+			const smoke = this.loadSmokeImage()
 			Promise.all(
-				[...bg, ...idle, ...attack, ...turn, ...ctrl, ...blockturn, ...blockside, ...blockface, ...ironskeleton]
+				[...bg, ...idle, ...attack, ...turn, ...ctrl, ...blockturn, ...blockside, ...blockface, ...ironskeleton,...smoke]
 			).then(() => {
 				res()
 			})
@@ -128,6 +133,14 @@ export default class ResourceManager extends Singleton {
 		const promiseList = []
 		for (let i = 0; i < IMG_ATTACK_COUNT; i++) {
 			promiseList.push(this.loadImage(`${IMG_ATTACK_PREFIX} (${i + 1}).png`))
+		}
+		return promiseList
+	}
+
+	loadSmokeImage() {
+		const promiseList = []
+		for (let i = 0; i < IMG_SMOKE_COUNT; i++) {
+			promiseList.push(this.loadImage(`${IMG_SMOKE_PREFIX} (${i + 1}).png`))
 		}
 		return promiseList
 	}

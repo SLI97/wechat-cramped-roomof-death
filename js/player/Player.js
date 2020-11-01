@@ -1,16 +1,16 @@
 import DataManager from '../runtime/DataManager'
 import EventManager from '../runtime/EventManager'
+import PoolManager from '../runtime/PoolManager'
 import Background from '../background/Background'
 import Entity from '../base/Entity'
+import Smoke from '../effect/Smoke/Smoke'
 import PlayerStateMachine, {
 	PARAMS_NAME
 } from './Animator/PlayerStateMachine'
 import {
 	EVENT_ENUM,
 	ENEMY_TYPE_ENUM,
-	DIRECTION_ORDER
-} from '../enums/index'
-import {
+	DIRECTION_ORDER,
 	DIRECTION_ENUM,
 	CONTROLLER_ENUM,
 	PLAYER_STATE
@@ -36,6 +36,7 @@ export default class Player extends Entity {
 		this.speed = 1 / 10
 		this.direction = DIRECTION_ENUM.BOTTOM
 		this.state = PLAYER_STATE.IDLE
+		this.smokes = []
 		this.fsm = new PlayerStateMachine(this)
 	}
 
@@ -60,6 +61,16 @@ export default class Player extends Entity {
 		}
 
 		this.fsm.update()
+	}
+
+	render() {
+		super.render()
+		// this.smokes.forEach(item => {
+		// 	// console.log(item)
+		// 	// console.log(item.x,item.y)
+		// 	item.update()
+		// 	item.render()
+		// })
 	}
 
 	goDead() {
@@ -137,6 +148,11 @@ export default class Player extends Entity {
 		}
 		EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
 		EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
+		const smoke = PoolManager.Instance.getItemByClass(ENEMY_TYPE_ENUM.SMOKE, Smoke)
+		smoke.x = this.targetX
+		smoke.y = this.targetY
+		smoke.direction = this.direction
+		DataManager.Instance.smokes.push(smoke)
 	}
 
 	/***

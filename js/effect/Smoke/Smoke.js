@@ -1,44 +1,40 @@
 import Sprite from '../../base/Sprite'
-import Player from '../../player/Player'
-import EventManager from '../../runtime/EventManager'
-import {EVENT_ENUM} from '../../enums/index'
-import CanvasManager from '../../runtime/CanvasManager'
+import SmokeStateMachine from './Animator/SmokeStateMachine'
+import {
+	DIRECTION_ENUM,
+} from '../../enums/index'
 
-const BG_WIDTH = 32
-const BG_HEIGHT = 32
-
-const IMG_BG_PREFIX = 'images/bg/bg (20).png'
+const SMOKE_WIDTH = 128
+const SMOKE_HEIGHT = 128
 
 export default class Smoke extends Sprite {
-	constructor(x,y) {
-		super(IMG_BG_PREFIX, BG_WIDTH, BG_HEIGHT,x,y)
+	constructor() {
+		super(null, SMOKE_WIDTH, SMOKE_HEIGHT)
+		this.init()
+	}
+
+	init() {
+		this.direction = DIRECTION_ENUM.BOTTOM
+		this.fsm = new SmokeStateMachine(this)
 	}
 
 	update() {
+		if (this.fsm) {
+			this.fsm.update()
+		}
 	}
 
-	show(){
+	play() {
 		this.visible = true
 	}
 
 	render() {
-		if(!this.visible){
+		if (!this.visible) {
 			return
 		}
 
-		const {
-			x,
-			y,
-			width,
-			height,
-		} = this
-
-		CanvasManager.Ctx.drawImage(
-			this.img,
-			(x * 32) + this.offset.width,
-			(y * 32) + this.offset.height,
-			width,
-			height
-		)
+		if (this.fsm) {
+			this.fsm.render()
+		}
 	}
 }

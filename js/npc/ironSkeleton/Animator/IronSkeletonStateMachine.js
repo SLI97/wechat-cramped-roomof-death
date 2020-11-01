@@ -11,7 +11,6 @@ const PARAMS_NAME = {
 	DIRECTION: 'DIRECTION',
 }
 
-
 export default class IronSkeletonStateMachine extends StateMachine {
 	constructor(owner) {
 		super()
@@ -45,12 +44,6 @@ export default class IronSkeletonStateMachine extends StateMachine {
 		this.states.set(PLAYER_STATE.IDLE, new IdleSubStateMachine(this.owner, this))
 		this.states.set(PLAYER_STATE.DEATH, new DeathSubStateMachine(this.owner, this))
 		this.currentState = this.states.get(PLAYER_STATE.IDLE)
-	}
-
-	render() {
-		if (this.currentState) {
-			this.currentState.render()
-		}
 	}
 
 	run() {
