@@ -5,12 +5,7 @@ import Singleton from './base/Singleton'
 
 import SceneManager from './scene/SceneManager'
 import StartScene from './scene/StartScene'
-
-const screenWidth = window.innerWidth
-const screenHeight = window.innerHeight
-
-const BG_WIDTH = 32
-const BG_HEIGHT = 32
+import BattleScene from './scene/BattleScene'
 
 /**
  * 游戏主函数
@@ -27,8 +22,8 @@ export default class Main extends Singleton {
 	}
 
 	start() {
-		this.calcOffset()
-		SceneManager.Instance.setScene(new StartScene())
+		// SceneManager.Instance.setScene(new StartScene())
+		SceneManager.Instance.setScene(new BattleScene(SceneManager.Instance))
 		this.loop()
 	}
 
@@ -51,27 +46,11 @@ export default class Main extends Singleton {
 	 * 每一帧重新绘制所有的需要展示的元素
 	 */
 	render() {
-		UIManager.Instance.render()
+		// UIManager.Instance.render()
 	}
 
 	// 游戏逻辑更新主函数
 	update() {
 		SceneManager.Instance.updateScene()
-	}
-
-	/***
-	 * 计算设备宽高把canvas整体偏移到屏幕中央
-	 */
-	calcOffset() {
-		const countObj = DataManager.Instance.getMapCount()
-
-		const rowCount = countObj.row
-		const columnCount = countObj.column
-		const disX = (screenWidth - (BG_WIDTH * rowCount)) / 2
-		const disY = (screenHeight - (BG_HEIGHT * columnCount)) / 2
-		DataManager.Instance.offset = {
-			width: disX,
-			height: disY
-		}
 	}
 }

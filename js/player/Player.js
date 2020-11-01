@@ -1,11 +1,14 @@
 import DataManager from '../runtime/DataManager'
 import EventManager from '../runtime/EventManager'
 import Background from '../background/Background'
-import Sprite from '../base/Sprite'
-import PlayerStateMachine, {PARAMS_NAME} from './Animator/PlayerStateMachine'
+import Entity from '../base/Entity'
+import PlayerStateMachine, {
+	PARAMS_NAME
+} from './Animator/PlayerStateMachine'
 import {
 	EVENT_ENUM,
-	ENEMY_TYPE_ENUM
+	ENEMY_TYPE_ENUM,
+	DIRECTION_ORDER
 } from '../enums/index'
 import {
 	DIRECTION_ENUM,
@@ -16,21 +19,24 @@ import {
 const PLAYER_WIDTH = 128
 const PLAYER_HEIGHT = 128
 
-const DIRECTION_ORDER = [
-	DIRECTION_ENUM.RIGHT,
-	DIRECTION_ENUM.BOTTOM,
-	DIRECTION_ENUM.LEFT,
-	DIRECTION_ENUM.TOP,
-]
 
 
-export default class Player extends Sprite {
+export default class Player extends Entity {
 
 	constructor() {
 		super(null, PLAYER_WIDTH, PLAYER_HEIGHT)
 		this.init()
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputProcess.bind(this))
 		EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.goDead.bind(this))
+	}
+
+	init() {
+		this.targetX = this.x = 0
+		this.targetY = this.y = 0
+		this.speed = 1 / 10
+		this.direction = DIRECTION_ENUM.BOTTOM
+		this.state = PLAYER_STATE.IDLE
+		this.fsm = new PlayerStateMachine(this)
 	}
 
 	update() {
@@ -45,25 +51,19 @@ export default class Player extends Sprite {
 		} else if (this.targetY > this.y) {
 			this.y += this.speed
 		}
-	}
 
-	init() {
-		this.targetX = this.x = 0
-		this.targetY = this.y = 0
-		this.speed = 1 / 10
-		this.direction = DIRECTION_ENUM.RIGHT
-		this.state = PLAYER_STATE.IDLE
-		this.fsm = new PlayerStateMachine(this)
-	}
+		if (Math.abs(this.targetX - this.x) < 0.01) {
+			this.x = this.targetX
+		}
+		if (Math.abs(this.targetY - this.y) < 0.01) {
+			this.y = this.targetY
+		}
 
-	render() {
-		this.fsm.render()
+		this.fsm.update()
 	}
 
 	goDead() {
 		this.state = PLAYER_STATE.DEATH
-		this.fsm.setParams(PARAMS_NAME.DIRECTION, DIRECTION_ORDER.findIndex(this.direction))
-		this.fsm.setParams(PARAMS_NAME.DEATH, true)
 	}
 
 	/***
@@ -71,9 +71,7 @@ export default class Player extends Sprite {
 	 * @param type
 	 */
 	inputProcess(type) {
-		if (this.state === PLAYER_STATE.DEATH) {
-			console.log('death!!')
-			// EventManager.Instance.emit(EVENT_ENUM.GAME_OVER)
+		if (this.state === PLAYER_STATE.ATTACK) {
 			return
 		}
 
@@ -81,8 +79,6 @@ export default class Player extends Sprite {
 		if (id !== -1) {
 			console.log('attack!')
 			this.state = PLAYER_STATE.ATTACK
-			this.fsm.setParams(PARAMS_NAME.DIRECTION, DIRECTION_ORDER.findIndex(this.direction))
-			this.fsm.setParams(PARAMS_NAME.ATTACK, true)
 			EventManager.Instance.emit(EVENT_ENUM.ATTACK_ENEMY, id)
 			EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
 			EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
@@ -90,13 +86,11 @@ export default class Player extends Sprite {
 		}
 
 		if (this.WillBlock(type)) {
-			console.log('stop!')
-			this.state = PLAYER_STATE.BLOCK
-			this.fsm.setParams(PARAMS_NAME.DIRECTION, DIRECTION_ORDER.findIndex(this.direction))
+			// console.log('stop!')
 			return
 		}
 
-		this.move()
+		this.move(type)
 	}
 
 	/***
@@ -106,30 +100,40 @@ export default class Player extends Sprite {
 	move(type) {
 		if (type === CONTROLLER_ENUM.TOP) {
 			this.targetY -= 1
-			this.fsm.setParams(PARAMS_NAME.IDLE, true)
+			this.state = PLAYER_STATE.IDLE
 		} else if (type === CONTROLLER_ENUM.BOTTOM) {
 			this.targetY += 1
-			this.fsm.setParams(PARAMS_NAME.IDLE, true)
+			this.state = PLAYER_STATE.IDLE
 		} else if (type === CONTROLLER_ENUM.LEFT) {
 			this.targetX -= 1
-			this.fsm.setParams(PARAMS_NAME.IDLE, true)
+			this.state = PLAYER_STATE.IDLE
 		} else if (type === CONTROLLER_ENUM.RIGHT) {
 			this.targetX += 1
-			this.fsm.setParams(PARAMS_NAME.IDLE, true)
+			this.state = PLAYER_STATE.IDLE
 		} else if (type === CONTROLLER_ENUM.TURNLEFT) {
 			this.state = PLAYER_STATE.TURNLEFT
-			const index = DIRECTION_ORDER.findIndex(i => i === this.direction)
-			const next = (index - 1 < 0) ? DIRECTION_ORDER.length - 1 : index - 1
-			this.direction = DIRECTION_ORDER[next]
-			this.fsm.setParams(PARAMS_NAME.DIRECTION, next)
-			this.fsm.setParams(PARAMS_NAME.TURNLEFT, true)
+			if (this.direction === DIRECTION_ENUM.TOP) {
+				this.direction = DIRECTION_ENUM.LEFT
+			} else if (this.direction === DIRECTION_ENUM.LEFT) {
+				this.direction = DIRECTION_ENUM.BOTTOM
+			} else if (this.direction === DIRECTION_ENUM.BOTTOM) {
+				this.direction = DIRECTION_ENUM.RIGHT
+			} else if (this.direction === DIRECTION_ENUM.RIGHT) {
+				this.direction = DIRECTION_ENUM.TOP
+			}
+			this.state = PLAYER_STATE.TURNLEFT
 		} else if (type === CONTROLLER_ENUM.TURNRIGHT) {
 			this.state = PLAYER_STATE.TURNRIGHT
-			const index = DIRECTION_ORDER.findIndex(i => i === this.direction)
-			const next = index + 1 > (DIRECTION_ORDER.length - 1) ? 0 : index + 1
-			this.direction = DIRECTION_ORDER[next]
-			this.fsm.setParams(PARAMS_NAME.DIRECTION, next)
-			this.fsm.setParams(PARAMS_NAME.TURNRIGHT, true)
+			if (this.direction === DIRECTION_ENUM.TOP) {
+				this.direction = DIRECTION_ENUM.RIGHT
+			} else if (this.direction === DIRECTION_ENUM.LEFT) {
+				this.direction = DIRECTION_ENUM.TOP
+			} else if (this.direction === DIRECTION_ENUM.BOTTOM) {
+				this.direction = DIRECTION_ENUM.LEFT
+			} else if (this.direction === DIRECTION_ENUM.RIGHT) {
+				this.direction = DIRECTION_ENUM.BOTTOM
+			}
+			this.state = PLAYER_STATE.TURNRIGHT
 		}
 		EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
 		EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
@@ -140,21 +144,28 @@ export default class Player extends Sprite {
 	 * @param type
 	 */
 	attackEnemy(type) {
-		const enemies = DataManager.Instance.enemies
+		const enemies = DataManager.Instance.enemies.filter(enemy => enemy.state !== PLAYER_STATE.DEATH)
 		for (let i = 0; i < enemies.length; i++) {
 			const enemy = enemies[i]
-			if (enemy.type === ENEMY_TYPE_ENUM.SKELETON_WOODEN || enemy.type === ENEMY_TYPE_ENUM.SKELETON_IRON) {
-				const {x: enemyX, y: enemyY, id: enemyId} = enemy
-				if (this.direction === DIRECTION_ENUM.TOP && type === CONTROLLER_ENUM.TOP && enemyY === this.targetY - 2) {
-					return enemyId
-				} else if (this.direction === DIRECTION_ENUM.BOTTOM && type === CONTROLLER_ENUM.BOTTOM && enemyY === this.targetY + 2) {
-					return enemyId
-				} else if (this.direction === DIRECTION_ENUM.LEFT && type === CONTROLLER_ENUM.LEFT && enemyX === this.targetX - 2) {
-					return enemyId
-				} else if (this.direction === DIRECTION_ENUM.RIGHT && type === CONTROLLER_ENUM.RIGHT && enemyX === this.targetX + 2) {
-					return enemyId
-				}
+			// if (enemy.type === ENEMY_TYPE_ENUM.SKELETON_WOODEN || enemy.type === ENEMY_TYPE_ENUM.SKELETON_IRON) {
+			const {
+				x: enemyX,
+				y: enemyY,
+				id: enemyId
+			} = enemy
+			if (this.direction === DIRECTION_ENUM.TOP && type === CONTROLLER_ENUM.TOP && enemyY === this.targetY - 2 &&
+				enemyX === this.x) {
+				return enemyId
+			} else if (this.direction === DIRECTION_ENUM.BOTTOM && type === CONTROLLER_ENUM.BOTTOM && enemyY === this.targetY + 2 &&
+				enemyX === this.x) {
+				return enemyId
+			} else if (this.direction === DIRECTION_ENUM.LEFT && type === CONTROLLER_ENUM.LEFT && enemyX === this.targetX - 2 &&
+				enemyY === this.y) {
+				return enemyId
+			} else if (this.direction === DIRECTION_ENUM.RIGHT && type === CONTROLLER_ENUM.RIGHT && enemyX === this.targetX + 2 && enemyY === this.y) {
+				return enemyId
 			}
+			// }
 		}
 
 		return -1
@@ -171,10 +182,9 @@ export default class Player extends Sprite {
 			direction
 		} = this
 		const tileInfo = Background.Instance.getTileMap()
-		const enemies = DataManager.Instance.enemies
-			.filter(enemy =>
-				enemy.type === ENEMY_TYPE_ENUM.SKELETON_WOODEN ||
-				enemy.type === ENEMY_TYPE_ENUM.SKELETON_IRON)
+		const enemies = DataManager.Instance.enemies.filter(enemy => enemy.state !== PLAYER_STATE.DEATH)
+		// enemy.type === ENEMY_TYPE_ENUM.SKELETON_WOODEN || enemy.type === ENEMY_TYPE_ENUM.SKELETON_IRON)
+
 		const {
 			row,
 			column
@@ -184,55 +194,77 @@ export default class Player extends Sprite {
 		if (type === CONTROLLER_ENUM.TOP) {
 
 			const playerNextY = y - 1
-			// if (playerNextY < 0) {
-			// 	this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
-			// 	EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
-			// 	return true
-			// }
 
 			//玩家方向——向上
 			if (direction === DIRECTION_ENUM.TOP) {
 				if (playerNextY < 0) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKFRONT
+
 					return true
 				}
 
 				const weaponNextY = y - 2
 				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[x][weaponNextY]
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === x && enemyY === weaponNextY) || (enemyX === x && enemyY === playerNextY)) {
+						this.state = PLAYER_STATE.BLOCKFRONT
+
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKFRONT
+
 					return true
 				}
 
 				//玩家方向——向下
 			} else if (direction === DIRECTION_ENUM.BOTTOM) {
 				if (playerNextY < 0) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKBACK
+
 					return true
 				}
 
 				const weaponNextY = y
 				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[x][weaponNextY]
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if (enemyX === x && enemyY === playerNextY) {
+						this.state = PLAYER_STATE.BLOCKBACK
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKBACK
+
 					return true
 				}
 
 				//玩家方向——向左
 			} else if (direction === DIRECTION_ENUM.LEFT) {
 				if (playerNextY < 0) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKRIGHT
+
 					return true
 				}
 
@@ -240,31 +272,57 @@ export default class Player extends Sprite {
 				const weaponNextY = y - 1
 				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === x && enemyY === playerNextY) || (enemyX === weaponNextX && enemyY === weaponNextY)) {
+						this.state = PLAYER_STATE.BLOCKRIGHT
+						return true
+					}
+				}
+
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKRIGHT
+
 					return true
 				}
 
 				//玩家方向——向右
 			} else if (direction === DIRECTION_ENUM.RIGHT) {
 				if (playerNextY < 0) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKLEFT
+
 					return true
 				}
 
 				const weaponNextX = x + 1
 				const weaponNextY = y - 1
-				const nextPlayerTile = tileInfo[playerNextY][y]
+				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === x && enemyY === playerNextY) || (enemyX === weaponNextX && enemyY === weaponNextY)) {
+						this.state = PLAYER_STATE.BLOCKLEFT
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKLEFT
+
 					return true
 				}
 			}
@@ -273,87 +331,134 @@ export default class Player extends Sprite {
 		} else if (type === CONTROLLER_ENUM.BOTTOM) {
 
 			const playerNextY = y + 1
-			// if (playerNextY > column - 1) {
-			// 	this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
-			// 	EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
-			// 	return true
-			// }
 
 			//玩家方向——向上
 			if (direction === DIRECTION_ENUM.TOP) {
 				if (playerNextY > column - 1) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKBACK
+
 					return true
 				}
 
 				const weaponNextY = y
 				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[x][weaponNextY]
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if (enemyX === x && enemyY === playerNextY) {
+						this.state = PLAYER_STATE.BLOCKBACK
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKBACK
+
 					return true
 				}
 
 				//玩家方向——向下
 			} else if (direction === DIRECTION_ENUM.BOTTOM) {
 				if (playerNextY > column - 1) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKFRONT
+
 					return true
 				}
 
 				const weaponNextY = y + 2
 				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[x][weaponNextY]
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === x && enemyY === weaponNextY) || (enemyX === x && enemyY === playerNextY)) {
+						this.state = PLAYER_STATE.BLOCKFRONT
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKFRONT
+
 					return true
 				}
 
 				//玩家方向——向左
 			} else if (direction === DIRECTION_ENUM.LEFT) {
 				if (playerNextY > column - 1) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKLEFT
+
 					return true
 				}
 
 				const weaponNextX = x - 1
 				const weaponNextY = y + 1
-				const nextPlayerTile = tileInfo[playerNextY][y]
+				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
-				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === x && enemyY === playerNextY) || (enemyX === weaponNextX && enemyY === weaponNextY)) {
+						this.state = PLAYER_STATE.BLOCKLEFT
+						return true
+					}
+				}
+
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKLEFT
+
 					return true
 				}
 
 				//玩家方向——向右
 			} else if (direction === DIRECTION_ENUM.RIGHT) {
 				if (playerNextY > column - 1) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKRIGHT
+
 					return true
 				}
 
 				const weaponNextX = x + 1
 				const weaponNextY = y + 1
-				const nextPlayerTile = tileInfo[playerNextY][y]
+				const nextPlayerTile = tileInfo[x][playerNextY]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === x && enemyY === playerNextY) || (enemyX === weaponNextX && enemyY === weaponNextY)) {
+						this.state = PLAYER_STATE.BLOCKRIGHT
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKRIGHT
+
 					return true
 				}
 			}
@@ -362,17 +467,12 @@ export default class Player extends Sprite {
 		} else if (type === CONTROLLER_ENUM.LEFT) {
 
 			const playerNextX = x - 1
-			// if (playerNextX < 0) {
-			// 	this.fsm.setParams(PARAMS_NAME.BLOCK, true)
-			// 	EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
-			// 	return false
-			// }
 
 			//玩家方向——向上
 			if (direction === DIRECTION_ENUM.TOP) {
 				if (playerNextX < 0) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKLEFT
+
 					return true
 				}
 
@@ -380,19 +480,33 @@ export default class Player extends Sprite {
 				const weaponNextY = y - 1
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === playerNextX && enemyY === y) || (enemyX === weaponNextX && enemyY === weaponNextY)) {
+						this.state = PLAYER_STATE.BLOCKLEFT
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKLEFT
+
 					return true
 				}
 
 				//玩家方向——向下
 			} else if (direction === DIRECTION_ENUM.BOTTOM) {
+
 				if (playerNextX < 0) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKRIGHT
+
 					return true
 				}
 
@@ -400,66 +514,102 @@ export default class Player extends Sprite {
 				const weaponNextY = y + 1
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === playerNextX && enemyY === y) || (enemyX === weaponNextX && enemyY === weaponNextY)) {
+						this.state = PLAYER_STATE.BLOCKRIGHT
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKRIGHT
+
 					return true
 				}
 
 				//玩家方向——向左
 			} else if (direction === DIRECTION_ENUM.LEFT) {
 				if (playerNextX < 0) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKFRONT
+
 					return true
 				}
 
 				const weaponNextX = x - 2
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][y]
-				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === playerNextX && enemyY === y) || (enemyX === weaponNextX && enemyY === y)) {
+						this.state = PLAYER_STATE.BLOCKFRONT
+						return true
+					}
+				}
+
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKFRONT
+
 					return true
 				}
 
 				//玩家方向——向右
 			} else if (direction === DIRECTION_ENUM.RIGHT) {
 				if (playerNextX < 0) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKBACK
+
 					return true
 				}
 
-				const weaponNextX = x + 2
+				const weaponNextX = x
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][y]
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if (enemyX === playerNextX && enemyY === y) {
+						this.state = PLAYER_STATE.BLOCKBACK
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKBACK
+
 					return true
 				}
 			}
 
 			//按钮方向——向右
-		} else if (type === CONTROLLER_ENUM.LEFT) {
+		} else if (type === CONTROLLER_ENUM.RIGHT) {
 
 			const playerNextX = x + 1
-			// if (playerNextX > row - 1) {
-			// 	return false
-			// }
 
 			//玩家方向——向上
 			if (direction === DIRECTION_ENUM.TOP) {
 				if (playerNextX > row - 1) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKRIGHT
+
 					return true
 				}
 
@@ -467,19 +617,32 @@ export default class Player extends Sprite {
 				const weaponNextY = y - 1
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === playerNextX && enemyY === y) || (enemyX === weaponNextX && enemyY === weaponNextY)) {
+						this.state = PLAYER_STATE.BLOCKRIGHT
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKRIGHT
+
 					return true
 				}
 
 				//玩家方向——向下
 			} else if (direction === DIRECTION_ENUM.BOTTOM) {
 				if (playerNextX > row - 1) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKLEFT
+
 					return true
 				}
 
@@ -487,49 +650,89 @@ export default class Player extends Sprite {
 				const weaponNextY = y + 1
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === playerNextX && enemyY === y) || (enemyX === weaponNextX && enemyY === weaponNextY)) {
+						this.state = PLAYER_STATE.BLOCKLEFT
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKLEFT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKLEFT
+
 					return true
 				}
 
 				//玩家方向——向左
 			} else if (direction === DIRECTION_ENUM.LEFT) {
 				if (playerNextX > row - 1) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKBACK
+
 					return true
 				}
 
 				const weaponNextX = x
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][y]
-				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile && nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKBACK, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if (enemyX === playerNextX && enemyY === y) {
+						this.state = PLAYER_STATE.BLOCKBACK
+						return true
+					}
+				}
+
+				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKBACK
+
 					return true
 				}
 
 				//玩家方向——向右
 			} else if (direction === DIRECTION_ENUM.RIGHT) {
 				if (playerNextX > row - 1) {
-					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+					this.state = PLAYER_STATE.BLOCKFRONT
+
 					return true
 				}
 
 				const weaponNextX = x + 2
 				const nextPlayerTile = tileInfo[playerNextX][y]
 				const nextWeaponTile = tileInfo[weaponNextX][y]
+
+				for (let i = 0; i < enemies.length; i++) {
+					const enemy = enemies[i]
+					const {
+						x: enemyX,
+						y: enemyY
+					} = enemy
+
+					if ((enemyX === playerNextX && enemyY === y) || (enemyX === weaponNextX && enemyY === y)) {
+						this.state = PLAYER_STATE.BLOCKFRONT
+						return true
+					}
+				}
+
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
-					this.fsm.setParams(PARAMS_NAME.BLOCKFRONT, true)
-					EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+					this.state = PLAYER_STATE.BLOCKFRONT
+
 					return true
 				}
 			}
@@ -556,15 +759,24 @@ export default class Player extends Sprite {
 
 			for (let i = 0; i < enemies.length; i++) {
 				const enemy = enemies[i]
-				const {x: enemyX, y: enemyY} = enemy
+				const {
+					x: enemyX,
+					y: enemyY
+				} = enemy
 
-				//有敌人在左上方
+
 				if (enemyX === nextX && enemyY === y) {
-					return false
-				} else if (enemyX === nextX && enemyY === nextX) {
-					return false
-				} else if (enemyX === x && enemyY === nextX) {
-					return false
+					this.state = PLAYER_STATE.BLOCKTURNLEFT
+
+					return true
+				} else if (enemyX === nextX && enemyY === nextY) {
+					this.state = PLAYER_STATE.BLOCKTURNLEFT
+
+					return true
+				} else if (enemyX === x && enemyY === nextY) {
+					this.state = PLAYER_STATE.BLOCKTURNLEFT
+
+					return true
 				}
 			}
 
@@ -572,10 +784,9 @@ export default class Player extends Sprite {
 				(!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
 				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
 				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
-			) {
-			} else {
-				this.fsm.setParams(PARAMS_NAME.BLOCKTURNLEFT, true)
-				EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+			) {} else {
+				this.state = PLAYER_STATE.BLOCKTURNLEFT
+
 				return true
 			}
 
@@ -603,15 +814,23 @@ export default class Player extends Sprite {
 
 			for (let i = 0; i < enemies.length; i++) {
 				const enemy = enemies[i]
-				const {x: enemyX, y: enemyY} = enemy
+				const {
+					x: enemyX,
+					y: enemyY
+				} = enemy
 
-				//有敌人在左上方
 				if (enemyX === nextX && enemyY === y) {
-					return false
-				} else if (enemyX === nextX && enemyY === nextX) {
-					return false
-				} else if (enemyX === x && enemyY === nextX) {
-					return false
+					this.state = PLAYER_STATE.BLOCKTURNRIGHT
+
+					return true
+				} else if (enemyX === nextX && enemyY === nextY) {
+					this.state = PLAYER_STATE.BLOCKTURNRIGHT
+
+					return true
+				} else if (enemyX === x && enemyY === nextY) {
+					this.state = PLAYER_STATE.BLOCKTURNRIGHT
+
+					return true
 				}
 			}
 
@@ -619,10 +838,9 @@ export default class Player extends Sprite {
 				(!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
 				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
 				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
-			) {
-			} else {
-				this.fsm.setParams(PARAMS_NAME.BLOCKRIGHT, true)
-				EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+			) {} else {
+				this.state = PLAYER_STATE.BLOCKTURNRIGHT
+
 				return true
 			}
 

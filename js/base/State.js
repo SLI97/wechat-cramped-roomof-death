@@ -1,5 +1,4 @@
 import Player from '../player/Player'
-import {PLAYER_STATE} from '../enums'
 import CanvasManager from '../runtime/CanvasManager'
 
 /***
@@ -12,22 +11,20 @@ const timer = Symbol('timer')
  * 状态（每组动画的承载容器）
  */
 export default class State {
-	constructor(animations) {
+	constructor(animations, isLoop = true) {
 
-		this.animations = animations
+		this.animations = animations || []
 		this.isPlaying = false
 		this.isRender = false
-		this.isLoop = true
+		this.isLoop = isLoop
 		this.index = 0
 		this[timer] = null
 		this.interval = 1000 / 6
 	}
 
-	play(index = 0, loop = false) {
+	play() {
 		this.isRender = true
 		this.isPlaying = true
-		this.isLoop = loop
-		this.index = index
 
 		if (this.interval > 0 && this.animations.length) {
 			this[timer] = setInterval(
@@ -37,11 +34,11 @@ export default class State {
 		}
 	}
 
-	render(){
-	}
+	render() {}
 
 	frameLoop() {
 		this.index++
+		// console.log(this.index)
 		if (this.index > this.animations.length - 1) {
 			if (this.isLoop) {
 				this.index = 0
@@ -61,7 +58,7 @@ export default class State {
 		}
 	}
 
-	stop(){
+	stop() {
 		this.index = 0
 		this.isRender = false
 		this.isPlaying = false
@@ -73,7 +70,7 @@ export default class State {
 	/***
 	 * 动画不是循环时，动画播放完毕的回调
 	 */
-	callback(){
+	callback() {
 
 	}
 }

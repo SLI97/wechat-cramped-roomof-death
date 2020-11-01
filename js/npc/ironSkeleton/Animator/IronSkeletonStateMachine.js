@@ -1,5 +1,8 @@
 import StateMachine from '../../../base/StateMachine'
-import {PLAYER_STATE, FSM_PARAM_TYPE_ENUM} from '../../../enums/index'
+import {
+	PLAYER_STATE,
+	FSM_PARAM_TYPE_ENUM
+} from '../../../enums/index'
 import IdleSubStateMachine from './IdleSubStateMachine'
 import DeathSubStateMachine from './DeathSubStateMachine'
 
@@ -44,6 +47,12 @@ export default class IronSkeletonStateMachine extends StateMachine {
 		this.currentState = this.states.get(PLAYER_STATE.IDLE)
 	}
 
+	render() {
+		if (this.currentState) {
+			this.currentState.render()
+		}
+	}
+
 	run() {
 		const currentState = this.currentState
 		switch (currentState) {
@@ -52,16 +61,13 @@ export default class IronSkeletonStateMachine extends StateMachine {
 					this.currentState = this.states.get(PLAYER_STATE.DEATH)
 				}
 				break
-			case  this.states.get(PLAYER_STATE.DEATH):
+			case this.states.get(PLAYER_STATE.DEATH):
 				break
 			default:
 				this.currentState = this.states.get(PLAYER_STATE.IDLE)
 				break
 		}
+		this.currentState.run()
 		this.resetTrigger()
-	}
-
-	render() {
-		this.currentState.render()
 	}
 }

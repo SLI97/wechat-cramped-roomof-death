@@ -1,23 +1,20 @@
 import DataManager from '../runtime/DataManager'
-import Sprite from '../base/Sprite'
-import PlayerAnimator from '../player/PlayerAnimator'
-import {DIRECTION_ENUM, PLAYER_STATE} from '../enums'
-import WoodenSkeletonAnimator from './woodenSkeleton/WoodenSkeletonAnimator'
-import EventManager from '../runtime/EventManager'
+import Entity from '../base/Entity'
+import {
+	DIRECTION_ENUM,
+	PLAYER_STATE
+} from '../enums/index'
 
 const ENEMY_WIDTH = 128
 const ENEMY_HEIGHT = 128
 
-const __ = {
-	speed: Symbol('speed')
-}
-
 /***
  * 敌人基类
  */
-export default class Enemy extends Sprite {
+export default class Enemy extends Entity {
 	constructor() {
 		super(null, ENEMY_WIDTH, ENEMY_HEIGHT)
+		this.init()
 	}
 
 	init() {
@@ -36,24 +33,33 @@ export default class Enemy extends Sprite {
 	 * 根据玩家在敌人的方位方便敌人的朝向
 	 */
 	changeDirection() {
-		const {x: playerX, y: playerY} = DataManager.Instance.player
+		if (this.state === PLAYER_STATE.DEATH) {
+			return
+		}
+		const {
+			x: playerX,
+			y: playerY
+		} = DataManager.Instance.player
 		const disX = Math.abs(playerX - this.x)
 		const disY = Math.abs(playerY - this.y)
+		if (disX === disY) {
+			return
+		}
 
 		//第一象限
-		if (playerX > this.x && playerY < this.y) {
+		if (playerX >= this.x && playerY <= this.y) {
 			this.direction = disX >= disY ? DIRECTION_ENUM.RIGHT : DIRECTION_ENUM.TOP
 
 			//第二象限
-		} else if (playerX < this.x && playerY < this.y) {
+		} else if (playerX <= this.x && playerY <= this.y) {
 			this.direction = disX >= disY ? DIRECTION_ENUM.LEFT : DIRECTION_ENUM.TOP
 
 			//第三象限
-		} else if (playerX < this.x && playerY > this.y) {
+		} else if (playerX <= this.x && playerY >= this.y) {
 			this.direction = disX >= disY ? DIRECTION_ENUM.LEFT : DIRECTION_ENUM.BOTTOM
 
 			//第四象限
-		} else if (playerX < this.x && playerY > this.y) {
+		} else if (playerX >= this.x && playerY >= this.y) {
 			this.direction = disX >= disY ? DIRECTION_ENUM.RIGHT : DIRECTION_ENUM.BOTTOM
 		}
 	}

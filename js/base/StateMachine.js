@@ -1,4 +1,10 @@
-import {PLAYER_STATE, FSM_PARAM_TYPE_ENUM} from '../enums/index'
+import {
+	PLAYER_STATE,
+	FSM_PARAM_TYPE_ENUM
+} from '../enums/index'
+
+import State from './State'
+import SubStateMachine from './SubStateMachine'
 
 const _currentState = Symbol('currentState')
 
@@ -15,7 +21,9 @@ export default class StateMachine {
 	set currentState(value) {
 		this.stop()
 		this[_currentState] = value
-		this[_currentState].play()
+		if (this[_currentState] instanceof State) {
+			this[_currentState].play()
+		}
 	}
 
 	constructor() {
@@ -32,27 +40,25 @@ export default class StateMachine {
 
 	}
 
-	render() {
-	}
+	render() {}
 
 	stop() {
 		for (const [key, value] of this.states) {
-			value.stop()
+			// if (value instanceof State) {
+				value.stop()
+			// }
 		}
 	}
 
-	setParams(paramsName,value){
-		if(this.params.has(paramsName)){
-			this.params.set(paramsName, {
-				type: FSM_PARAM_TYPE_ENUM.TRIGGER,
-				value
-			})
+	setParams(paramsName, value) {
+		if (this.params.has(paramsName)) {
+			this.params.get(paramsName).value = value
 		}
 	}
 
 	resetTrigger() {
 		for (const [key, value] of this.params) {
-			if (key.type === FSM_PARAM_TYPE_ENUM.TRIGGER) {
+			if (value.type === FSM_PARAM_TYPE_ENUM.TRIGGER) {
 				value.value = false
 			}
 		}

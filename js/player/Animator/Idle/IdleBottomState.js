@@ -9,14 +9,14 @@ export default class IdleBottomState extends IdleState {
 	/***
 	 * 在这里可以实现动画事件
 	 */
-	event(){
+	event() {
 		/*for example
-		*
-		* if(this.index === 1 | 2 |3){
-		*   new Smoke() and so on...
-		* }
-		*
-		*
-		* */
+		 *
+		 * if(this.index === 1 | 2 |3){
+		 *   new Smoke() and so on...
+		 * }
+		 *
+		 *
+		 * */
 	}
 }

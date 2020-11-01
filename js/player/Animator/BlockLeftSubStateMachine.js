@@ -1,65 +1,61 @@
 import SubStateMachine from '../../base/SubStateMachine'
-import {PLAYER_STATE} from '../../enums/index'
+import {
+	DIRECTION_ENUM,
+	DIRECTION_ORDER,
+	PLAYER_STATE
+} from '../../enums/index'
+import BlockLeftTopState from './BlockLeft/BlockLeftTopState'
+import BlockLeftBottomState from './BlockLeft/BlockLeftBottomState'
+import BlockLeftLeftState from './BlockLeft/BlockLeftLeftState'
+import BlockLeftRightState from './BlockLeft/BlockLeftRightState'
+import {
+	PARAMS_NAME
+} from './PlayerStateMachine'
+import ResourceManager from '../../runtime/ResourceManager'
+import DirectionStateMachine from '../../base/DirectionStateMachine'
 
-import {DIRECTION_ENUM} from '../../enums/index'
-import BlockTurnLeftTopState from './BlockTurnLeft/BlockTurnLeftTopState'
-import BlockTurnLeftBottomState from './BlockTurnLeft/BlockTurnLeftBottomState'
-import BlockTurnLeftLeftState from './BlockTurnLeft/BlockTurnLeftLeftState'
-import BlockTurnLeftRightState from './BlockTurnLeft/BlockTurnLeftRightState'
-import {PARAMS_NAME} from './PlayerStateMachine'
+const IMG_BLOCKSIDE_PREFIX = 'images/blockside/blockside'
 
-export default class BlockLeftSubStateMachine extends SubStateMachine {
+export default class BlockLeftSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
 		this.init()
 	}
 
 	init() {
+		this.initAnimations()
 		this.initState()
 	}
 
+	initAnimations() {
+		this.blockSideLeftTopAnimations = []
+		this.blockSideLeftBottomAnimations = []
+		this.blockSideLeftLeftAnimations = []
+		this.blockSideLeftRightAnimations = []
+
+		const imageMap = ResourceManager.Instance.getImageMap()
+		for (let i = 1; i <= 4; i++) {
+			this.blockSideLeftTopAnimations.push(imageMap.get(`${IMG_BLOCKSIDE_PREFIX} (${i }).png`))
+		}
+
+		for (let i = 9; i <= 12; i++) {
+			this.blockSideLeftBottomAnimations.push(imageMap.get(`${IMG_BLOCKSIDE_PREFIX} (${i }).png`))
+		}
+
+		for (let i = 17; i <= 20; i++) {
+			this.blockSideLeftLeftAnimations.push(imageMap.get(`${IMG_BLOCKSIDE_PREFIX} (${i }).png`))
+		}
+
+		for (let i = 25; i <= 28; i++) {
+			this.blockSideLeftRightAnimations.push(imageMap.get(`${IMG_BLOCKSIDE_PREFIX} (${i }).png`))
+		}
+	}
+
 	initState() {
-		this.states.set(DIRECTION_ENUM.TOP, new BlockTurnLeftTopState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.BOTTOM, new BlockTurnLeftBottomState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.LEFT, new BlockTurnLeftLeftState(this.owner, this, []))
-		this.states.set(PLAYER_STATE.RIGHT, new BlockTurnLeftRightState(this.owner, this, []))
+		this.states.set(DIRECTION_ENUM.TOP, new BlockLeftTopState(this.owner, this.fsm, this.blockSideLeftTopAnimations))
+		this.states.set(DIRECTION_ENUM.BOTTOM, new BlockLeftBottomState(this.owner, this.fsm, this.blockSideLeftBottomAnimations))
+		this.states.set(DIRECTION_ENUM.LEFT, new BlockLeftLeftState(this.owner, this.fsm, this.blockSideLeftLeftAnimations))
+		this.states.set(DIRECTION_ENUM.RIGHT, new BlockLeftRightState(this.owner, this.fsm, this.blockSideLeftRightAnimations))
 		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
-	}
-
-	run() {
-		const currentState = this.currentState
-		switch (currentState) {
-			case this.states.get(DIRECTION_ENUM.TOP):
-				this.switch()
-				break
-			case this.states.get(DIRECTION_ENUM.BOTTOM):
-				this.switch()
-				break
-			case  this.states.get(DIRECTION_ENUM.LEFT):
-				this.switch()
-				break
-			case this.states.get(DIRECTION_ENUM.RIGHT):
-				this.switch()
-				break
-			default:
-				this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
-				break
-		}
-	}
-
-	switch(){
-		if (this.params.get(PARAMS_NAME.DIRECTION).value === 0) {
-			this.currentState = this.states.get(DIRECTION_ENUM.TOP)
-		} else if (this.params.get(PARAMS_NAME.DIRECTION).value=== 1) {
-			this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
-		} else if (this.params.get(PARAMS_NAME.DIRECTION).value=== 1) {
-			this.currentState = this.states.get(DIRECTION_ENUM.LEFT)
-		} else if (this.params.get(PARAMS_NAME.DIRECTION).value=== 1) {
-			this.currentState = this.states.get(DIRECTION_ENUM.RIGHT)
-		}
-	}
-
-	render(){
-		this.currentState.render()
 	}
 }

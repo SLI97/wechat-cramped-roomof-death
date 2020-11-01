@@ -6,9 +6,9 @@ import {
 
 const mapInfo = [
 	[{
-		'src': null,
-		'type': null,
-	},
+			'src': null,
+			'type': null,
+		},
 		{
 			'src': null,
 			'type': null,
@@ -51,9 +51,9 @@ const mapInfo = [
 		}
 	],
 	[{
-		'src': null,
-		'type': null,
-	},
+			'src': null,
+			'type': null,
+		},
 		{
 			'src': null,
 			'type': null,
@@ -96,9 +96,9 @@ const mapInfo = [
 		}
 	],
 	[{
-		'src': null,
-		'type': null,
-	},
+			'src': null,
+			'type': null,
+		},
 		{
 			'src': null,
 			'type': null,
@@ -141,9 +141,9 @@ const mapInfo = [
 		}
 	],
 	[{
-		'src': null,
-		'type': null,
-	},
+			'src': null,
+			'type': null,
+		},
 		{
 			'src': null,
 			'type': null,
@@ -186,9 +186,9 @@ const mapInfo = [
 		}
 	],
 	[{
-		'src': null,
-		'type': null,
-	},
+			'src': null,
+			'type': null,
+		},
 		{
 			'src': null,
 			'type': null,
@@ -231,9 +231,9 @@ const mapInfo = [
 		}
 	],
 	[{
-		'src': null,
-		'type': null,
-	},
+			'src': null,
+			'type': null,
+		},
 		{
 			'src': null,
 			'type': null,
@@ -276,9 +276,9 @@ const mapInfo = [
 		}
 	],
 	[{
-		'src': null,
-		'type': null,
-	},
+			'src': null,
+			'type': null,
+		},
 		{
 			'src': null,
 			'type': null,
@@ -321,9 +321,9 @@ const mapInfo = [
 		}
 	],
 	[{
-		'src': null,
-		'type': null,
-	},
+			'src': null,
+			'type': null,
+		},
 		{
 			'src': null,
 			'type': null,
@@ -366,9 +366,9 @@ const mapInfo = [
 		}
 	],
 	[{
-		'src': null,
-		'type': null
-	},
+			'src': null,
+			'type': null
+		},
 		{
 			'src': null,
 			'type': null
@@ -418,32 +418,26 @@ const player = {
 	direction: DIRECTION_ENUM.RIGHT
 }
 
-const enemies = [
-	{
-		x: 1,
-		y: 1,
-		direction: DIRECTION_ENUM.RIGHT,
-		type: ENEMY_TYPE_ENUM.SKELETON_WOODEN
-	}
-]
+const enemies = [{
+	x: 4,
+	y: 5,
+	direction: DIRECTION_ENUM.RIGHT,
+	type: ENEMY_TYPE_ENUM.SKELETON_IRON
+}]
 
-const spkies = [
-	{
-		x: 1,
-		y: 1,
-		type: ENEMY_TYPE_ENUM.SPIKES_ONE,
-		count: 0
-	}
-]
+const spkies = [{
+	x: 1,
+	y: 1,
+	type: ENEMY_TYPE_ENUM.SPIKES_ONE,
+	count: 0
+}]
 
-const bursts = [
-	{
-		x: 1,
-		y: 1,
-		type: ENEMY_TYPE_ENUM.BURST_FLOOR,
-		active: true
-	}
-]
+const bursts = [{
+	x: 1,
+	y: 1,
+	type: ENEMY_TYPE_ENUM.BURST_FLOOR,
+	active: true
+}]
 
 const door = {
 	x: 4,

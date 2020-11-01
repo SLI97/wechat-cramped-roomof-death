@@ -1,6 +1,6 @@
 import Scene from './Scene'
 import EventManager from '../runtime/EventManager'
-import {EVENT_ENUM, UI_ENUM} from '../enums'
+import {EVENT_ENUM, UI_ENUM} from '../enums/index'
 import BattleScene from './BattleScene'
 import UIManager from '../ui/UIManager'
 
@@ -18,7 +18,7 @@ export default class MainMenuScene extends Scene {
 	}
 
 	updateScene() {
-		this.button.render()
+		// this.button.render()
 	}
 
 	startGame() {

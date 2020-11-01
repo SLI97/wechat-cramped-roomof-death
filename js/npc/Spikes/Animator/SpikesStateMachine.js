@@ -1,14 +1,9 @@
-import StateMachine from '../../base/StateMachine'
+import StateMachine from '../../../base/StateMachine'
 import {DIRECTION_ENUM, FSM_PARAM_TYPE_ENUM} from '../../../enums/index'
-import IdleSubStateMachine from './IdleSubStateMachine'
-import AttackSubStateMachine from './AttackSubStateMachine'
-import DeathSubStateMachine from './DeathSubStateMachine'
-import OpenTopState from './Open/OpenTopState'
-import OpenBottomState from './Open/OpenBottomState'
-import OpenLeftState from './Open/OpenLeftState'
-import OpenRightState from './Open/OpenRightState'
-import DoorOpenSubStateMachine from './DoorOpenSubStateMachine'
-import DoorCloseSubStateMachine from './DoorCloseSubStateMachine'
+import SpikesOneState from './SpikesOneState'
+import SpikesTwoState from './SpikesTwoState'
+import SpikesThreeState from './SpikesThreeState'
+import SpikesFourState from './SpikesFourState'
 
 export const PARAMS_NAME = {
 	OPEN:'OPEN',
@@ -45,8 +40,10 @@ export default class SpikesStateMachine extends StateMachine {
 	}
 
 	initState() {
-		this.states.set(DOOR_STATE_ENUM.OPEN, new DoorOpenSubStateMachine(this.owner, this))
-		this.states.set(DOOR_STATE_ENUM.CLOSE, new DoorCloseSubStateMachine(this.owner, this))
+		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesOneState(this.owner, this))
+		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesTwoState(this.owner, this))
+		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesThreeState(this.owner, this))
+		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesFourState(this.owner, this))
 		this.currentState = this.states.get(DOOR_STATE_ENUM.CLOSE)
 	}
 

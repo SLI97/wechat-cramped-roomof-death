@@ -13,8 +13,8 @@ export default class StartScene extends Scene{
 	beginScene(){
 		//播放游戏开始音乐
 		MusicManager.Instance.playBgm()
-		ResourceManager.Instance.load().then(()=>{
-			this.sceneManager.setScene(new MainMenuScene())
-		})
+		// ResourceManager.Instance.load().then(()=>{
+		// 	this.sceneManager.setScene(new MainMenuScene())
+		// })
 	}
 }

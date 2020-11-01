@@ -1,69 +1,60 @@
 import SubStateMachine from '../../base/SubStateMachine'
-import {PLAYER_STATE} from '../../enums/index'
-
-import {DIRECTION_ENUM} from '../../enums/index'
-import {PARAMS_NAME} from './PlayerStateMachine'
-import BlockFrontTopState from './BlockFront/BlockFrontTopState'
-import BlockFrontBottomState from './BlockFront/BlockFrontBottomState'
-import BlocFrontLeftState from './BlockFront/BlocFrontLeftState'
-import BlockFrontRightState from './BlockFront/BlockFrontRightState'
+import {
+	PLAYER_STATE,
+	DIRECTION_ENUM
+} from '../../enums/index'
+import {
+	PARAMS_NAME
+} from './PlayerStateMachine'
 import BlockBackTopState from './BlockBack/BlockBackTopState'
 import BlockBackBottomState from './BlockBack/BlockBackBottomState'
 import BlockBackLeftState from './BlockBack/BlockBackLeftState'
 import BlockBackRightState from './BlockBack/BlockBackRightState'
+import ResourceManager from '../../runtime/ResourceManager'
+import DirectionStateMachine from '../../base/DirectionStateMachine'
 
-export default class BlockBackSubStateMachine extends SubStateMachine {
+const IMG_BLOCKFACE_PREFIX = 'images/blockface/blockface'
+
+export default class BlockBackSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
 		this.init()
 	}
 
 	init() {
+		this.initAnimations()
 		this.initState()
 	}
 
+	initAnimations() {
+		this.blockFaceBackTopAnimations = []
+		this.blockFaceBackBottomAnimations = []
+		this.blockFaceBackLeftAnimations = []
+		this.blockFaceBackRightAnimations = []
+
+		const imageMap = ResourceManager.Instance.getImageMap()
+		for (let i = 5; i <= 8; i++) {
+			this.blockFaceBackTopAnimations.push(imageMap.get(`${IMG_BLOCKFACE_PREFIX} (${i }).png`))
+		}
+
+		for (let i = 13; i <= 16; i++) {
+			this.blockFaceBackBottomAnimations.push(imageMap.get(`${IMG_BLOCKFACE_PREFIX} (${i }).png`))
+		}
+
+		for (let i = 21; i <= 24; i++) {
+			this.blockFaceBackLeftAnimations.push(imageMap.get(`${IMG_BLOCKFACE_PREFIX} (${i }).png`))
+		}
+
+		for (let i = 29; i <= 32; i++) {
+			this.blockFaceBackRightAnimations.push(imageMap.get(`${IMG_BLOCKFACE_PREFIX} (${i }).png`))
+		}
+	}
+
 	initState() {
-		this.states.set(DIRECTION_ENUM.TOP, new BlockBackTopState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.BOTTOM, new BlockBackBottomState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.LEFT, new BlockBackLeftState(this.owner, this, []))
-		this.states.set(PLAYER_STATE.RIGHT, new BlockBackRightState(this.owner, this, []))
+		this.states.set(DIRECTION_ENUM.TOP, new BlockBackTopState(this.owner, this.fsm, this.blockFaceBackTopAnimations))
+		this.states.set(DIRECTION_ENUM.BOTTOM, new BlockBackBottomState(this.owner, this.fsm, this.blockFaceBackBottomAnimations))
+		this.states.set(DIRECTION_ENUM.LEFT, new BlockBackLeftState(this.owner, this.fsm, this.blockFaceBackLeftAnimations))
+		this.states.set(DIRECTION_ENUM.RIGHT, new BlockBackRightState(this.owner, this.fsm, this.blockFaceBackRightAnimations))
 		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
-	}
-
-	run() {
-		const currentState = this.currentState
-		switch (currentState) {
-			case this.states.get(DIRECTION_ENUM.TOP):
-				this.switch()
-				break
-			case this.states.get(DIRECTION_ENUM.BOTTOM):
-				this.switch()
-				break
-			case  this.states.get(DIRECTION_ENUM.LEFT):
-				this.switch()
-				break
-			case this.states.get(DIRECTION_ENUM.RIGHT):
-				this.switch()
-				break
-			default:
-				this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
-				break
-		}
-	}
-
-	switch(){
-		if (this.params.get(PARAMS_NAME.DIRECTION).value === 0) {
-			this.currentState = this.states.get(DIRECTION_ENUM.TOP)
-		} else if (this.params.get(PARAMS_NAME.DIRECTION).value=== 1) {
-			this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
-		} else if (this.params.get(PARAMS_NAME.DIRECTION).value=== 1) {
-			this.currentState = this.states.get(DIRECTION_ENUM.LEFT)
-		} else if (this.params.get(PARAMS_NAME.DIRECTION).value=== 1) {
-			this.currentState = this.states.get(DIRECTION_ENUM.RIGHT)
-		}
-	}
-
-	render(){
-		this.currentState.render()
 	}
 }

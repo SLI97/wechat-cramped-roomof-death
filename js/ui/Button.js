@@ -1,6 +1,8 @@
 import Sprite from '../base/Sprite'
 import EventManager from '../runtime/EventManager'
-import {EVENT_ENUM} from '../enums/index'
+import {
+	EVENT_ENUM
+} from '../enums/index'
 import CanvasManager from '../runtime/CanvasManager'
 
 const IMG_PREFIX = 'images/ctrl/ctrl'
@@ -28,6 +30,9 @@ export default class Button extends Sprite {
 	}
 
 	render() {
+		if (!this.img) {
+			return
+		}
 		CanvasManager.Ctx.drawImage(
 			this.img,
 			this.position.startX,

@@ -4,6 +4,7 @@ import {
   TILE_TYPE_ENUM
 } from '../enums/index'
 import CanvasManager from '../runtime/CanvasManager'
+import DataManager from '../runtime/DataManager'
 
 
 const BG_WIDTH = 32
@@ -39,10 +40,14 @@ export default class Tile extends Sprite {
   }
 
   render() {
-	  CanvasManager.Ctx.drawImage(
+    const offset = DataManager.Instance.getOffset()
+    if (!this.img) {
+      return
+    }
+    CanvasManager.Ctx.drawImage(
       this.img,
-      this.x,
-      this.y,
+      (this.x * 32) + offset.width,
+      (this.y * 32) + offset.height,
       BG_WIDTH,
       BG_HEIGHT
     )

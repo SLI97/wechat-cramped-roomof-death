@@ -1,7 +1,7 @@
 import Sprite from '../base/Sprite'
 import CanvasManager from '../runtime/CanvasManager'
 import EventManager from '../runtime/EventManager'
-import {EVENT_ENUM} from '../enums'
+import {EVENT_ENUM} from '../enums/index'
 
 const IMG_PREFIX = 'images/ctrl/ctrl'
 const CTRL_WIDTH = 48

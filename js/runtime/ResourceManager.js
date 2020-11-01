@@ -11,7 +11,22 @@ const IMG_TURN_PREFIX = 'images/turn/turn'
 const IMG_TURN_COUNT = 24
 
 const IMG_CTRL_PREFIX = 'images/ctrl/ctrl'
-const IMG_CTRL_COUNT = 24
+const IMG_CTRL_COUNT = 6
+
+const IMG_BLOCKTURN_PREFIX = 'images/blockturn/blockturn'
+const IMG_BLOCKTURN_COUNT = 32
+
+const IMG_BLOCKSIDE_PREFIX = 'images/blockside/blockside'
+const IMG_BLOCKSIDE_COUNT = 32
+
+const IMG_BLOCKFACE_PREFIX = 'images/blockface/blockface'
+const IMG_BLOCKFACE_COUNT = 32
+
+const IMG_IRONSKELETON_PREFIX = 'images/ironskeleton/ironskeleton'
+const IMG_IRONSKELETOE_COUNT = 72
+
+const IMG_ATTACK_PREFIX = 'images/attack/attack'
+const IMG_ATTACK_COUNT = 32
 
 export default class ResourceManager extends Singleton {
 
@@ -21,7 +36,7 @@ export default class ResourceManager extends Singleton {
 
 	constructor() {
 		super()
-	// 	this.init()
+		// 	this.init()
 	}
 
 	load() {
@@ -29,9 +44,16 @@ export default class ResourceManager extends Singleton {
 			this.imgMap = new Map()
 			const bg = this.loadBgImage()
 			const idle = this.loadIDLEImage()
+			const attack = this.loadAttackImage()
 			const turn = this.loadTurnImage()
 			const ctrl = this.loadCtrlImage()
-			Promise.all([...bg, ...idle, ...turn, ...ctrl]).then(() => {
+			const blockturn = this.loadBlockTurnImage()
+			const blockside = this.loadBlockSideImage()
+			const blockface = this.loadBlockFaceImage()
+			const ironskeleton = this.loadIronSkeletonImage()
+			Promise.all(
+				[...bg, ...idle, ...attack, ...turn, ...ctrl, ...blockturn, ...blockside, ...blockface, ...ironskeleton]
+			).then(() => {
 				res()
 			})
 		})
@@ -70,13 +92,53 @@ export default class ResourceManager extends Singleton {
 		return promiseList
 	}
 
+	loadBlockTurnImage() {
+		const promiseList = []
+		for (let i = 0; i < IMG_BLOCKTURN_COUNT; i++) {
+			promiseList.push(this.loadImage(`${IMG_BLOCKTURN_PREFIX} (${i + 1}).png`))
+		}
+		return promiseList
+	}
+
+	loadBlockSideImage() {
+		const promiseList = []
+		for (let i = 0; i < IMG_BLOCKSIDE_COUNT; i++) {
+			promiseList.push(this.loadImage(`${IMG_BLOCKSIDE_PREFIX} (${i + 1}).png`))
+		}
+		return promiseList
+	}
+
+	loadBlockFaceImage() {
+		const promiseList = []
+		for (let i = 0; i < IMG_BLOCKFACE_COUNT; i++) {
+			promiseList.push(this.loadImage(`${IMG_BLOCKFACE_PREFIX} (${i + 1}).png`))
+		}
+		return promiseList
+	}
+
+	loadIronSkeletonImage() {
+		const promiseList = []
+		for (let i = 0; i < IMG_IRONSKELETOE_COUNT; i++) {
+			promiseList.push(this.loadImage(`${IMG_IRONSKELETON_PREFIX} (${i + 1}).png`))
+		}
+		return promiseList
+	}
+
+	loadAttackImage() {
+		const promiseList = []
+		for (let i = 0; i < IMG_ATTACK_COUNT; i++) {
+			promiseList.push(this.loadImage(`${IMG_ATTACK_PREFIX} (${i + 1}).png`))
+		}
+		return promiseList
+	}
+
 	loadImage(src) {
 		return new Promise((res, rej) => {
 			const image = wx.createImage()
 			image.src = src
 			image.onload = () => {
 				if (!this.imgMap.has(image.src)) {
-					this.imgMap.set(image.src, image)
+					this.imgMap.set(src, image)
 				}
 				res()
 			}

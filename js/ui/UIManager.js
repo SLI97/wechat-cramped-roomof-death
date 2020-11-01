@@ -24,12 +24,13 @@ export default class UIManager extends Singleton {
 		super()
 		this.oldFrame = 0
 		this.aniId = 0
+		this.init()
 	}
 
 	init() {
 		this.buttonList = []
 		this.uis = new Map()
-		this.uis.set(UI_ENUM.GAME_START, new StartButton())
+		// this.uis.set(UI_ENUM.GAME_START, new StartButton())
 		this.touchHandler = this.touchEventHandler.bind(this)
 		this.initButton()
 		this.unBind()
@@ -88,7 +89,7 @@ export default class UIManager extends Singleton {
 	}
 
 	get(type) {
-		return this.uis.get(type)
+		// return this.uis.get(type)
 	}
 
 	fadeIn() {
@@ -114,7 +115,7 @@ export default class UIManager extends Singleton {
 		}
 	}
 
-	fadeOutHandler(){
+	fadeOutHandler() {
 		const fadePercent = DataManager.Instance.frame - this.oldFrame / 100
 		CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${1- fadePercent})`

@@ -3,7 +3,7 @@ import Player from '../../player/Player'
 import CanvasManager from '../../runtime/CanvasManager'
 import BurstStateMachine from './Animator/BurstStateMachine'
 import EventManager from '../../runtime/EventManager'
-import {EVENT_ENUM} from '../../enums'
+import {EVENT_ENUM} from '../../enums/index'
 
 const BG_WIDTH = 32
 const BG_HEIGHT = 32

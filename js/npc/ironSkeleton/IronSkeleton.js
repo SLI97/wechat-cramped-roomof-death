@@ -1,22 +1,21 @@
 import Enemy from '../Enemy'
-import {DIRECTION_ENUM, PLAYER_STATE} from '../../enums'
 import IronSkeletonStateMachine from './Animator/IronSkeletonStateMachine'
 
 
-export default class IronSkeleton extends Enemy{
-	constructor(){
+export default class IronSkeleton extends Enemy {
+	constructor(type) {
 		super(null)
+		this.type = type
+		this.init()
 	}
 
 	init() {
-		this.x = 0
-		this.y = 0
-		this.direction = DIRECTION_ENUM.BOTTOM
-		this.state = PLAYER_STATE.IDLE
-		this.fsm = new IronSkeletonStateMachine()
+		super.init()
+		this.fsm = new IronSkeletonStateMachine(this)
 	}
 
-	render() {
-		this.fsm.render()
+	update() {
+		super.update()
+		this.fsm.update()
 	}
 }

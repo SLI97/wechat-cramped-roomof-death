@@ -1,6 +1,6 @@
-import State from '../../../../base/State'
-import CanvasManager from '../../../../runtime/CanvasManager'
-import {PLAYER_STATE} from '../../../../enums/index'
+import State from '../../../base/State'
+import CanvasManager from '../../../runtime/CanvasManager'
+import {PLAYER_STATE} from '../../../enums/index'
 
 /***
  * 如果四个方向的state没有太大差异可以提取一个父级state

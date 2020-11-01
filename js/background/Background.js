@@ -44,11 +44,11 @@ export default class Background extends Singleton {
 				}
 
 				const imgSrc = `${IMG_PREFIX} (${number}).png`
-				const x = i * BG_WIDTH + offset.width
-				const y = j * BG_HEIGHT + offset.height
+				// const x = i * BG_WIDTH + offset.width
+				// const y = j * BG_HEIGHT + offset.height
 				const type = item.type
 
-				const tile = new Tile(type, imgSrc, x, y)
+				const tile = new Tile(type, imgSrc, i, j)
 				this.tileMap[i][j] = tile
 			}
 		}

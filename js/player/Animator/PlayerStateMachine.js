@@ -1,12 +1,16 @@
 import StateMachine from '../../base/StateMachine'
-import {PARAMS_NAME, FSM_PARAM_TYPE_ENUM} from '../../enums/index'
+import {
+	FSM_PARAM_TYPE_ENUM
+} from '../../enums/index'
 import IdleSubStateMachine from './IdleSubStateMachine'
 import AttackSubStateMachine from './AttackSubStateMachine'
 import TurnLeftSubStateMachine from './TurnLeftSubStateMachine'
 import TurnRightSubStateMachine from './TurnRightSubStateMachine'
+import BlockFrontSubStateMachine from './BlockFrontSubStateMachine'
+import BlockBackSubStateMachine from './BlockBackSubStateMachine'
+import BlockLeftSubStateMachine from './BlockLeftSubStateMachine'
 import BlockRightSubStateMachine from './BlockRightSubStateMachine'
 import DeathSubStateMachine from './DeathSubStateMachine'
-import BlockLeftSubStateMachine from './BlockLeftSubStateMachine'
 import BlockTurnLeftSubStateMachine from './BlockTurnLeftSubStateMachine'
 import BlockTurnRightSubStateMachine from './BlockTurnRightSubStateMachine'
 
@@ -95,21 +99,29 @@ export default class PlayerStateMachine extends StateMachine {
 
 		this.params.set(PARAMS_NAME.DIRECTION, {
 			type: FSM_PARAM_TYPE_ENUM.NUMBER,
-			value: 1
+			value: 0
 		})
 	}
 
 	initState() {
 		this.states.set(PARAMS_NAME.IDLE, new IdleSubStateMachine(this.owner, this))
 		this.states.set(PARAMS_NAME.ATTACK, new AttackSubStateMachine(this.owner, this))
-		this.states.set(PARAMS_NAME.TURNRIGHT, new TurnLeftSubStateMachine(this.owner, this))
-		this.states.set(PARAMS_NAME.TURNLEFT, new TurnRightSubStateMachine(this.owner, this))
+		this.states.set(PARAMS_NAME.TURNLEFT, new TurnLeftSubStateMachine(this.owner, this))
+		this.states.set(PARAMS_NAME.TURNRIGHT, new TurnRightSubStateMachine(this.owner, this))
+		this.states.set(PARAMS_NAME.BLOCKFRONT, new BlockFrontSubStateMachine(this.owner, this))
+		this.states.set(PARAMS_NAME.BLOCKBACK, new BlockBackSubStateMachine(this.owner, this))
 		this.states.set(PARAMS_NAME.BLOCKLEFT, new BlockLeftSubStateMachine(this.owner, this))
 		this.states.set(PARAMS_NAME.BLOCKRIGHT, new BlockRightSubStateMachine(this.owner, this))
 		this.states.set(PARAMS_NAME.BLOCKTURNLEFT, new BlockTurnLeftSubStateMachine(this.owner, this))
 		this.states.set(PARAMS_NAME.BLOCKTURNRIGHT, new BlockTurnRightSubStateMachine(this.owner, this))
-		this.states.set(PARAMS_NAME.DEATH, new DeathSubStateMachine(this.owner, this))
+		// this.states.set(PARAMS_NAME.DEATH, new DeathSubStateMachine(this.owner, this))
 		this.currentState = this.states.get(PARAMS_NAME.IDLE)
+	}
+
+	render() {
+		if (this.currentState) {
+			this.currentState.render()
+		}
 	}
 
 	run() {
@@ -121,42 +133,62 @@ export default class PlayerStateMachine extends StateMachine {
 			case this.states.get(PARAMS_NAME.ATTACK):
 				this.switch()
 				break
-			case  this.states.get(PARAMS_NAME.TURNLEFT):
+			case this.states.get(PARAMS_NAME.TURNLEFT):
 				this.switch()
 				break
 			case this.states.get(PARAMS_NAME.TURNRIGHT):
 				this.switch()
 				break
-			case this.states.get(PARAMS_NAME.BLOCK):
+			case this.states.get(PARAMS_NAME.BLOCKTURNLEFT):
 				this.switch()
 				break
-			case  this.states.get(PARAMS_NAME.DEATH):
+			case this.states.get(PARAMS_NAME.BLOCKTURNRIGHT):
+				this.switch()
+				break
+			case this.states.get(PARAMS_NAME.BLOCKFRONT):
+				this.switch()
+				break
+			case this.states.get(PARAMS_NAME.BLOCKBACK):
+				this.switch()
+				break
+			case this.states.get(PARAMS_NAME.BLOCKLEFT):
+				this.switch()
+				break
+			case this.states.get(PARAMS_NAME.BLOCKRIGHT):
+				this.switch()
+				break
+			case this.states.get(PARAMS_NAME.DEATH):
 				this.switch()
 				break
 			default:
 				this.currentState = this.states.get(PARAMS_NAME.IDLE)
 				break
 		}
+		this.currentState.run()
 		this.resetTrigger()
 	}
 
-	render() {
-		this.currentState.render()
-	}
-
-	switch() {
-		if (this.params.get(PARAMS_NAME.ATTACK).value) {
-			this.currentState = this.states.get(PARAMS_NAME.ATTACK)
-		} else if (this.params.get(PARAMS_NAME.BLOCK).value) {
-			this.currentState = this.states.get(PARAMS_NAME.BLOCK)
-		} else if (this.params.get(PARAMS_NAME.DEATH).value) {
-			this.currentState = this.states.get(PARAMS_NAME.DEATH)
-		} else if (this.params.get(PARAMS_NAME.TURNLEFT).value) {
+	switch () {
+		if (this.params.get(PARAMS_NAME.TURNLEFT).value) {
 			this.currentState = this.states.get(PARAMS_NAME.TURNLEFT)
 		} else if (this.params.get(PARAMS_NAME.TURNRIGHT).value) {
 			this.currentState = this.states.get(PARAMS_NAME.TURNRIGHT)
 		} else if (this.params.get(PARAMS_NAME.IDLE).value) {
 			this.currentState = this.states.get(PARAMS_NAME.IDLE)
+		} else if (this.params.get(PARAMS_NAME.BLOCKFRONT).value) {
+			this.currentState = this.states.get(PARAMS_NAME.BLOCKFRONT)
+		} else if (this.params.get(PARAMS_NAME.BLOCKBACK).value) {
+			this.currentState = this.states.get(PARAMS_NAME.BLOCKBACK)
+		} else if (this.params.get(PARAMS_NAME.BLOCKLEFT).value) {
+			this.currentState = this.states.get(PARAMS_NAME.BLOCKLEFT)
+		} else if (this.params.get(PARAMS_NAME.BLOCKRIGHT).value) {
+			this.currentState = this.states.get(PARAMS_NAME.BLOCKRIGHT)
+		} else if (this.params.get(PARAMS_NAME.BLOCKTURNLEFT).value) {
+			this.currentState = this.states.get(PARAMS_NAME.BLOCKTURNLEFT)
+		} else if (this.params.get(PARAMS_NAME.BLOCKTURNRIGHT).value) {
+			this.currentState = this.states.get(PARAMS_NAME.BLOCKTURNRIGHT)
+		} else if (this.params.get(PARAMS_NAME.ATTACK).value) {
+			this.currentState = this.states.get(PARAMS_NAME.ATTACK)
 		}
 	}
 }

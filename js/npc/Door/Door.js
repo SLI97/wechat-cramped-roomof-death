@@ -1,7 +1,7 @@
 import Sprite from '../../base/Sprite'
 import DoorStateMachine, {PARAMS_NAME} from './Animator/DoorStateMachine'
 import EventManager from '../../runtime/EventManager'
-import {EVENT_ENUM} from '../../enums'
+import {EVENT_ENUM} from '../../enums/index'
 
 const BG_WIDTH = 32
 const BG_HEIGHT = 32

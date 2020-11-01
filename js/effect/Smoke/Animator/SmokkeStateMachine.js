@@ -9,7 +9,7 @@ const PARAMS_NAME = {
 }
 
 
-export default class DoorStateMachine extends StateMachine {
+export default class SmokeStateMachine extends StateMachine {
 	constructor(owner) {
 		super()
 		this.owner = owner

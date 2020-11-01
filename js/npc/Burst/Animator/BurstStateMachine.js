@@ -1,4 +1,4 @@
-import StateMachine from '../../base/StateMachine'
+import StateMachine from '../../../base/StateMachine'
 import {DIRECTION_ENUM, FSM_PARAM_TYPE_ENUM} from '../../../enums/index'
 import BurstState from './BurstState'
 

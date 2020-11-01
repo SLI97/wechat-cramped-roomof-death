@@ -1,7 +1,7 @@
 import Sprite from '../../base/Sprite'
 import Player from '../../player/Player'
 import CanvasManager from '../../runtime/CanvasManager'
-import {ENEMY_TYPE_ENUM, EVENT_ENUM, PLAYER_STATE} from '../../enums'
+import {ENEMY_TYPE_ENUM, EVENT_ENUM, PLAYER_STATE} from '../../enums/index'
 import EventManager from '../../runtime/EventManager'
 import PlayerStateMachine from '../../player/Animator/PlayerStateMachine'
 import SpikesStateMachine from './Animator/SpikesStateMachine'

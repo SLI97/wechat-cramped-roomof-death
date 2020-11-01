@@ -1,4 +1,4 @@
-import {DIRECTION_ENUM, EVENT_ENUM, PLAYER_STATE} from '../../enums'
+import {DIRECTION_ENUM, EVENT_ENUM, PLAYER_STATE} from '../../enums/index'
 import DataManager from '../../runtime/DataManager'
 import Enemy from '../Enemy'
 import EventManager from '../../runtime/EventManager'

@@ -20,6 +20,7 @@ export default class SceneManager extends Singleton {
 	updateScene() {
 		if (this.scene && !this.begin) {
 			this.scene.beginScene()
+			this.begin = true
 		}
 
 		if(this.scene){

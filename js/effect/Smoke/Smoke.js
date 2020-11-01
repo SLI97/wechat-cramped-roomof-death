@@ -15,9 +15,6 @@ export default class Smoke extends Sprite {
 	}
 
 	update() {
-		//TODO
-		//当所有敌人都消灭的时候，门停止渲染
-		this.visible = false
 	}
 
 	show(){

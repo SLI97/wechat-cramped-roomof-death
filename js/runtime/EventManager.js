@@ -13,7 +13,8 @@ export default class EventManager extends Singleton {
 
 	on(event, action) {
 		if (this.eventDic.has(event)) {
-			this.eventDic[event].push(action)
+		
+			this.eventDic.get(event).push(action)
 		} else {
 
 			this.eventDic.set(event,[action])
@@ -22,8 +23,8 @@ export default class EventManager extends Singleton {
 
 	off(event, action) {
 		if (this.eventDic.has(event)) {
-			const index = this.eventDic[event].findIndex(i => action === i)
-			index > -1 && this.eventDic[event].splice()
+			const index = this.eventDic.get(event).findIndex(i => action === i)
+			index > -1 && this.eventDic.get(event).splice()
 		}
 	}
 
