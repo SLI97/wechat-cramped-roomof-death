@@ -1,6 +1,8 @@
+/***
+ * 场景接口类
+ */
 export default class Scene {
 	sceneName = ''
-
 	sceneManager = null
 
 	constructor(sceneManager) {

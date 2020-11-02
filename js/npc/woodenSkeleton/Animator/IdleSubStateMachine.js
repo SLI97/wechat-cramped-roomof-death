@@ -1,31 +1,40 @@
-import SubStateMachine from '../../base/SubStateMachine'
-import {PLAYER_STATE} from '../../enums/index'
 import IdleTopState from './Idle/IdleTopState'
 import IdleBottomState from './Idle/IdleBottomState'
 import IdleLeftState from './Idle/IdleLeftState'
 import IdleRightState from './Idle/IdleRightState'
+import DirectionStateMachine from '../../../base/DirectionStateMachine'
 
-import {DIRECTION_ENUM} from '../../enums/index'
+const IMG_WOODENSKELETON_PREFIX = 'images/woodenskeleton/woodenskeleton'
 
-export default class IdleSubStateMachine extends SubStateMachine {
+export default class IdleSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.init()
+		this.topClass = IdleTopState
+		this.bottomClass = IdleBottomState
+		this.leftClass = IdleLeftState
+		this.rightClass = IdleRightState
 	}
 
-	init() {
-		this.initState()
-	}
+	initAnimations() {
+		this.topAnimations = []
+		this.bottomAnimations = []
+		this.leftAnimations = []
+		this.rightAnimations = []
 
-	initState() {
-		this.states.set(DIRECTION_ENUM.TOP, new IdleTopState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.BOTTOM, new IdleBottomState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.LEFT, new IdleLeftState(this.owner, this, []))
-		this.states.set(PLAYER_STATE.RIGHT, new IdleRightState(this.owner, this, []))
-		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
-	}
+		for (let i = 13; i <= 16; i++) {
+			this.topAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
+		}
 
-	render() {
-		this.currentState.render()
+		for (let i = 1; i <= 4; i++) {
+			this.bottomAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
+		}
+
+		for (let i = 9; i <= 12; i++) {
+			this.leftAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
+		}
+
+		for (let i = 5; i <= 8; i++) {
+			this.rightAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
+		}
 	}
 }

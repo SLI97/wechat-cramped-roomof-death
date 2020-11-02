@@ -52,7 +52,9 @@ export default class WoodenSkeletonStateMachine extends StateMachine {
 		this.currentState = this.states.get(PLAYER_STATE.IDLE)
 	}
 
-	run() {
+	update() {
+		super.update()
+
 		const currentState = this.currentState
 		switch (currentState) {
 			case this.states.get(PLAYER_STATE.IDLE):
@@ -73,10 +75,5 @@ export default class WoodenSkeletonStateMachine extends StateMachine {
 				this.currentState = this.states.get(PLAYER_STATE.IDLE)
 				break
 		}
-		this.resetTrigger()
-	}
-
-	render() {
-		this.currentState.render()
 	}
 }

@@ -3,7 +3,6 @@ import SmokeTopState from './Smoke/SmokeTopState'
 import SmokeBottomState from './Smoke/SmokeBottomState'
 import SmokeLeftState from './Smoke/SmokeLeftState'
 import SmokeRightState from './Smoke/SmokeRightState'
-import ResourceManager from '../../../runtime/ResourceManager'
 
 import {
   PLAYER_STATE,
@@ -29,7 +28,6 @@ export default class SmokeSubStateMachine extends DirectionStateMachine {
     this.smokeLeftAnimations = []
     this.smokeRightAnimations = []
 
-    const imageMap = ResourceManager.Instance.getImageMap()
     for (let i = 25; i <= 36; i++) {
       this.smokeTopAnimations.push(imageMap.get(`${IMG_SMOKE_PREFIX} (${i }).png`))
     }

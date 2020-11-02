@@ -4,14 +4,11 @@ const poolDic =  Symbol('poolDic')
 
 
 /**
- * 简易的对象池实现
- * 用于对象的存贮和重复使用
- * 可以有效减少对象创建开销和避免频繁的垃圾回收
- * 提高游戏性能
+ * 对象池管理类
  */
-export default class Pool extends Singleton{
+export default class PoolManager extends Singleton{
 	static get Instance() {
-		return super.GetInstance(Pool)
+		return super.GetInstance(PoolManager)
 	}
 
   constructor() {

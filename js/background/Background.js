@@ -2,10 +2,6 @@ import DataManager from '../runtime/DataManager'
 import Tile from './Tile'
 import Singleton from '../base/Singleton'
 
-
-const BG_WIDTH = 32
-const BG_HEIGHT = 32
-
 const IMG_PREFIX = 'images/bg/bg'
 
 export default class Background extends Singleton {
@@ -22,7 +18,6 @@ export default class Background extends Singleton {
 	initTile() {
 		this.tileMap = []
 		const mapInfo = DataManager.Instance.getMapInfo()
-		const offset = DataManager.Instance.getOffset()
 
 		for (let i = 0; i < mapInfo.length; i++) {
 			const colum = mapInfo[i]
@@ -44,8 +39,6 @@ export default class Background extends Singleton {
 				}
 
 				const imgSrc = `${IMG_PREFIX} (${number}).png`
-				// const x = i * BG_WIDTH + offset.width
-				// const y = j * BG_HEIGHT + offset.height
 				const type = item.type
 
 				const tile = new Tile(type, imgSrc, i, j)

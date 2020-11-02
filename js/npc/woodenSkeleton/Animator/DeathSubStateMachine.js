@@ -1,30 +1,40 @@
-import SubStateMachine from '../../../base/SubStateMachine'
-import {PLAYER_STATE,DIRECTION_ENUM} from '../../../enums/index'
-
 import DeathTopState from './Death/DeathTopState'
 import DeathBottomState from './Death/DeathBottomState'
 import DeathLeftState from './Death/DeathLeftState'
 import DeathRightState from './Death/DeathRightState'
+import DirectionStateMachine from '../../../base/DirectionStateMachine'
 
-export default class DeathSubStateMachine extends SubStateMachine {
+const IMG_WOODENSKELETON_PREFIX = 'images/woodenskeleton/woodenskeleton'
+
+export default class DeathSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.init()
+		this.topClass = DeathTopState
+		this.bottomClass = DeathBottomState
+		this.leftClass = DeathLeftState
+		this.rightClass = DeathRightState
 	}
 
-	init() {
-		this.initState()
-	}
+	initAnimations() {
+		this.topAnimations = []
+		this.bottomAnimations = []
+		this.leftAnimations = []
+		this.rightAnimations = []
 
-	initState() {
-		this.states.set(DIRECTION_ENUM.TOP, new DeathTopState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.BOTTOM, new DeathBottomState(this.owner, this, []))
-		this.states.set(DIRECTION_ENUM.LEFT, new DeathLeftState(this.owner, this, []))
-		this.states.set(PLAYER_STATE.RIGHT, new DeathRightState(this.owner, this, []))
-		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
-	}
+		for (let i = 13; i <= 16; i++) {
+			this.topAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
+		}
 
-	render() {
-		this.currentState.render()
+		for (let i = 1; i <= 4; i++) {
+			this.bottomAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
+		}
+
+		for (let i = 9; i <= 12; i++) {
+			this.leftAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
+		}
+
+		for (let i = 5; i <= 8; i++) {
+			this.rightAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
+		}
 	}
 }

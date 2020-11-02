@@ -33,11 +33,10 @@ export default class StateMachine {
 	}
 
 	update() {
-		this.run()
-	}
-
-	run() {
-
+		if (this.currentState) {
+			this.currentState.update()
+			this.resetTrigger()
+		}
 	}
 
 	render() {
@@ -48,9 +47,7 @@ export default class StateMachine {
 
 	stop() {
 		for (const [key, value] of this.states) {
-			// if (value instanceof State) {
 				value.stop()
-			// }
 		}
 	}
 

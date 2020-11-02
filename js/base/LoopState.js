@@ -2,24 +2,15 @@ import State from './State'
 import CanvasManager from '../runtime/CanvasManager'
 import DataManager from '../runtime/DataManager'
 
-import {
-	PLAYER_STATE
-} from '../enums/index'
-
 /***
  * 如果四个方向的state没有太大差异可以提取一个父级state
  * 这样每个具体方向的state可以自定义动画事件（实现event方法），具有更高的自主性
  */
-export default class NextIsIdleState extends State {
+export default class LoopState extends State {
 	constructor(owner, fsm, animations) {
-		super(animations, false)
+		super(animations, true)
 		this.owner = owner
 		this.fsm = fsm
-		this.init()
-	}
-
-	init() {
-		// this.isLoop = false
 	}
 
 	render() {
@@ -40,10 +31,5 @@ export default class NextIsIdleState extends State {
 				height
 			)
 		}
-	}
-
-	callback() {
-		// this.fsm.currentState = this.fsm.states.get(PLAYER_STATE.IDLE)
-		this.owner.state = PLAYER_STATE.IDLE
 	}
 }

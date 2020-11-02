@@ -4,13 +4,13 @@ import Player from '../player/Player'
 import Background from '../background/Background'
 import CanvasManager from '../runtime/CanvasManager'
 import ResourceManager from '../runtime/ResourceManager'
-import Enemy from '../npc/Enemy'
+import Enemy from '../base/Enemy'
 import WoodenSkeleton from '../npc/woodenSkeleton/WoodenSkeleton'
 import EventManager from '../runtime/EventManager'
 import {
 	ENEMY_TYPE_ENUM,
 	EVENT_ENUM,
-	PLAYER_STATE
+	PLAYER_STATE, UI_ENUM
 } from '../enums/index'
 import MainMenuScene from './MainMenuScene'
 import UIManager from '../ui/UIManager'
@@ -31,6 +31,9 @@ const BG_COLOR = '#140B28'
 const BG_WIDTH = 32
 const BG_HEIGHT = 32
 
+/***
+ * 游戏主场景类，游戏整体逻辑都在这里实现
+ */
 export default class BattleScene extends Scene {
 	constructor(sceneManager) {
 		super(sceneManager)
@@ -55,32 +58,41 @@ export default class BattleScene extends Scene {
 		EventManager.Instance.on(EVENT_ENUM.NEXT_LEVEL, this.nextLevelHandler)
 		EventManager.Instance.on(EVENT_ENUM.ATTACK_ENEMY, this.attackEnemyHandler)
 		EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.attackPlayerHandler)
+		this.onBindUI()
 
-		ResourceManager.Instance.load().then(() => {
-			DataManager.Instance.reset()
-			this.initLevel()
-			this.calcOffset()
-			// this.sceneManager.setScene(new MainMenuScene())
-			this.isLoaded = true
-			this.useFade = false
-			canvas.addEventListener('touchstart', () => {
-				// UIManager.Instance.fadeIn()
-				this.useFade = true
-				this.oldFrame = DataManager.Instance.frame
-				setTimeout(() => {
-					this.useFade = false
-				}, 100000)
-			})
-		})
-
+		DataManager.Instance.reset()
+		this.initLevel()
+		this.calcOffset()
+		this.isLoaded = true
+		// this.useFade = false
+		// canvas.addEventListener('touchstart', () => {
+		// 	// UIManager.Instance.fadeIn()
+		// 	this.useFade = true
+		// 	this.oldFrame = DataManager.Instance.frame
+		// 	setTimeout(() => {
+		// 		this.useFade = false
+		// 	}, 100000)
+		// })
 	}
 
 	updateScene() {
-		// this.checkEnemyAttackPlayer()
+		if(!this.isLoaded){
+			return
+		}
 
+		this.update()
+		this.render()
+	}
+
+	endScene(){
+		this.unBindUI()
+	}
+
+	update(){
 		if (DataManager.Instance.player) {
 			DataManager.Instance.player.update()
 		}
+
 		if (DataManager.Instance.enemies instanceof Array && DataManager.Instance.enemies.length) {
 			DataManager.Instance.enemies.forEach(enemy => {
 				enemy.update()
@@ -92,14 +104,9 @@ export default class BattleScene extends Scene {
 				smoke.update()
 			})
 		}
-
-		this.render()
 	}
 
 	render() {
-		if (!this.isLoaded) {
-			return
-		}
 		CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		CanvasManager.Ctx.fillStyle = BG_COLOR
 		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -114,17 +121,18 @@ export default class BattleScene extends Scene {
 		})
 
 		DataManager.Instance.player.render()
+
 		UIManager.Instance.render()
 
 
-		if (this.useFade) {
-			console.log(999)
-			// UIManager.Instance.fadeIn()
-			const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 1000
-			CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-			CanvasManager.Ctx.fillStyle = `rgba(255, 255, 0,${ fadePercent})`
-
-			CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+		// if (this.useFade) {
+		// 	console.log(999)
+		// 	// UIManager.Instance.fadeIn()
+		// 	const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 1000
+		// 	CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+		// 	CanvasManager.Ctx.fillStyle = `rgba(255, 255, 0,${ fadePercent})`
+		//
+		// 	CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 			// console.log(fadePercent, 1)
 			// if (fadePercent > 1) {
 			// 	window.cancelAnimationFrame(this.aniId)
@@ -132,8 +140,9 @@ export default class BattleScene extends Scene {
 			// } else {
 			// 	this.aniId = window.requestAnimationFrame(this.fadeInHandler.bind(this), canvas)
 			// }
-		}
+		// }
 	}
+
 
 	restart() {
 		DataManager.Instance.reset()
@@ -185,7 +194,7 @@ export default class BattleScene extends Scene {
 			if (item.type === ENEMY_TYPE_ENUM.SKELETON_WOODEN) {
 				enemy = new WoodenSkeleton()
 			} else if (item.type === ENEMY_TYPE_ENUM.SKELETON_IRON) {
-				enemy = new IronSkeleton(ENEMY_TYPE_ENUM.SKELETON_IRON)
+				enemy = new IronSkeleton()
 			} else {
 				return null
 			}
@@ -273,6 +282,24 @@ export default class BattleScene extends Scene {
 			DataManager.Instance.bursts = item.bursts
 			DataManager.Instance.door = item.door
 		}
+	}
+
+	onBindUI(){
+		UIManager.Instance.get(UI_ENUM.CTRL_TOP).onShow()
+		UIManager.Instance.get(UI_ENUM.CTRL_BOTTOM).onShow()
+		UIManager.Instance.get(UI_ENUM.CTRL_LEFT).onShow()
+		UIManager.Instance.get(UI_ENUM.CTRL_RIGHT).onShow()
+		UIManager.Instance.get(UI_ENUM.CTRL_TURN_LEFT).onShow()
+		UIManager.Instance.get(UI_ENUM.CTRL_TURN_RIGHT).onShow()
+	}
+
+	unBindUI(){
+		UIManager.Instance.get(UI_ENUM.CTRL_TOP).onHide()
+		UIManager.Instance.get(UI_ENUM.CTRL_BOTTOM).onHide()
+		UIManager.Instance.get(UI_ENUM.CTRL_LEFT).onHide()
+		UIManager.Instance.get(UI_ENUM.CTRL_RIGHT).onHide()
+		UIManager.Instance.get(UI_ENUM.CTRL_TURN_LEFT).onHide()
+		UIManager.Instance.get(UI_ENUM.CTRL_TURN_RIGHT).onHide()
 	}
 
 	openDoorOrNot() {

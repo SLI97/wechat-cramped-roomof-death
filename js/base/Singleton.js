@@ -1,3 +1,6 @@
+/***
+ * 单例模式接口
+ */
 export default class Singleton {
 	static _instance
 

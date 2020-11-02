@@ -25,13 +25,18 @@ const IMG_BLOCKFACE_COUNT = 32
 const IMG_IRONSKELETON_PREFIX = 'images/ironskeleton/ironskeleton'
 const IMG_IRONSKELETOE_COUNT = 72
 
+const IMG_WOODENSKELETOE_PREFIX = 'images/woodenskeleton/woodenskeleton'
+const IMG_WOODENSKELETOE_COUNT = 104
+
 const IMG_ATTACK_PREFIX = 'images/attack/attack'
 const IMG_ATTACK_COUNT = 32
 
 const IMG_SMOKE_PREFIX = 'images/smoke/smoke'
 const IMG_SMOKE_COUNT = 48
 
-
+/***
+ * 资源管理类，主要负责加载图片的加载（监听img的onload事件全部执行）
+ */
 export default class ResourceManager extends Singleton {
 
 	static get Instance() {
@@ -55,9 +60,22 @@ export default class ResourceManager extends Singleton {
 			const blockside = this.loadBlockSideImage()
 			const blockface = this.loadBlockFaceImage()
 			const ironskeleton = this.loadIronSkeletonImage()
+			const woodenskeleton = this.loadWoodenSkeletonImage()
 			const smoke = this.loadSmokeImage()
 			Promise.all(
-				[...bg, ...idle, ...attack, ...turn, ...ctrl, ...blockturn, ...blockside, ...blockface, ...ironskeleton,...smoke]
+				[
+					...bg,
+					...idle,
+					...attack,
+					...turn,
+					...ctrl,
+					...blockturn,
+					...blockside,
+					...blockface,
+					...ironskeleton,
+					...woodenskeleton,
+					...smoke
+				]
 			).then(() => {
 				res()
 			})
@@ -125,6 +143,14 @@ export default class ResourceManager extends Singleton {
 		const promiseList = []
 		for (let i = 0; i < IMG_IRONSKELETOE_COUNT; i++) {
 			promiseList.push(this.loadImage(`${IMG_IRONSKELETON_PREFIX} (${i + 1}).png`))
+		}
+		return promiseList
+	}
+
+	loadWoodenSkeletonImage() {
+		const promiseList = []
+		for (let i = 0; i < IMG_WOODENSKELETOE_COUNT; i++) {
+			promiseList.push(this.loadImage(`${IMG_WOODENSKELETOE_PREFIX} (${i + 1}).png`))
 		}
 		return promiseList
 	}

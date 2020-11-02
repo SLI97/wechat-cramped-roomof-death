@@ -3,8 +3,11 @@ import EventManager from '../runtime/EventManager'
 import {EVENT_ENUM, UI_ENUM} from '../enums/index'
 import BattleScene from './BattleScene'
 import UIManager from '../ui/UIManager'
+import MusicManager from '../runtime/MusicManager'
 
-
+/***
+ * 主菜单场景类，显示游戏开始按钮
+ */
 export default class MainMenuScene extends Scene {
 	constructor(sceneManager) {
 		super(sceneManager)
@@ -13,19 +16,22 @@ export default class MainMenuScene extends Scene {
 	}
 
 	beginScene() {
-		this.button = UIManager.Instance.get(UI_ENUM.GAME_START)
+		MusicManager.Instance.play()
 		EventManager.Instance.on(EVENT_ENUM.GAME_START, this.startGameHandler)
+		const button = UIManager.Instance.get(UI_ENUM.GAME_START)
+		button.onShow()
 	}
 
 	updateScene() {
-		// this.button.render()
-	}
-
-	startGame() {
-		this.sceneManager.setScene(new BattleScene())
 	}
 
 	endScene() {
 		EventManager.Instance.off(EVENT_ENUM.GAME_START, this.startGameHandler)
+		const button = UIManager.Instance.get(UI_ENUM.GAME_START)
+		button.onHide()
+	}
+
+	startGame() {
+		this.sceneManager.setScene(new BattleScene())
 	}
 }

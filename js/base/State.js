@@ -1,3 +1,6 @@
+import DataManager from '../runtime/DataManager'
+import CanvasManager from '../runtime/CanvasManager'
+
 /***
  * 使用es6的symbol模拟私有成员
  * @type {symbol}
@@ -24,7 +27,6 @@ export default class State {
 		this.isPlaying = true
 
 		if (this.interval > 0 && this.animations.length) {
-			// console.log("play!")
 			this[timer] = setInterval(
 				this.frameLoop.bind(this),
 				this.interval
@@ -32,7 +34,25 @@ export default class State {
 		}
 	}
 
-	render() {}
+	render() {
+		const image = this.animations[this.index]
+		const offset = DataManager.Instance.getOffset()
+		const {
+			x,
+			y,
+			width,
+			height,
+		} = this.owner
+		if (image) {
+			CanvasManager.Ctx.drawImage(
+				image,
+				(x * 32) + offset.width - 32 - 15,
+				(y * 32) + offset.height - 32 - 18,
+				width,
+				height
+			)
+		}
+	}
 
 	frameLoop() {
 		this.index++

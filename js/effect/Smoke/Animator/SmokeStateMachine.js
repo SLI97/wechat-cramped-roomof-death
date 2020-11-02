@@ -37,14 +37,13 @@ export default class SmokeStateMachine extends StateMachine {
 		this.currentState = this.states.get(SMOKE_STATE_ENUM.PLAY)
 	}
 
-	run() {
+	update() {
+		super.update()
 		const currentState = this.currentState
 		// switch (currentState) {
 		// 	default:
 		// 		this.currentState = this.states.get(SMOKE_STATE_ENUM.PLAY)
 		// 		break
 		// }
-		this.currentState.run()
-		this.resetTrigger()
 	}
 }

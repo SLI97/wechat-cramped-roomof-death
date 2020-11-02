@@ -1,48 +1,60 @@
 import Sprite from '../base/Sprite'
-import EventManager from '../runtime/EventManager'
-import {
-	EVENT_ENUM
-} from '../enums/index'
 import CanvasManager from '../runtime/CanvasManager'
 
-const IMG_PREFIX = 'images/ctrl/ctrl'
-const CTRL_WIDTH = 48
-const CTRL_HEIGHT = 48
 
-const screenWidth = window.innerWidth
-const screenHeight = window.innerHeight
 /***
- * 按钮类
+ * UI按钮类
  */
 export default class Button extends Sprite {
-	constructor(type, index) {
-		super(`${IMG_PREFIX} (${index}).png`)
-		this.type = type
-
-		const xAxis = Math.floor((index - 1) / 2)
-		const yAxis = (index - 1) % 2
-		this.position = {
-			startX: (screenWidth / 2) - (CTRL_WIDTH * 3 / 2) + xAxis * CTRL_WIDTH,
-			startY: screenHeight - (CTRL_HEIGHT * 2) - 40 + yAxis * CTRL_HEIGHT,
-			endX: (screenWidth / 2) - (CTRL_WIDTH * 3 / 2) + xAxis * CTRL_WIDTH + CTRL_WIDTH,
-			endY: screenHeight - (CTRL_HEIGHT * 2) - 40 + yAxis * CTRL_HEIGHT + CTRL_HEIGHT
-		}
+	constructor(img) {
+		super(img)
+		this.visible = false
+		this.touchHandler = this.touchEventHandler.bind(this)
 	}
 
 	render() {
-		if (!this.img) {
+		if (!this.img || !this.visible) {
 			return
 		}
+
+		const {startX, startY, width, height} = this.position
 		CanvasManager.Ctx.drawImage(
 			this.img,
-			this.position.startX,
-			this.position.startY,
-			CTRL_WIDTH,
-			CTRL_HEIGHT
+			startX,
+			startY,
+			width,
+			height
 		)
 	}
 
-	onClick() {
-		EventManager.Instance.emit(EVENT_ENUM.PLAYER_CTRL, this.type)
+	onShow() {
+		this.visible = true
+		this.onBind()
+	}
+
+	onHide() {
+		this.visible = false
+		this.unBind()
+	}
+
+	onBind() {
+		canvas.addEventListener('touchstart', this.touchHandler)
+	}
+
+	unBind() {
+		canvas.removeEventListener('touchstart', this.touchHandler)
+	}
+
+	touchEventHandler(e) {
+		e.preventDefault()
+
+		let x = e.touches[0].clientX
+		let y = e.touches[0].clientY
+
+		const {startX, startY, endX, endY} = this.position
+
+		if (x >= startX && x <= endX && y >= startY && y <= endY) {
+			this.onClick()
+		}
 	}
 }

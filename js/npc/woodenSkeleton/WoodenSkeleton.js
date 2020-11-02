@@ -1,19 +1,20 @@
 import {DIRECTION_ENUM, EVENT_ENUM, PLAYER_STATE} from '../../enums/index'
 import DataManager from '../../runtime/DataManager'
-import Enemy from '../Enemy'
+import Enemy from '../../base/Enemy'
 import EventManager from '../../runtime/EventManager'
+import WoodenSkeletonStateMachine from './Animator/WoodenSkeletonStateMachine'
 
+/***
+ * 木头帽子敌人类
+ */
 export default class WoodenSkeleton extends Enemy {
 	constructor() {
 		super(null)
 	}
 
 	init() {
-		this.x = 0
-		this.y = 0
-		this.direction = DIRECTION_ENUM.BOTTOM
-		this.state = PLAYER_STATE.IDLE
-		this.fsm = new WoodenSkeletonAnimator()
+		super.init()
+		this.fsm = new WoodenSkeletonStateMachine(this)
 	}
 
 	update() {
@@ -22,17 +23,11 @@ export default class WoodenSkeleton extends Enemy {
 	}
 
 	checkAttack() {
-		const {x: playerX, y: playerY} = DataManager.Instance.player
-		if (playerX === this.x && Math.abs(playerY - this.y) <= 1) {
-			this.state = PLAYER_STATE.ATTACK
-			EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
-		} else if (playerY === this.x && Math.abs(playerX - this.y) <= 1) {
+		const {x: playerX, y: playerY, state: playerState} = DataManager.Instance.player
+		if (((playerX === this.x && Math.abs(playerY - this.y) <= 1) || (
+			playerY === this.x && Math.abs(playerX - this.y) <= 1)) && playerState === PLAYER_STATE.IDLE) {
 			this.state = PLAYER_STATE.ATTACK
 			EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
 		}
-	}
-
-	render() {
-		this.fsm.render()
 	}
 }

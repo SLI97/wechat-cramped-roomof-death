@@ -1,8 +1,10 @@
 import SubStateMachine from './SubStateMachine'
+import State from './State'
 import {
   DIRECTION_ENUM,
   DIRECTION_ORDER
 } from '../enums/index'
+import ResourceManager from '../runtime/ResourceManager'
 
 const PARAMS_NAME = {
   DIRECTION: 'DIRECTION'
@@ -11,9 +13,40 @@ const PARAMS_NAME = {
 export default class DirectionStateMachine extends SubStateMachine {
   constructor(owner, fsm) {
     super(owner, fsm)
+
+	  this.topAnimations = []
+	  this.bottomAnimations = []
+	  this.leftAnimations = []
+	  this.rightAnimations = []
+
+	  this.topClass = State
+	  this.bottomClass = State
+	  this.leftClass = State
+	  this.rightClass = State
+
+	  this.imageMap = ResourceManager.Instance.getImageMap()
+
+	  this.init()
   }
 
-  run() {
+	init() {
+		this.initAnimations()
+		this.initState()
+	}
+
+	initAnimations(){
+
+	}
+
+	initState() {
+		this.states.set(DIRECTION_ENUM.TOP, new this.topClass(this.owner, this.fsm, this.topAnimations))
+		this.states.set(DIRECTION_ENUM.BOTTOM, new this.bottomClass(this.owner, this.fsm, this.bottomAnimations))
+		this.states.set(DIRECTION_ENUM.LEFT, new this.leftClass(this.owner, this.fsm, this.leftAnimations))
+		this.states.set(DIRECTION_ENUM.RIGHT, new this.rightClass(this.owner, this.fsm, this.rightAnimations))
+		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
+	}
+
+	update() {
     const currentState = this.currentState
     switch (currentState) {
       case this.states.get(DIRECTION_ENUM.TOP):
@@ -48,12 +81,6 @@ export default class DirectionStateMachine extends SubStateMachine {
       this.currentState = this.states.get(DIRECTION_ENUM.LEFT)
     } else if (this.params.get(PARAMS_NAME.DIRECTION).value === 3) {
       this.currentState = this.states.get(DIRECTION_ENUM.RIGHT)
-    }
-  }
-
-  render() {
-    if (this.currentState) {
-      this.currentState.render()
     }
   }
 }

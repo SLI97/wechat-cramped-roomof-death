@@ -1,16 +1,14 @@
 import StateMachine from '../../../base/StateMachine'
-import {DIRECTION_ENUM, FSM_PARAM_TYPE_ENUM} from '../../../enums/index'
-import BurstState from './BurstState'
+import {FSM_PARAM_TYPE_ENUM, PLAYER_STATE} from '../../../enums/index'
+import IdleState from './IdleState'
+import Death from './DeathState'
+import ResourceManager from '../../../runtime/ResourceManager'
 
-export const PARAMS_NAME = {
-	INACTIVE:'INACTIVE',
+const PARAMS_NAME = {
+	DEATH: 'DEATH',
 }
 
-const BURST_STATE_ENUM = {
-	ACTIVE:'ACTIVE',
-	INACTIVE:'INACTIVE',
-}
-
+const IMG_DOOR_PREFIX = 123
 
 export default class BurstStateMachine extends StateMachine {
 	constructor(owner) {
@@ -21,36 +19,53 @@ export default class BurstStateMachine extends StateMachine {
 
 	init() {
 		this.initParams()
+		this.initAnimations()
 		this.initState()
 	}
 
 	initParams() {
-		this.params.set(PARAMS_NAME.INACTIVE, {
+		this.params.set(PARAMS_NAME.DEATH, {
 			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
 			value: false
 		})
 	}
 
 	initState() {
-		this.states.set(BURST_STATE_ENUM.INACTIVE, new BurstState(this.owner, this))
-		this.currentState = this.states.get(BURST_STATE_ENUM.INACTIVE)
+		this.states.set(PLAYER_STATE.DEATH, new IdleState(this.owner, this, this.idleAnimations))
+		this.states.set(PLAYER_STATE.DEATH, new Death(this.owner, this, this.deathAnimations))
+		this.currentState = this.states.get(PLAYER_STATE.IDLE)
 	}
 
-	run() {
+	initAnimations() {
+		const imageMap = ResourceManager.Instance.getImageMap()
+
+		this.idleAnimations = []
+		this.deathAnimations = []
+
+		for (let i = 13; i <= 16; i++) {
+			this.idleAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		}
+
+		for (let i = 13; i <= 16; i++) {
+			this.deathAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		}
+	}
+
+	update() {
+		super.update()
+
 		const currentState = this.currentState
 		switch (currentState) {
-			case this.states.get(BURST_STATE_ENUM.ACTIVE):
-				if (this.params.get(PARAMS_NAME.INACTIVE).value) {
-					this.currentState = this.states.get(BURST_STATE_ENUM.INACTIVE)
+			case this.states.get(PLAYER_STATE.IDLE):
+				if (this.params.get(PARAMS_NAME.DEATH).value) {
+					this.currentState = this.states.get(PLAYER_STATE.DEATH)
 				}
 				break
+			case this.states.get(PLAYER_STATE.DEATH):
+				break
 			default:
+				this.currentState = this.states.get(PLAYER_STATE.IDLE)
 				break
 		}
-		this.resetTrigger()
-	}
-
-	render() {
-		this.currentState.render()
 	}
 }

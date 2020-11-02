@@ -1,5 +1,8 @@
 import Singleton from '../base/Singleton'
 
+/***
+ * 场景管理类
+ */
 export default class SceneManager extends Singleton {
 
 	static get Instance() {

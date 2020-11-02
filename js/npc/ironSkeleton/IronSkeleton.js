@@ -1,21 +1,23 @@
-import Enemy from '../Enemy'
+import Enemy from '../../base/Enemy'
 import IronSkeletonStateMachine from './Animator/IronSkeletonStateMachine'
+import {ENEMY_TYPE_ENUM} from '../../enums/index'
 
-
+/***
+ * 钢铁敌人类
+ */
 export default class IronSkeleton extends Enemy {
-	constructor(type) {
+	constructor() {
 		super(null)
-		this.type = type
 		this.init()
 	}
 
 	init() {
 		super.init()
+		this.type = ENEMY_TYPE_ENUM.SKELETON_IRON
 		this.fsm = new IronSkeletonStateMachine(this)
 	}
 
 	update() {
 		super.update()
-		this.fsm.update()
 	}
 }

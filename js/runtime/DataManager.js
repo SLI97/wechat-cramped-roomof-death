@@ -2,7 +2,7 @@ import {DIRECTION_ENUM, ENEMY_TYPE_ENUM} from '../enums/index'
 import Singleton from '../base/Singleton'
 
 /**
- * 全局状态管理器
+ * 全局数据管理类
  */
 export default class DataManager extends Singleton {
 	static get Instance() {

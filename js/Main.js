@@ -36,17 +36,8 @@ export default class Main extends Singleton {
 		DataManager.Instance.frame++
 
 		this.update()
-		this.render()
 
 		this.aniId = window.requestAnimationFrame(this.bindLoop, canvas)
-	}
-
-	/**
-	 * canvas重绘函数
-	 * 每一帧重新绘制所有的需要展示的元素
-	 */
-	render() {
-		// UIManager.Instance.render()
 	}
 
 	// 游戏逻辑更新主函数

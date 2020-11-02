@@ -7,11 +7,18 @@ import BlockTurnLeftBottomState from './BlockTurnLeft/BlockTurnLeftBottomState'
 import BlockTurnLeftLeftState from './BlockTurnLeft/BlockTurnLeftLeftState'
 import BlockTurnLeftRightState from './BlockTurnLeft/BlockTurnLeftRightState'
 import {PARAMS_NAME} from './PlayerStateMachine'
+import TurnLeftTopState from './TurnLeft/TurnLeftTopState'
+import TurnLeftBottomState from './TurnLeft/TurnLeftBottomState'
+import TurnLeftLeftState from './TurnLeft/TurnLeftLeftState'
+import TurnLeftRightState from './TurnLeft/TurnLeftRightState'
 
 export default class DeathSubStateMachine extends SubStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.init()
+		this.topClass = TurnLeftTopState
+		this.bottomClass = TurnLeftBottomState
+		this.leftClass = TurnLeftLeftState
+		this.rightClass = TurnLeftRightState
 	}
 
 	init() {
@@ -26,7 +33,7 @@ export default class DeathSubStateMachine extends SubStateMachine {
 		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
 	}
 
-	run() {
+	update() {
 		const currentState = this.currentState
 		switch (currentState) {
 			case this.states.get(DIRECTION_ENUM.TOP):
@@ -57,9 +64,5 @@ export default class DeathSubStateMachine extends SubStateMachine {
 		} else if (this.params.get(PARAMS_NAME.DIRECTION).value=== 1) {
 			this.currentState = this.states.get(DIRECTION_ENUM.RIGHT)
 		}
-	}
-
-	render(){
-		this.currentState.render()
 	}
 }

@@ -31,14 +31,13 @@ export default class SubStateMachine {
 	}
 
 	update() {
-		this.run()
 	}
 
-	run() {
-
+	render() {
+		if (this.currentState) {
+			this.currentState.render()
+		}
 	}
-
-	render() {}
 
 	stop() {
 		this[_currentState] = null

@@ -11,7 +11,9 @@ import {
 } from '../player/Animator/PlayerStateMachine'
 import EventManager from '../runtime/EventManager'
 
-
+/***
+ * 实体类，实体必须具备方向和状态
+ */
 export default class Entity extends Sprite {
 
   _direction = DIRECTION_ENUM.BOTTOM
@@ -44,6 +46,12 @@ export default class Entity extends Sprite {
       }
       this.fsm.setParams(value, true)
     }
+  }
+
+  update(){
+	  if (this.fsm) {
+		  this.fsm.update()
+	  }
   }
 
   render() {

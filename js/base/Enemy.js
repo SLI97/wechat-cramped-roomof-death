@@ -1,5 +1,5 @@
 import DataManager from '../runtime/DataManager'
-import Entity from '../base/Entity'
+import Entity from './Entity'
 import {
 	DIRECTION_ENUM,
 	PLAYER_STATE
@@ -9,7 +9,7 @@ const ENEMY_WIDTH = 128
 const ENEMY_HEIGHT = 128
 
 /***
- * 敌人基类
+ * 敌人基类,主要实现整面向玩家
  */
 export default class Enemy extends Entity {
 	constructor() {
@@ -26,6 +26,7 @@ export default class Enemy extends Entity {
 	}
 
 	update() {
+		super.update()
 		this.changeDirection()
 	}
 

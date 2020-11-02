@@ -1,20 +1,16 @@
 import Sprite from '../../base/Sprite'
-import Player from '../../player/Player'
-import CanvasManager from '../../runtime/CanvasManager'
-import {ENEMY_TYPE_ENUM, EVENT_ENUM, PLAYER_STATE} from '../../enums/index'
+import {DIRECTION_ENUM, DIRECTION_ORDER, ENEMY_TYPE_ENUM, EVENT_ENUM, PLAYER_STATE} from '../../enums/index'
 import EventManager from '../../runtime/EventManager'
-import PlayerStateMachine from '../../player/Animator/PlayerStateMachine'
 import SpikesStateMachine from './Animator/SpikesStateMachine'
 import DataManager from '../../runtime/DataManager'
+import {PARAMS_NAME} from '../../player/Animator/PlayerStateMachine'
 
-const BG_WIDTH = 32
-const BG_HEIGHT = 32
-
-const IMG_BG_PREFIX = 'images/bg/bg (20).png'
+const BG_WIDTH = 128
+const BG_HEIGHT = 128
 
 export default class Spikes extends Sprite {
 	constructor(x, y, type) {
-		super(IMG_BG_PREFIX, BG_WIDTH, BG_HEIGHT, x, y)
+		super(null, BG_WIDTH, BG_HEIGHT, x, y)
 		this.init(type)
 	}
 
@@ -31,32 +27,55 @@ export default class Spikes extends Sprite {
 		}
 
 		this.count = 0
-		this.runHandler = this.run.bind(this)
-		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE, this.runHandler)
+		this.onLoopHandler = this.onLoop.bind(this)
+		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onLoopHandler)
 
 		this.fsm = new SpikesStateMachine(this)
 	}
 
-	update() {
-		// this.visible = false
-		this.checkAttack()
+	_state = PLAYER_STATE.IDLE
+
+	get state() {
+		return this._state
 	}
 
-	run() {
-		this.count++
+	set state(value) {
+		this._state = value
+		if (this.fsm && this.fsm.params.has(value)) {
+			//同样类型的blick不要覆盖
+			if (this.fsm.currentState === this.fsm.states.get(value)) {
+				return
+			}
+			if (value.indexOf("BLOCK") > -1) {
+				EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+			}
+			this.fsm.setParams(value, true)
+		}
+	}
+
+	update(){
+		if (this.fsm) {
+			this.fsm.update()
+		}
+		this.onAttack()
 	}
 
 	render() {
-		this.fsm.render()
+		if (this.fsm) {
+			this.fsm.render()
+		}
 	}
 
-	checkAttack() {
-		if (this.count % this.spikesCount === 0) {
-			return
-		}
-		const {x: playerX, y: playerY} = DataManager.Instance.player
-		if (playerX === this.x && playerY === this.y) {
-			EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
+	onLoop() {
+		this.count++
+	}
+
+	onAttack() {
+		if(this.count % this.spikesCount === 0){
+			const {targetX: playerX, targetY: playerY} = DataManager.Instance.player
+			if (playerX === this.x && playerY === this.y) {
+				EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
+			}
 		}
 	}
 }

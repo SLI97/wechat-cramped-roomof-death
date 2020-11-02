@@ -29,6 +29,9 @@ export const PARAMS_NAME = {
 	DIRECTION: 'DIRECTION',
 }
 
+/***
+ * 玩家状态机，根据参数调节自身信息渲染人物
+ */
 export default class PlayerStateMachine extends StateMachine {
 	constructor(owner) {
 		super()
@@ -117,8 +120,10 @@ export default class PlayerStateMachine extends StateMachine {
 		// this.states.set(PARAMS_NAME.DEATH, new DeathSubStateMachine(this.owner, this))
 		this.currentState = this.states.get(PARAMS_NAME.IDLE)
 	}
-	
-	run() {
+
+	update() {
+		super.update()
+
 		const currentState = this.currentState
 		switch (currentState) {
 			case this.states.get(PARAMS_NAME.IDLE):
@@ -158,8 +163,6 @@ export default class PlayerStateMachine extends StateMachine {
 				this.currentState = this.states.get(PARAMS_NAME.IDLE)
 				break
 		}
-		this.currentState.run()
-		this.resetTrigger()
 	}
 
 	switch () {

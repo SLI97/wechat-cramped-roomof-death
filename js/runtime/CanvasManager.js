@@ -1,6 +1,8 @@
 import Singleton from '../base/Singleton'
 
-
+/***
+ * Canvas绘图管理类，负责输出canvas上下文context
+ */
 export default class CanvasManager extends Singleton {
 
 	static ctx = null

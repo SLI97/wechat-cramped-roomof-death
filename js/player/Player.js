@@ -10,7 +10,6 @@ import PlayerStateMachine, {
 import {
 	EVENT_ENUM,
 	ENEMY_TYPE_ENUM,
-	DIRECTION_ORDER,
 	DIRECTION_ENUM,
 	CONTROLLER_ENUM,
 	PLAYER_STATE
@@ -19,15 +18,14 @@ import {
 const PLAYER_WIDTH = 128
 const PLAYER_HEIGHT = 128
 
-
-
+/***
+ * 玩家类
+ */
 export default class Player extends Entity {
 
 	constructor() {
 		super(null, PLAYER_WIDTH, PLAYER_HEIGHT)
 		this.init()
-		EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputProcess.bind(this))
-		EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.goDead.bind(this))
 	}
 
 	init() {
@@ -36,11 +34,25 @@ export default class Player extends Entity {
 		this.speed = 1 / 10
 		this.direction = DIRECTION_ENUM.BOTTOM
 		this.state = PLAYER_STATE.IDLE
-		this.smokes = []
 		this.fsm = new PlayerStateMachine(this)
+
+		this.inputProcessHandler = this.inputProcess.bind(this)
+		this.onDeadHandler = this.onDead.bind(this)
+		EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputProcessHandler)
+		EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.onDeadHandler)
+
+		this.isMoveEnd = true
 	}
 
 	update() {
+		super.update()
+		this.updatePosition()
+	}
+
+	/***
+	 * 更新人物位置
+	 */
+	updatePosition() {
 		if (this.targetX < this.x) {
 			this.x -= this.speed
 		} else if (this.targetX > this.x) {
@@ -55,25 +67,25 @@ export default class Player extends Entity {
 
 		if (Math.abs(this.targetX - this.x) < 0.01) {
 			this.x = this.targetX
+			this.onMoveEnd()
 		}
 		if (Math.abs(this.targetY - this.y) < 0.01) {
 			this.y = this.targetY
+			this.onMoveEnd()
 		}
-
-		this.fsm.update()
 	}
 
-	render() {
-		super.render()
-		// this.smokes.forEach(item => {
-		// 	// console.log(item)
-		// 	// console.log(item.x,item.y)
-		// 	item.update()
-		// 	item.render()
-		// })
+	onMoveEnd(){
+		if (!this.isMoveEnd) {
+			this.isMoveEnd = true
+			EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
+		}
 	}
 
-	goDead() {
+	/***
+	 * 玩家死亡
+	 */
+	onDead() {
 		this.state = PLAYER_STATE.DEATH
 	}
 
@@ -97,7 +109,7 @@ export default class Player extends Entity {
 		}
 
 		if (this.WillBlock(type)) {
-			// console.log('stop!')
+			console.log('stop!')
 			return
 		}
 
@@ -148,6 +160,15 @@ export default class Player extends Entity {
 		}
 		EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
 		EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
+		this.isMoveEnd = false
+
+		this.showSmoke()
+	}
+
+	/***
+	 * 生成烟雾
+	 */
+	showSmoke() {
 		const smoke = PoolManager.Instance.getItemByClass(ENEMY_TYPE_ENUM.SMOKE, Smoke)
 		smoke.x = this.targetX
 		smoke.y = this.targetY
@@ -238,7 +259,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKFRONT
 
 					return true
@@ -270,7 +292,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKBACK
 
 					return true
@@ -303,7 +326,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 
 					return true
@@ -336,7 +360,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKLEFT
 
 					return true
@@ -374,7 +399,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKBACK
 
 					return true
@@ -406,7 +432,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKFRONT
 
 					return true
@@ -439,7 +466,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKLEFT
 
 					return true
@@ -472,7 +500,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 
 					return true
@@ -511,7 +540,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKLEFT
 
 					return true
@@ -545,7 +575,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 
 					return true
@@ -577,7 +608,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKFRONT
 
 					return true
@@ -609,7 +641,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKBACK
 
 					return true
@@ -648,7 +681,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 
 					return true
@@ -682,7 +716,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKLEFT
 
 					return true
@@ -714,7 +749,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKBACK
 
 					return true
@@ -746,7 +782,8 @@ export default class Player extends Entity {
 				}
 
 				// return (nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
+				} else {
 					this.state = PLAYER_STATE.BLOCKFRONT
 
 					return true
@@ -800,7 +837,8 @@ export default class Player extends Entity {
 				(!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
 				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
 				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
-			) {} else {
+			) {
+			} else {
 				this.state = PLAYER_STATE.BLOCKTURNLEFT
 
 				return true
@@ -854,7 +892,8 @@ export default class Player extends Entity {
 				(!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
 				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
 				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
-			) {} else {
+			) {
+			} else {
 				this.state = PLAYER_STATE.BLOCKTURNRIGHT
 
 				return true

@@ -47,7 +47,7 @@ export default class SpikesStateMachine extends StateMachine {
 		this.currentState = this.states.get(DOOR_STATE_ENUM.CLOSE)
 	}
 
-	run() {
+	update() {
 		const currentState = this.currentState
 		switch (currentState) {
 			case this.states.get(DOOR_STATE_ENUM.OPEN):
@@ -64,9 +64,5 @@ export default class SpikesStateMachine extends StateMachine {
 				this.currentState = this.states.get(DOOR_STATE_ENUM.CLOSE)
 				break
 		}
-	}
-
-	render() {
-		this.currentState.render()
 	}
 }
