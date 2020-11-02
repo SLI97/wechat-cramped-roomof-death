@@ -1,4 +1,4 @@
-import NoLoopState from '../../../base/NoLoopState'
+import NoLoopState from '../../../../base/NoLoopState'
 
 /***
  * 如果四个方向的state没有太大差异可以提取一个父级state

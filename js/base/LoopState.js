@@ -16,6 +16,7 @@ export default class LoopState extends State {
 	render() {
 		const image = this.animations[this.index]
 		const offset = DataManager.Instance.getOffset()
+		console.log(image)
 		const {
 			x,
 			y,

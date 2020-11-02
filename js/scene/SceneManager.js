@@ -22,11 +22,12 @@ export default class SceneManager extends Singleton {
 
 	updateScene() {
 		if (this.scene && !this.begin) {
-			this.scene.beginScene()
 			this.begin = true
+			this.scene.beginScene()
 		}
 
 		if(this.scene){
+			// console.log(this.scene)
 			this.scene.updateScene()
 		}
 	}

@@ -1,6 +1,6 @@
 import NoLoopState from '../../../../base/NoLoopState'
 import EventManager from '../../../../runtime/EventManager'
-import {EVENT_ENUM} from '../../../../enums'
+import {EVENT_ENUM} from '../../../../enums/index'
 
 /***
  * 如果四个方向的state没有太大差异可以提取一个父级state

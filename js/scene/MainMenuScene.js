@@ -4,6 +4,7 @@ import {EVENT_ENUM, UI_ENUM} from '../enums/index'
 import BattleScene from './BattleScene'
 import UIManager from '../ui/UIManager'
 import MusicManager from '../runtime/MusicManager'
+import SceneManager from './SceneManager'
 
 /***
  * 主菜单场景类，显示游戏开始按钮
@@ -16,13 +17,15 @@ export default class MainMenuScene extends Scene {
 	}
 
 	beginScene() {
-		MusicManager.Instance.play()
+		// MusicManager.Instance.play()
 		EventManager.Instance.on(EVENT_ENUM.GAME_START, this.startGameHandler)
 		const button = UIManager.Instance.get(UI_ENUM.GAME_START)
 		button.onShow()
+		this.startGame()
 	}
 
 	updateScene() {
+		// console.log(999)
 	}
 
 	endScene() {
@@ -32,6 +35,6 @@ export default class MainMenuScene extends Scene {
 	}
 
 	startGame() {
-		this.sceneManager.setScene(new BattleScene())
+		this.sceneManager.setScene(new BattleScene(SceneManager.Instance))
 	}
 }

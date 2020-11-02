@@ -60,7 +60,7 @@ export default class ResourceManager extends Singleton {
 			const blockside = this.loadBlockSideImage()
 			const blockface = this.loadBlockFaceImage()
 			const ironskeleton = this.loadIronSkeletonImage()
-			const woodenskeleton = this.loadWoodenSkeletonImage()
+			// const woodenskeleton = this.loadWoodenSkeletonImage()
 			const smoke = this.loadSmokeImage()
 			Promise.all(
 				[
@@ -73,7 +73,6 @@ export default class ResourceManager extends Singleton {
 					...blockside,
 					...blockface,
 					...ironskeleton,
-					...woodenskeleton,
 					...smoke
 				]
 			).then(() => {

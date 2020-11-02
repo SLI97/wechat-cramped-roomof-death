@@ -22,8 +22,8 @@ export default class Main extends Singleton {
 	}
 
 	start() {
-		// SceneManager.Instance.setScene(new StartScene())
-		SceneManager.Instance.setScene(new BattleScene(SceneManager.Instance))
+		SceneManager.Instance.setScene(new StartScene(SceneManager.Instance))
+		// SceneManager.Instance.setScene(new BattleScene(SceneManager.Instance))
 		this.loop()
 	}
 
