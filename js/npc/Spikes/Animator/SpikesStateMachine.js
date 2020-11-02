@@ -1,13 +1,13 @@
 import StateMachine from '../../../base/StateMachine'
 import {DIRECTION_ENUM, FSM_PARAM_TYPE_ENUM} from '../../../enums/index'
-import SpikesOneState from './SpikesOneState'
-import SpikesTwoState from './SpikesTwoState'
-import SpikesThreeState from './SpikesThreeState'
-import SpikesFourState from './SpikesFourState'
+import SpikesOneSubStateMachine from './SpikesOneSubStateMachine'
+import SpikesTwoSubStateMachine from './SpikesTwoSubStateMachine'
+import SpikesThreeSubStateMachine from './SpikesThreeSubStateMachine'
+import SpikesFourSubStateMachine from './SpikesFourSubStateMachine'
 
 export const PARAMS_NAME = {
-	OPEN:'OPEN',
-	DIRECTION:'DIRECTION'
+	TYPE:'TYPE',
+	COUNT:'COUNT',
 }
 
 const DOOR_STATE_ENUM = {
@@ -33,36 +33,21 @@ export default class SpikesStateMachine extends StateMachine {
 			value: false
 		})
 
-		this.params.set(PARAMS_NAME.DIRECTION, {
+		this.params.set(PARAMS_NAME.COUNT, {
 			type: FSM_PARAM_TYPE_ENUM.NUMBER,
 			value: 1
 		})
 	}
 
 	initState() {
-		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesOneState(this.owner, this))
-		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesTwoState(this.owner, this))
-		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesThreeState(this.owner, this))
-		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesFourState(this.owner, this))
+		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesOneSubStateMachine(this.owner, this))
+		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesTwoSubStateMachine(this.owner, this))
+		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesThreeSubStateMachine(this.owner, this))
+		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesFourSubStateMachine(this.owner, this))
 		this.currentState = this.states.get(DOOR_STATE_ENUM.CLOSE)
 	}
-
-	update() {
-		const currentState = this.currentState
-		switch (currentState) {
-			case this.states.get(DOOR_STATE_ENUM.OPEN):
-				if (!this.params.get(PARAMS_NAME.OPEN).value) {
-					this.currentState = this.states.get(DOOR_STATE_ENUM.CLOSE)
-				}
-				break
-			case this.states.get(DOOR_STATE_ENUM.CLOSE):
-				if (!this.params.get(PARAMS_NAME.OPEN).value) {
-					this.currentState = this.states.get(DOOR_STATE_ENUM.OPEN)
-				}
-				break
-			default:
-				this.currentState = this.states.get(DOOR_STATE_ENUM.CLOSE)
-				break
-		}
-	}
+	//
+	// update() {
+	// 	super.update()
+	// }
 }

@@ -1,5 +1,3 @@
-import DataManager from '../runtime/DataManager'
-import CanvasManager from '../runtime/CanvasManager'
 
 /***
  * 使用es6的symbol模拟私有成员
@@ -35,23 +33,6 @@ export default class State {
 	}
 
 	render() {
-		const image = this.animations[this.index]
-		const offset = DataManager.Instance.getOffset()
-		const {
-			x,
-			y,
-			width,
-			height,
-		} = this.owner
-		if (image) {
-			CanvasManager.Ctx.drawImage(
-				image,
-				(x * 32) + offset.width - 32 - 15,
-				(y * 32) + offset.height - 32 - 18,
-				width,
-				height
-			)
-		}
 	}
 
 	frameLoop() {
@@ -89,5 +70,20 @@ export default class State {
 	 */
 	callback() {
 
+	}
+
+
+	/***
+	 * 在这里可以实现动画事件
+	 */
+	event(){
+		/*for example
+		*
+		* if(this.index === 1 | 2 |3){
+		*   new Idle() and so on...
+		* }
+		*
+		*
+		* */
 	}
 }

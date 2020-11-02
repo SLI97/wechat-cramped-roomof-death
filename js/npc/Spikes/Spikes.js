@@ -3,10 +3,11 @@ import {DIRECTION_ENUM, DIRECTION_ORDER, ENEMY_TYPE_ENUM, EVENT_ENUM, PLAYER_STA
 import EventManager from '../../runtime/EventManager'
 import SpikesStateMachine from './Animator/SpikesStateMachine'
 import DataManager from '../../runtime/DataManager'
-import {PARAMS_NAME} from '../../player/Animator/PlayerStateMachine'
 
 const BG_WIDTH = 128
 const BG_HEIGHT = 128
+
+
 
 export default class Spikes extends Sprite {
 	constructor(x, y, type) {
@@ -27,6 +28,8 @@ export default class Spikes extends Sprite {
 		}
 
 		this.count = 0
+		this.states = type
+
 		this.onLoopHandler = this.onLoop.bind(this)
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onLoopHandler)
 

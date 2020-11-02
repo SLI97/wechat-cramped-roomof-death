@@ -1,13 +1,13 @@
-import Sprite from '../../base/Sprite'
+import Entity from '../../base/Entity'
 import SmokeStateMachine from './Animator/SmokeStateMachine'
 import {
-	DIRECTION_ENUM,
+	DIRECTION_ENUM, PLAYER_STATE,
 } from '../../enums/index'
 
 const SMOKE_WIDTH = 128
 const SMOKE_HEIGHT = 128
 
-export default class Smoke extends Sprite {
+export default class Smoke extends Entity {
 	constructor() {
 		super(null, SMOKE_WIDTH, SMOKE_HEIGHT)
 		this.init()
@@ -15,26 +15,7 @@ export default class Smoke extends Sprite {
 
 	init() {
 		this.direction = DIRECTION_ENUM.BOTTOM
+		this.state = PLAYER_STATE.IDLE
 		this.fsm = new SmokeStateMachine(this)
-	}
-
-	update() {
-		if (this.fsm) {
-			this.fsm.update()
-		}
-	}
-
-	play() {
-		this.visible = true
-	}
-
-	render() {
-		if (!this.visible) {
-			return
-		}
-
-		if (this.fsm) {
-			this.fsm.render()
-		}
 	}
 }
