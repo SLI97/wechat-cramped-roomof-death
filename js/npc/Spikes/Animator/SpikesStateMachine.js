@@ -1,18 +1,13 @@
 import StateMachine from '../../../base/StateMachine'
-import {DIRECTION_ENUM, FSM_PARAM_TYPE_ENUM} from '../../../enums/index'
+import {DIRECTION_ENUM, ENEMY_TYPE_ENUM, FSM_PARAM_TYPE_ENUM} from '../../../enums/index'
 import SpikesOneSubStateMachine from './SpikesOneSubStateMachine'
 import SpikesTwoSubStateMachine from './SpikesTwoSubStateMachine'
 import SpikesThreeSubStateMachine from './SpikesThreeSubStateMachine'
 import SpikesFourSubStateMachine from './SpikesFourSubStateMachine'
 
 export const PARAMS_NAME = {
-	TYPE:'TYPE',
-	COUNT:'COUNT',
-}
-
-const DOOR_STATE_ENUM = {
-	OPEN:'OPEN',
-	CLOSE:'CLOSE',
+	SPIKES_TYPE: 'SPIKES_TYPE',
+	COUNT: 'COUNT',
 }
 
 export default class SpikesStateMachine extends StateMachine {
@@ -28,8 +23,8 @@ export default class SpikesStateMachine extends StateMachine {
 	}
 
 	initParams() {
-		this.params.set(PARAMS_NAME.OPEN, {
-			type: FSM_PARAM_TYPE_ENUM.BOOLEAN,
+		this.params.set(PARAMS_NAME.SPIKES_TYPE, {
+			type: FSM_PARAM_TYPE_ENUM.NUMBER,
 			value: false
 		})
 
@@ -40,14 +35,10 @@ export default class SpikesStateMachine extends StateMachine {
 	}
 
 	initState() {
-		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesOneSubStateMachine(this.owner, this))
-		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesTwoSubStateMachine(this.owner, this))
-		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesThreeSubStateMachine(this.owner, this))
-		this.states.set(DOOR_STATE_ENUM.OPEN, new SpikesFourSubStateMachine(this.owner, this))
-		this.currentState = this.states.get(DOOR_STATE_ENUM.CLOSE)
+		this.states.set(ENEMY_TYPE_ENUM.SPIKES_ONE, new SpikesOneSubStateMachine(this.owner, this))
+		this.states.set(ENEMY_TYPE_ENUM.SPIKES_TWO, new SpikesTwoSubStateMachine(this.owner, this))
+		this.states.set(ENEMY_TYPE_ENUM.SPIKES_THREE, new SpikesThreeSubStateMachine(this.owner, this))
+		this.states.set(ENEMY_TYPE_ENUM.SPIKES_FOUR, new SpikesFourSubStateMachine(this.owner, this))
+		this.currentState = this.states.get(this.owner.type)
 	}
-	//
-	// update() {
-	// 	super.update()
-	// }
 }
