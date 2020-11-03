@@ -10,6 +10,7 @@ export default class DataManager extends Singleton {
 
 	constructor() {
 		super()
+		this.reset()
 	}
 
 	reset() {

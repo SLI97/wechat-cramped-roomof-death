@@ -1,16 +1,16 @@
 import Scene from './Scene'
+import SceneManager from './SceneManager'
 import DataManager from '../runtime/DataManager'
 import Player from '../player/Player'
 import Background from '../background/Background'
 import CanvasManager from '../runtime/CanvasManager'
-import ResourceManager from '../runtime/ResourceManager'
-import Enemy from '../base/Enemy'
 import WoodenSkeleton from '../npc/woodenSkeleton/WoodenSkeleton'
 import EventManager from '../runtime/EventManager'
 import {
 	ENEMY_TYPE_ENUM,
 	EVENT_ENUM,
-	PLAYER_STATE, UI_ENUM
+	PLAYER_STATE,
+	UI_ENUM
 } from '../enums/index'
 import MainMenuScene from './MainMenuScene'
 import UIManager from '../ui/UIManager'
@@ -56,14 +56,14 @@ export default class BattleScene extends Scene {
 		this.initLevel()
 		this.calcOffset()
 		this.isLoaded = true
-		// this.useFade = false
+		this.useFade = false
 		// canvas.addEventListener('touchstart', () => {
-		// 	// UIManager.Instance.fadeIn()
-		// 	this.useFade = true
-		// 	this.oldFrame = DataManager.Instance.frame
-		// 	setTimeout(() => {
-		// 		this.useFade = false
-		// 	}, 100000)
+		// 	UIManager.Instance.fadeIn()
+		// 	// this.useFade = true
+		// 	// this.oldFrame = DataManager.Instance.frame
+		// 	// setTimeout(() => {
+		// 	// 	this.useFade = false
+		// 	// }, 100000)
 		// })
 	}
 
@@ -112,20 +112,20 @@ export default class BattleScene extends Scene {
 			enemy.render()
 		})
 
-		DataManager.Instance.player.render()
+		if (DataManager.Instance.player) {
+			DataManager.Instance.player.render()
+		}
 
 		UIManager.Instance.render()
 
 
 		// if (this.useFade) {
-		// 	console.log(999)
-		// 	// UIManager.Instance.fadeIn()
-		// 	const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 1000
-		// 	CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-		// 	CanvasManager.Ctx.fillStyle = `rgba(255, 255, 0,${ fadePercent})`
-		//
-		// 	CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-		// console.log(fadePercent, 1)
+		// UIManager.Instance.fadeIn()
+		// const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 1000
+		// CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+		// CanvasManager.Ctx.fillStyle = `rgba(255, 255, 0,${ fadePercent})`
+
+		// CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		// if (fadePercent > 1) {
 		// 	window.cancelAnimationFrame(this.aniId)
 		// 	this.fadeOut()
@@ -153,13 +153,13 @@ export default class BattleScene extends Scene {
 			this.generateEnemy()
 			// this.generateBursts()
 			// this.generateSpikes()
-			// this.generateDoor()
+			this.generateDoor()
 
 			// setTimeout(() => {
 			// 	UIManager.Instance.fadeOut()
 			// }, 1000)
 		} else {
-			this.sceneManager.setScene(new MainMenuScene())
+			// this.sceneManager.setScene(new MainMenuScene(SceneManager.Instance))
 		}
 	}
 
@@ -176,6 +176,7 @@ export default class BattleScene extends Scene {
 			} else if (item.type === ENEMY_TYPE_ENUM.SKELETON_IRON) {
 				enemy = new IronSkeleton(item)
 			}
+			enemy.direction = item.direction
 			return enemy
 		})
 		DataManager.Instance.enemies = list
@@ -193,7 +194,7 @@ export default class BattleScene extends Scene {
 	}
 
 	generateSpikes() {
-		const list = this.level.spkies.map(item => {
+		const list = this.level.spikes.map(item => {
 			let enemy = null
 			if (item.type === ENEMY_TYPE_ENUM.BURST_FLOOR) {
 				enemy = new Spikes(item)
@@ -212,7 +213,7 @@ export default class BattleScene extends Scene {
 		const item = {
 			player: Object.assign({}, DataManager.Instance.player),
 			enemies: DataManager.Instance.enemies.concat(),
-			spkies: DataManager.Instance.spkies.concat(),
+			spikes: DataManager.Instance.spikes.concat(),
 			bursts: DataManager.Instance.bursts.concat(),
 			door: Object.assign({}, DataManager.Instance.door),
 		}
@@ -224,17 +225,24 @@ export default class BattleScene extends Scene {
 		if (item) {
 			DataManager.Instance.player = item.player
 			DataManager.Instance.enemies = item.enemies
-			DataManager.Instance.spkies = item.spkies
+			DataManager.Instance.spikes = item.spikes
 			DataManager.Instance.bursts = item.bursts
 			DataManager.Instance.door = item.door
-		}else {
+		} else {
 			//TODO 播放游戏音频
 		}
 	}
 
 	checkFinishCurLevel() {
-		const {x: doorX, y: doorY, state: doorState} = DataManager.Instance.door
-		const {x: playerX, y: playerY} = DataManager.Instance.player
+		const {
+			x: doorX,
+			y: doorY,
+			state: doorState
+		} = DataManager.Instance.door
+		const {
+			x: playerX,
+			y: playerY
+		} = DataManager.Instance.player
 		if (doorX === playerX && doorY === playerY && doorState === PLAYER_STATE.DEATH) {
 			EventManager.Instance.emit(EVENT_ENUM.NEXT_LEVEL)
 		}

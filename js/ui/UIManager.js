@@ -66,12 +66,9 @@ export default class UIManager extends Singleton {
 	}
 
 	fadeInHandler() {
-		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 100
-		CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-		CanvasManager.Ctx.fillStyle = `rgba(255, 255, 0,${ fadePercent})`
-
+		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 10
+		CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${ fadePercent})`
 		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-		console.log(fadePercent, 1)
 		if (fadePercent > 1) {
 			window.cancelAnimationFrame(this.aniId)
 			this.fadeOut()
@@ -81,11 +78,9 @@ export default class UIManager extends Singleton {
 	}
 
 	fadeOutHandler() {
-		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 100
-		CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 10
 		CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${1 - fadePercent})`
 		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-		console.log(fadePercent, 2)
 		if (fadePercent > 1) {
 			window.cancelAnimationFrame(this.aniId)
 		} else {

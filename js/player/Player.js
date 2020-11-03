@@ -24,7 +24,7 @@ const PLAYER_HEIGHT = 128
 export default class Player extends Entity {
 
 	constructor(dto) {
-		super(dto, null, PLAYER_WIDTH, PLAYER_HEIGHT)
+		super(dto,PlayerStateMachine, null, PLAYER_WIDTH, PLAYER_HEIGHT)
 	}
 
 	init() {
@@ -32,14 +32,13 @@ export default class Player extends Entity {
 		this.targetY = this.y
 		this.speed = 1 / 10
 
-		this.fsm = new PlayerStateMachine(this)
-
 		this.inputProcessHandler = this.inputProcess.bind(this)
 		this.onDeadHandler = this.onDead.bind(this)
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputProcessHandler)
 		EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.onDeadHandler)
 
 		this.isMoveEnd = true
+
 	}
 
 	update() {
@@ -160,7 +159,7 @@ export default class Player extends Entity {
 		EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
 		this.isMoveEnd = false
 
-		this.showSmoke()
+		// this.showSmoke()
 	}
 
 	/***
@@ -209,7 +208,7 @@ export default class Player extends Entity {
 	 * @param type
 	 */
 	WillBlock(type) {
-		const {x, y, direction} = this
+		const {targetX:x, targetY:y, direction} = this
 		const tileInfo = Background.Instance.getTileMap()
 		const enemies = DataManager.Instance.enemies.filter(enemy => enemy.state !== PLAYER_STATE.DEATH)
 		const {x: doorX, y: doorY, state: doorState} = DataManager.Instance.door

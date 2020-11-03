@@ -9,11 +9,14 @@ const IMG_BLOCKSIDE_PREFIX = 'images/blockside/blockside'
 export default class BlockRightSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.topClass = BlockRightTopState
-		this.bottomClass = BlockRightBottomState
-		this.leftClass = BlockRightLeftState
-		this.rightClass = BlockRightRightState
 	}
+
+  initClass(){
+    this.topClass = BlockRightTopState
+    this.bottomClass = BlockRightBottomState
+    this.leftClass = BlockRightLeftState
+    this.rightClass = BlockRightRightState
+  }
 
 	initAnimations() {
 		this.topAnimations = []

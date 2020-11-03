@@ -122,8 +122,6 @@ export default class PlayerStateMachine extends StateMachine {
 	}
 
 	update() {
-		super.update()
-
 		const currentState = this.currentState
 		switch (currentState) {
 			case this.states.get(PARAMS_NAME.IDLE):
@@ -163,6 +161,8 @@ export default class PlayerStateMachine extends StateMachine {
 				this.currentState = this.states.get(PARAMS_NAME.IDLE)
 				break
 		}
+		super.update()
+
 	}
 
 	switch () {

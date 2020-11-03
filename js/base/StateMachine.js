@@ -51,6 +51,12 @@ export default class StateMachine {
 		}
 	}
 
+	getParams(paramsName){
+    if (this.params.has(paramsName)) {
+      return this.params.get(paramsName).value
+    }
+	}
+
 	setParams(paramsName, value) {
 		if (this.params.has(paramsName)) {
 			this.params.get(paramsName).value = value

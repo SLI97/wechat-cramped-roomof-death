@@ -36,7 +36,7 @@ export default class IronSkeletonStateMachine extends StateMachine {
 
 		this.params.set(PARAMS_NAME.DIRECTION, {
 			type: FSM_PARAM_TYPE_ENUM.NUMBER,
-			value: 1
+			value: 3
 		})
 	}
 

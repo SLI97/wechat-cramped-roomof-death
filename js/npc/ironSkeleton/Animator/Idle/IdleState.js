@@ -6,8 +6,6 @@ import LoopState from '../../../../base/LoopState'
  */
 export default class IdleState extends LoopState {
 	constructor(owner, fsm, animations) {
-		super(animations, true)
-		this.owner = owner
-		this.fsm = fsm
+    super(owner, fsm, animations)
 	}
 }

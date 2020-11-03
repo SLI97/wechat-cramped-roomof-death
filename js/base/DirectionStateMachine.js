@@ -30,8 +30,13 @@ export default class DirectionStateMachine extends SubStateMachine {
 	}
 
 	init() {
+		this.initClass()
 		this.initAnimations()
 		this.initState()
+	}
+
+	initClass() {
+
 	}
 
 	initAnimations() {
@@ -67,12 +72,14 @@ export default class DirectionStateMachine extends SubStateMachine {
 		}
 	}
 
-	switch(type) {
-		const {value} = this.params.get(PARAMS_NAME.DIRECTION)
+	switch (type) {
+		const {
+			value
+		} = this.params.get(PARAMS_NAME.DIRECTION)
 		if (DIRECTION_ORDER.findIndex(i => i === type) === value) {
 			return
 		}
 
-		this.currentState = DIRECTION_ORDER.findIndex(i => i === type)
+		this.currentState = this.states.get(DIRECTION_ORDER.find((item, index) => value === index))
 	}
 }

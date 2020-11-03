@@ -12,13 +12,12 @@ const BG_HEIGHT = 32
  */
 export default class Burst extends Entity {
 	constructor(dto) {
-		super(dto, null, BG_WIDTH, BG_HEIGHT)
+		super(dto, BurstStateMachine,null, BG_WIDTH, BG_HEIGHT)
 	}
 
 	init() {
 		this.prePlayerX = DataManager.Instance.player.x
 		this.prePlayerY = DataManager.Instance.player.y
-		this.fsm = new BurstStateMachine(this)
 
 		this.onBurstHandler = this.onBurst.bind(this)
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onBurstHandler)

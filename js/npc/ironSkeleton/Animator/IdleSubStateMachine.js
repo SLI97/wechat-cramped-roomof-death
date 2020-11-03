@@ -9,11 +9,14 @@ const IMG_IRONSKELETON_PREFIX = 'images/ironskeleton/ironskeleton'
 export default class IdleSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.topClass = IdleTopState
-		this.bottomClass = IdleBottomState
-		this.leftClass = IdleLeftState
-		this.rightClass = IdleRightState
 	}
+
+  initClass(){
+    this.topClass = IdleTopState
+    this.bottomClass = IdleBottomState
+    this.leftClass = IdleLeftState
+    this.rightClass = IdleRightState
+  }
 
 	initAnimations() {
 		this.topAnimations = []

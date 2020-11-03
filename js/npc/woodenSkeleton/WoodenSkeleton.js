@@ -9,11 +9,10 @@ import WoodenSkeletonStateMachine from './Animator/WoodenSkeletonStateMachine'
  */
 export default class WoodenSkeleton extends Enemy {
 	constructor(dto) {
-		super(dto)
+		super(dto,WoodenSkeletonStateMachine)
 	}
 
 	init() {
-		this.fsm = new WoodenSkeletonStateMachine(this)
 		this.onAttackHandler = this.onAttack.bind(this)
 		this.onDeadHandler = this.onDead.bind(this)
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onAttackHandler)

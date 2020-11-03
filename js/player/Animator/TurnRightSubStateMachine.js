@@ -9,11 +9,14 @@ const IMG_TURN_PREFIX = 'images/turn/turn'
 export default class TurnRightSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.topClass = TurnRightTopState
-		this.bottomClass = TurnRightBottomState
-		this.leftClass = TurnRightLeftState
-		this.rightClass = TurnRightRightState
 	}
+
+  initClass(){
+    this.topClass = TurnRightTopState
+    this.bottomClass = TurnRightBottomState
+    this.leftClass = TurnRightLeftState
+    this.rightClass = TurnRightRightState
+  }
 
 	initAnimations() {
 		this.topAnimations = []

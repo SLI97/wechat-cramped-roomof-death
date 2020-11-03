@@ -15,6 +15,13 @@ export default class BlockTurnLeftSubStateMachine extends DirectionStateMachine 
 		this.rightClass = BlockTurnLeftRightState
 	}
 
+  initClass(){
+    this.topClass = BlockTurnLeftTopState
+    this.bottomClass = BlockTurnLeftBottomState
+    this.leftClass = BlockTurnLeftLeftState
+    this.rightClass = BlockTurnLeftRightState
+  }
+
 	initAnimations() {
 		this.topAnimations = []
 		this.bottomAnimations = []

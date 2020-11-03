@@ -12,8 +12,8 @@ const ENEMY_HEIGHT = 128
  * 敌人基类,主要实现整面向玩家
  */
 export default class Enemy extends Entity {
-	constructor(dto) {
-		super(dto, null, ENEMY_WIDTH, ENEMY_HEIGHT)
+	constructor(dto, fsm) {
+		super(dto, fsm, null, ENEMY_WIDTH, ENEMY_HEIGHT)
 	}
 
 	update() {

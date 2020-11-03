@@ -1,7 +1,8 @@
 import {
 	TILE_TYPE_ENUM,
 	DIRECTION_ENUM,
-	ENEMY_TYPE_ENUM, PLAYER_STATE,
+	ENEMY_TYPE_ENUM,
+	PLAYER_STATE,
 } from '../enums/index'
 
 const mapInfo = [
@@ -416,14 +417,14 @@ const player = {
 	x: 4,
 	y: 7,
 	direction: DIRECTION_ENUM.RIGHT,
-	state:PLAYER_STATE.IDLE
+	state: PLAYER_STATE.IDLE
 }
 
 const enemies = [{
 	x: 4,
 	y: 5,
 	direction: DIRECTION_ENUM.RIGHT,
-	state:PLAYER_STATE.IDLE,
+	state: PLAYER_STATE.IDLE,
 	type: ENEMY_TYPE_ENUM.SKELETON_IRON
 }]
 
@@ -437,15 +438,15 @@ const spkies = [{
 const bursts = [{
 	x: 1,
 	y: 1,
-	state:PLAYER_STATE.IDLE,
+	state: PLAYER_STATE.IDLE,
 	type: ENEMY_TYPE_ENUM.BURST_FLOOR
 }]
 
 const door = {
-	x: 4,
-	y: 7,
-	direction: DIRECTION_ENUM.RIGHT,
-	state:PLAYER_STATE.IDLE,
+	x: 0,
+	y: 0,
+	direction: DIRECTION_ENUM.BOTTOM,
+	state: PLAYER_STATE.IDLE,
 	type: ENEMY_TYPE_ENUM.DOOR
 }
 

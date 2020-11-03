@@ -9,11 +9,14 @@ const IMG_BLOCKFACE_PREFIX = 'images/blockface/blockface'
 export default class BlockBackSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.topClass = BlockBackTopState
-		this.bottomClass = BlockBackBottomState
-		this.leftClass = BlockBackLeftState
-		this.rightClass = BlockBackRightState
 	}
+
+  initClass(){
+    this.topClass = BlockBackTopState
+    this.bottomClass = BlockBackBottomState
+    this.leftClass = BlockBackLeftState
+    this.rightClass = BlockBackRightState
+  }
 
 	initAnimations() {
 		this.topAnimations = []

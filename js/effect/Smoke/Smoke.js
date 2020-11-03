@@ -8,14 +8,10 @@ const SMOKE_WIDTH = 128
 const SMOKE_HEIGHT = 128
 
 export default class Smoke extends Entity {
-	constructor() {
-		super(null, SMOKE_WIDTH, SMOKE_HEIGHT)
-		this.init()
+	constructor(dto) {
+		super(dto,SmokeStateMachine,null, SMOKE_WIDTH, SMOKE_HEIGHT)
 	}
 
 	init() {
-		this.direction = DIRECTION_ENUM.BOTTOM
-		this.state = PLAYER_STATE.IDLE
-		this.fsm = new SmokeStateMachine(this)
 	}
 }

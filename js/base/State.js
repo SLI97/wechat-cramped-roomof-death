@@ -10,7 +10,6 @@ const timer = Symbol('timer')
  */
 export default class State {
 	constructor(animations, isLoop = true) {
-
 		this.animations = animations || []
 		this.isPlaying = false
 		this.isRender = false

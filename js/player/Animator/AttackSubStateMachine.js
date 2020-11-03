@@ -9,16 +9,14 @@ const IMG_ATTACK_PREFIX = 'images/attack/attack'
 export default class AttackSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.topClass = AttackTopState
-		this.bottomClass = AttackBottomState
-		this.leftClass = AttackLeftState
-		this.rightClass = AttackRightState
 	}
 
-	init() {
-		this.initAnimations()
-		this.initState()
-	}
+  initClass(){
+    this.topClass = AttackTopState
+    this.bottomClass = AttackBottomState
+    this.leftClass = AttackLeftState
+    this.rightClass = AttackRightState
+  }
 
 	initAnimations() {
 		this.topAnimations = []

@@ -6,8 +6,6 @@ import NoLoopState from '../../../base/NoLoopState'
  */
 export default class SpikesFourSubStateMachine extends NoLoopState {
 	constructor(owner,fsm,animations) {
-		super(animations,false)
-		this.owner = owner
-		this.fsm = fsm
+    super(owner, fsm, animations)
 	}
 }

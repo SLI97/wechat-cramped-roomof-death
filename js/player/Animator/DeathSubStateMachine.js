@@ -9,11 +9,14 @@ const IMG_IDLE_PREFIX = 'images/idle/idle'
 export default class DeathSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.topClass = BlockTurnRightTopState
-		this.bottomClass = BlockTurnRightBottomState
-		this.leftClass = BlockTurnRightLeftState
-		this.rightClass = BlockTurnRightRightState
 	}
+
+  initClass(){
+    this.topClass = BlockTurnRightTopState
+    this.bottomClass = BlockTurnRightBottomState
+    this.leftClass = BlockTurnRightLeftState
+    this.rightClass = BlockTurnRightRightState
+  }
 
 	initAnimations() {
 		this.topAnimations = []

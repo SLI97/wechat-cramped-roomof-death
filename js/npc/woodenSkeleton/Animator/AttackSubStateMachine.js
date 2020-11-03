@@ -15,6 +15,13 @@ export default class AttackSubStateMachine extends DirectionStateMachine {
 		this.rightClass = AttackRightState
 	}
 
+  initClass(){
+    this.topClass = AttackTopState
+    this.bottomClass = AttackBottomState
+    this.leftClass = AttackLeftState
+    this.rightClass = AttackRightState
+  }
+
 	initAnimations() {
 		this.topAnimations = []
 		this.bottomAnimations = []

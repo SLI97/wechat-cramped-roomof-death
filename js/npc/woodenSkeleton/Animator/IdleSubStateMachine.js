@@ -15,6 +15,13 @@ export default class IdleSubStateMachine extends DirectionStateMachine {
 		this.rightClass = IdleRightState
 	}
 
+  initClass(){
+    this.topClass = IdleTopState
+    this.bottomClass = IdleBottomState
+    this.leftClass = IdleLeftState
+    this.rightClass = IdleRightState
+  }
+
 	initAnimations() {
 		this.topAnimations = []
 		this.bottomAnimations = []

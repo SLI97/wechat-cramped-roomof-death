@@ -12,12 +12,10 @@ const BG_HEIGHT = 32
  */
 export default class Door extends Entity {
 	constructor(dto) {
-		super(dto, null, BG_WIDTH, BG_HEIGHT)
+		super(dto,DoorStateMachine, null, BG_WIDTH, BG_HEIGHT)
 	}
 
 	init() {
-		this.fsm = new DoorStateMachine(this)
-
 		this.onOpenHandler = this.onOpen.bind(this)
 		EventManager.Instance.on(EVENT_ENUM.OPENDOOR, this.onOpenHandler)
 	}

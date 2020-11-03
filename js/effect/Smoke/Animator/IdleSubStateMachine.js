@@ -9,10 +9,13 @@ const IMG_SMOKE_PREFIX = 'images/smoke/smoke'
 export default class IdleSubStateMachine extends DirectionStateMachine {
   constructor(owner, fsm) {
     super(owner, fsm)
-	  this.topClass = IdleTopState
-	  this.bottomClass = SmokeBottomState
-	  this.leftClass = IdleLeftState
-	  this.rightClass = IdleRightState
+  }
+
+  initClass(){
+    this.topClass = IdleTopState
+    this.bottomClass = SmokeBottomState
+    this.leftClass = IdleLeftState
+    this.rightClass = IdleRightState
   }
 
 	initAnimations() {

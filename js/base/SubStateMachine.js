@@ -30,11 +30,10 @@ export default class SubStateMachine {
 		}
 	}
 
-	update() {
-	}
+	update() {}
 
 	render() {
-		if (this.currentState) {
+		if (this.currentState instanceof State) {
 			this.currentState.render()
 		}
 	}

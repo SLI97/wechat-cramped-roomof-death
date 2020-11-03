@@ -9,10 +9,13 @@ const IMG_IDLE_PREFIX = 'images/idle/idle'
 export default class IdleSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.topClass = IdleTopState
-		this.bottomClass = IdleBottomState
-		this.leftClass = IdleLeftState
-		this.rightClass = IdleRightState
+	}
+
+  initClass(){
+    this.topClass = IdleTopState
+    this.bottomClass = IdleBottomState
+    this.leftClass = IdleLeftState
+    this.rightClass = IdleRightState
 	}
 
 	initAnimations() {

@@ -15,6 +15,13 @@ export default class DeathSubStateMachine extends DirectionStateMachine {
 		this.rightClass = DeathRightState
 	}
 
+  initClass(){
+    this.topClass = DeathTopState
+    this.bottomClass = DeathBottomState
+    this.leftClass = DeathLeftState
+    this.rightClass = DeathRightState
+  }
+
 	initAnimations() {
 		this.topAnimations = []
 		this.bottomAnimations = []

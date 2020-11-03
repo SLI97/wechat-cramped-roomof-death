@@ -9,11 +9,14 @@ const IMG_BLOCKTURN_PREFIX = 'images/blockturn/blockturn'
 export default class BlockTurnRightSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.topClass = BlockTurnRightTopState
-		this.bottomClass = BlockTurnRightBottomState
-		this.leftClass = BlockTurnRightLeftState
-		this.rightClass = BlockTurnRightRightState
 	}
+
+  initClass(){
+    this.topClass = BlockTurnRightTopState
+    this.bottomClass = BlockTurnRightBottomState
+    this.leftClass = BlockTurnRightLeftState
+    this.rightClass = BlockTurnRightRightState
+  }
 
 	initAnimations() {
 		this.topAnimations = []

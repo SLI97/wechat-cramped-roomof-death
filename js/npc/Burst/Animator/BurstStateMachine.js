@@ -1,7 +1,7 @@
 import StateMachine from '../../../base/StateMachine'
 import {FSM_PARAM_TYPE_ENUM, PLAYER_STATE} from '../../../enums/index'
 import IdleState from './IdleState'
-import Death from './DeathState'
+import DeathState from './DeathState'
 import ResourceManager from '../../../runtime/ResourceManager'
 
 const PARAMS_NAME = {
@@ -32,7 +32,7 @@ export default class BurstStateMachine extends StateMachine {
 
 	initState() {
 		this.states.set(PLAYER_STATE.IDLE, new IdleState(this.owner, this, this.idleAnimations))
-		this.states.set(PLAYER_STATE.DEATH, new Death(this.owner, this, this.deathAnimations))
+		this.states.set(PLAYER_STATE.DEATH, new DeathState(this.owner, this, this.deathAnimations))
 		this.currentState = this.states.get(PLAYER_STATE.IDLE)
 	}
 

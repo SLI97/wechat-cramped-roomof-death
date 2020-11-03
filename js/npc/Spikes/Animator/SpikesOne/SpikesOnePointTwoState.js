@@ -1,5 +1,4 @@
 import SpikesOnePointState from './SpikesOnePointState'
-import {PLAYER_STATE} from '../../../../enums'
 
 export default class SpikesOnePointTwoState extends SpikesOnePointState{
 	constructor(owner,fsm,animations) {
