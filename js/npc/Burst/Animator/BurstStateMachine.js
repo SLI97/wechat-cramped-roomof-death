@@ -31,7 +31,7 @@ export default class BurstStateMachine extends StateMachine {
 	}
 
 	initState() {
-		this.states.set(PLAYER_STATE.DEATH, new IdleState(this.owner, this, this.idleAnimations))
+		this.states.set(PLAYER_STATE.IDLE, new IdleState(this.owner, this, this.idleAnimations))
 		this.states.set(PLAYER_STATE.DEATH, new Death(this.owner, this, this.deathAnimations))
 		this.currentState = this.states.get(PLAYER_STATE.IDLE)
 	}

@@ -2,6 +2,7 @@ import Scene from './Scene'
 import ResourceManager from '../runtime/ResourceManager'
 import MainMenuScene from './MainMenuScene'
 import SceneManager from './SceneManager'
+import CanvasManager from '../runtime/CanvasManager'
 
 /***
  * 游戏开始场景类，主要负责加载资源后跳转Main Menu场景，后续也可以做loading UI。
@@ -20,6 +21,7 @@ export default class StartScene extends Scene {
 	}
 
 	updateScene() {
+		CanvasManager.Instance.Ctx.fillText(`${ResourceManager.Instance.finishCount}/${ResourceManager.Instance.totalCount}`, 30, 30)
 	}
 
 	endScene() {

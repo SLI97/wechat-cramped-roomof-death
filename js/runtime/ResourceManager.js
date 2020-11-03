@@ -43,6 +43,9 @@ export default class ResourceManager extends Singleton {
 		return super.GetInstance(ResourceManager)
 	}
 
+	finishCount = 0
+	totalCount = 0
+
 	constructor() {
 		super()
 		// 	this.init()
@@ -62,20 +65,20 @@ export default class ResourceManager extends Singleton {
 			const ironskeleton = this.loadIronSkeletonImage()
 			// const woodenskeleton = this.loadWoodenSkeletonImage()
 			const smoke = this.loadSmokeImage()
-			Promise.all(
-				[
-					...bg,
-					...idle,
-					...attack,
-					...turn,
-					...ctrl,
-					...blockturn,
-					...blockside,
-					...blockface,
-					...ironskeleton,
-					...smoke
-				]
-			).then(() => {
+			const allImg = [
+				...bg,
+				...idle,
+				...attack,
+				...turn,
+				...ctrl,
+				...blockturn,
+				...blockside,
+				...blockface,
+				...ironskeleton,
+				...smoke
+			]
+			this.totalCount = allImg.length
+			Promise.all(allImg).then(() => {
 				res()
 			})
 		})
@@ -177,6 +180,7 @@ export default class ResourceManager extends Singleton {
 			image.onload = () => {
 				if (!this.imgMap.has(image.src)) {
 					this.imgMap.set(src, image)
+					this.finishCount++
 				}
 				res()
 			}

@@ -11,32 +11,31 @@ const BG_HEIGHT = 32
  * 裂地板类
  */
 export default class Burst extends Entity {
-	constructor() {
-		super(null, BG_WIDTH, BG_HEIGHT)
-		this.init()
+	constructor(dto) {
+		super(dto, null, BG_WIDTH, BG_HEIGHT)
 	}
 
 	init() {
-		this.prePlayerX = DataManager.Instance.player.targetX
-		this.prePlayerY = DataManager.Instance.player.targetY
+		this.prePlayerX = DataManager.Instance.player.x
+		this.prePlayerY = DataManager.Instance.player.y
 		this.fsm = new BurstStateMachine(this)
 
 		this.onBurstHandler = this.onBurst.bind(this)
-		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE, this.onBurstHandler)
+		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onBurstHandler)
 	}
 
 	onBurst() {
 		//我都死了，别烦我了
-		if(this.state === PLAYER_STATE.DEATH){
+		if (this.state === PLAYER_STATE.DEATH) {
 			return
 		}
 		const {prePlayerX, prePlayerY} = this
-		const {targetX: curPlayerX, targetY: curPlayerY} = DataManager.Instance.player
+		const {x: curPlayerX, y: curPlayerY} = DataManager.Instance.player
 		//如果触发移动事件后，玩家上一步的位置等于我的位置，我他妈直接裂开
 		if (this.x === prePlayerX && this.y === prePlayerY) {
 			this.state = PLAYER_STATE.DEATH
 			//如果我裂开的时候你人在我上面，你直接狗带吧
-			if(this.x === curPlayerX && this.y === curPlayerY){
+			if (this.x === curPlayerX && this.y === curPlayerY) {
 				EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
 			}
 		}

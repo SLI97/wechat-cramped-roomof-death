@@ -25,7 +25,6 @@ export default class MainMenuScene extends Scene {
 	}
 
 	updateScene() {
-		// console.log(999)
 	}
 
 	endScene() {

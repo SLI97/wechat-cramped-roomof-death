@@ -12,17 +12,8 @@ const ENEMY_HEIGHT = 128
  * 敌人基类,主要实现整面向玩家
  */
 export default class Enemy extends Entity {
-	constructor() {
-		super(null, ENEMY_WIDTH, ENEMY_HEIGHT)
-		this.init()
-	}
-
-	init() {
-		this.x = 0
-		this.y = 0
-		this.id = RndNum(8)
-		this.direction = DIRECTION_ENUM.BOTTOM
-		this.state = PLAYER_STATE.IDLE
+	constructor(dto) {
+		super(dto, null, ENEMY_WIDTH, ENEMY_HEIGHT)
 	}
 
 	update() {
@@ -64,11 +55,4 @@ export default class Enemy extends Entity {
 			this.direction = disX >= disY ? DIRECTION_ENUM.RIGHT : DIRECTION_ENUM.BOTTOM
 		}
 	}
-}
-
-function RndNum(n) {
-	let rnd = ''
-	for (let i = 0; i < n; i++)
-		rnd += Math.floor(Math.random() * 10)
-	return rnd
 }

@@ -1,11 +1,8 @@
-import UIManager from './ui/UIManager'
-import Music from './runtime/MusicManager'
 import DataManager from './runtime/DataManager'
 import Singleton from './base/Singleton'
 
 import SceneManager from './scene/SceneManager'
 import StartScene from './scene/StartScene'
-import BattleScene from './scene/BattleScene'
 
 /**
  * 游戏主函数
@@ -23,7 +20,6 @@ export default class Main extends Singleton {
 
 	start() {
 		SceneManager.Instance.setScene(new StartScene(SceneManager.Instance))
-		// SceneManager.Instance.setScene(new BattleScene(SceneManager.Instance))
 		this.loop()
 	}
 

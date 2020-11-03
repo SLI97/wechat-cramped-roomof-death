@@ -6,13 +6,11 @@ import {ENEMY_TYPE_ENUM} from '../../enums/index'
  * 钢铁敌人类
  */
 export default class IronSkeleton extends Enemy {
-	constructor() {
-		super(null)
-		this.init()
+	constructor(dto) {
+		super(dto)
 	}
 
 	init() {
-		super.init()
 		this.type = ENEMY_TYPE_ENUM.SKELETON_IRON
 		this.fsm = new IronSkeletonStateMachine(this)
 	}

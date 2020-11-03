@@ -1,4 +1,3 @@
-import {DIRECTION_ENUM, ENEMY_TYPE_ENUM} from '../enums/index'
 import Singleton from '../base/Singleton'
 
 /**
@@ -40,10 +39,6 @@ export default class DataManager extends Singleton {
 		this.levelIndex = 1
 	}
 
-	getMapInfo() {
-		return this.mapInfo
-	}
-
 	getMapCount() {
 		return {
 			row: this.mapRowCount,
@@ -54,5 +49,4 @@ export default class DataManager extends Singleton {
 	getOffset() {
 		return this.offset
 	}
-
 }

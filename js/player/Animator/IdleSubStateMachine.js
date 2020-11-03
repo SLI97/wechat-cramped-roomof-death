@@ -6,7 +6,6 @@ import DirectionStateMachine from '../../base/DirectionStateMachine'
 
 const IMG_IDLE_PREFIX = 'images/idle/idle'
 
-
 export default class IdleSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)

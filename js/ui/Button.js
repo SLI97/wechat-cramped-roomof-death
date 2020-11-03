@@ -47,12 +47,9 @@ export default class Button extends Sprite {
 
 	touchEventHandler(e) {
 		e.preventDefault()
-
 		let x = e.touches[0].clientX
 		let y = e.touches[0].clientY
-
 		const {startX, startY, endX, endY} = this.position
-
 		if (x >= startX && x <= endX && y >= startY && y <= endY) {
 			this.onClick()
 		}

@@ -25,8 +25,7 @@ export const ENEMY_TYPE_ENUM = {
 	SPIKES_THREE: 'SPIKES_THREE',
 	SPIKES_FOUR: 'SPIKES_FOUR',
 	BURST_FLOOR: 'BURST_FLOOR',
-	DOOR_ROW: 'DOOR_ROW',
-	DOOR_COLUMN: 'DOOR_COLUMN',
+	DOOR: 'DOOR',
 	SMOKE: 'SMOKE'
 }
 
@@ -119,3 +118,38 @@ export const DIRECTION_ORDER = [
 	DIRECTION_ENUM.LEFT,
 	DIRECTION_ENUM.RIGHT,
 ]
+
+/***
+ * 尖刺类型和总点数映射
+ */
+export const SPIKES_TYPE_MAP_POINT = {
+	SPIKES_ONE: 2,
+	SPIKES_TWO: 3,
+	SPIKES_THREE: 4,
+	SPIKES_FOUR: 5,
+}
+
+/***
+ * 尖刺当前点数枚举
+ */
+export
+const SPIKES_CUR_POINT_TYPE = {
+	ZERO: 'ZERO',
+	ONE: 'ONE',
+	TWO: 'TWO',
+	THREE: 'THREE',
+	FOUR: 'FOUR',
+	FIVE: 'FIVE',
+}
+
+/***
+ * 尖刺点数类型和数字映射
+ */
+const SPIKES_POINT_MAP_NUMBER = {
+	ZERO: 0,
+	ONE: 1,
+	TWO: 2,
+	THREE: 3,
+	FOUR: 4,
+	FIVE: 5,
+}

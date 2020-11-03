@@ -11,9 +11,8 @@ const BG_HEIGHT = 32
  * 关卡门类
  */
 export default class Door extends Entity {
-	constructor() {
-		super(null, BG_WIDTH, BG_HEIGHT)
-		this.init()
+	constructor(dto) {
+		super(dto, null, BG_WIDTH, BG_HEIGHT)
 	}
 
 	init() {
@@ -25,7 +24,7 @@ export default class Door extends Entity {
 
 	onOpen() {
 		const enemies = DataManager.Instance.enemies.filter(enemy => enemy.state !== PLAYER_STATE.DEATH)
-		if(enemies.length === 0){
+		if (enemies.length === 0) {
 			this.state = PLAYER_STATE.DEATH
 		}
 	}
