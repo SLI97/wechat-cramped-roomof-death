@@ -5,6 +5,7 @@ import {
   EVENT_ENUM,
   PLAYER_STATE
 } from '../enums/index'
+import {randomByCount} from '../util/index'
 
 import {
   PARAMS_NAME
@@ -22,7 +23,7 @@ export default class Entity extends Sprite {
     this.fsm = new FsmClass(this)
     this.state = state
     this.direction = direction
-    this.id = RndNum(12)
+    this.id = randomByCount(12)
     this.init()
   }
 
@@ -52,7 +53,7 @@ export default class Entity extends Sprite {
   set state(value) {
     this._state = value
     if (this.fsm && this.fsm.params.has(value)) {
-      //同样类型的blick不要覆盖
+      //同样类型的block不要覆盖
       if (this.fsm.currentState === this.fsm.states.get(value)) {
         return
       }
@@ -74,11 +75,4 @@ export default class Entity extends Sprite {
       this.fsm.render()
     }
   }
-}
-
-function RndNum(n) {
-  let rnd = ''
-  for (let i = 0; i < n; i++)
-    rnd += Math.floor(Math.random() * 10)
-  return rnd
 }

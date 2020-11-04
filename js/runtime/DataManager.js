@@ -39,15 +39,4 @@ export default class DataManager extends Singleton {
 
 		this.levelIndex = 1
 	}
-
-	getMapCount() {
-		return {
-			row: this.mapRowCount,
-			column: this.mapColumnCount,
-		}
-	}
-
-	getOffset() {
-		return this.offset
-	}
 }

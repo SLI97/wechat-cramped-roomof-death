@@ -6,7 +6,6 @@ import {
 import CanvasManager from '../runtime/CanvasManager'
 import DataManager from '../runtime/DataManager'
 
-
 const BG_WIDTH = 32
 const BG_HEIGHT = 32
 
@@ -40,7 +39,7 @@ export default class Tile extends Sprite {
   }
 
   render() {
-    const offset = DataManager.Instance.getOffset()
+    const {offset} = DataManager.Instance
     if (!this.img) {
       return
     }
@@ -48,8 +47,8 @@ export default class Tile extends Sprite {
       this.img,
       (this.x * 32) + offset.width,
       (this.y * 32) + offset.height,
-      BG_WIDTH,
-      BG_HEIGHT
+      this.width,
+      this.height
     )
   }
 }

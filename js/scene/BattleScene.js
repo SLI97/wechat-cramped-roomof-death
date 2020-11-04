@@ -56,15 +56,6 @@ export default class BattleScene extends Scene {
 		this.initLevel()
 		this.calcOffset()
 		this.isLoaded = true
-		this.useFade = false
-		// canvas.addEventListener('touchstart', () => {
-		// 	UIManager.Instance.fadeIn()
-		// 	// this.useFade = true
-		// 	// this.oldFrame = DataManager.Instance.frame
-		// 	// setTimeout(() => {
-		// 	// 	this.useFade = false
-		// 	// }, 100000)
-		// })
 	}
 
 	updateScene() {
@@ -78,6 +69,7 @@ export default class BattleScene extends Scene {
 
 	endScene() {
 		this.unBindUI()
+		UIManager.Instance.fadeIn(1000)
 	}
 
 	update() {
@@ -117,32 +109,15 @@ export default class BattleScene extends Scene {
 		}
 
 		UIManager.Instance.render()
-
-
-		// if (this.useFade) {
-		// UIManager.Instance.fadeIn()
-		// const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 1000
-		// CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-		// CanvasManager.Ctx.fillStyle = `rgba(255, 255, 0,${ fadePercent})`
-
-		// CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-		// if (fadePercent > 1) {
-		// 	window.cancelAnimationFrame(this.aniId)
-		// 	this.fadeOut()
-		// } else {
-		// 	this.aniId = window.requestAnimationFrame(this.fadeInHandler.bind(this), canvas)
-		// }
-		// }
 	}
 
 	initLevel() {
 		const level = LEVELS['level' + DataManager.Instance.levelIndex]
 		if (level) {
+			UIManager.Instance.fadeIn(1000)
 			DataManager.Instance.reset()
 
 			this.level = level
-
-			// UIManager.Instance.fadeIn()
 
 			//地图信息
 			DataManager.Instance.mapInfo = this.level.mapInfo.concat()
@@ -155,11 +130,9 @@ export default class BattleScene extends Scene {
 			// this.generateSpikes()
 			this.generateDoor()
 
-			// setTimeout(() => {
-			// 	UIManager.Instance.fadeOut()
-			// }, 1000)
+			UIManager.Instance.fadeOut(1000)
 		} else {
-			// this.sceneManager.setScene(new MainMenuScene(SceneManager.Instance))
+			this.sceneManager.setScene(new MainMenuScene(SceneManager.Instance))
 		}
 	}
 
@@ -279,12 +252,9 @@ export default class BattleScene extends Scene {
 	 * 计算设备宽高把canvas整体偏移到屏幕中央
 	 */
 	calcOffset() {
-		const countObj = DataManager.Instance.getMapCount()
-
-		const rowCount = countObj.row
-		const columnCount = countObj.column
-		const disX = (SCREEN_WIDTH - (BG_WIDTH * rowCount)) / 2
-		const disY = (SCREEN_HEIGHT - (BG_HEIGHT * columnCount)) / 2
+		const {mapRowCount, mapColumnCount} = DataManager.Instance
+		const disX = (SCREEN_WIDTH - (BG_WIDTH * mapRowCount)) / 2
+		const disY = (SCREEN_HEIGHT - (BG_HEIGHT * mapColumnCount)) / 2
 		DataManager.Instance.offset = {
 			width: disX,
 			height: disY

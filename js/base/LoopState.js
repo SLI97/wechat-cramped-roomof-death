@@ -2,10 +2,6 @@ import State from './State'
 import CanvasManager from '../runtime/CanvasManager'
 import DataManager from '../runtime/DataManager'
 
-/***
- * 如果四个方向的state没有太大差异可以提取一个父级state
- * 这样每个具体方向的state可以自定义动画事件（实现event方法），具有更高的自主性
- */
 export default class LoopState extends State {
 	constructor(owner, fsm, animations) {
 		super(animations, true)
@@ -15,7 +11,7 @@ export default class LoopState extends State {
 
 	render() {
 		const image = this.animations[this.index]
-		const offset = DataManager.Instance.getOffset()
+		const {offset} = DataManager.Instance
 		const {
 			x,
 			y,

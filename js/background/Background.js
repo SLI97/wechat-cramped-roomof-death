@@ -1,6 +1,7 @@
 import DataManager from '../runtime/DataManager'
 import Tile from './Tile'
 import Singleton from '../base/Singleton'
+import {randomByRange} from '../util/index'
 
 const IMG_PREFIX = 'images/bg/bg'
 
@@ -31,11 +32,11 @@ export default class Background extends Singleton {
 				}
 				let number = parseInt(item.src)
 				if (number === 1) {
-					number += rnd(0, 4)
+					number += randomByRange(0, 4)
 				} else if (number === 5) {
-					number += rnd(0, 4)
+					number += randomByRange(0, 4)
 				} else if (number === 9) {
-					number += rnd(0, 4)
+					number += randomByRange(0, 4)
 				}
 
 				const imgSrc = `${IMG_PREFIX} (${number}).png`
@@ -61,8 +62,4 @@ export default class Background extends Singleton {
 	getTileMap() {
 		return this.tileMap
 	}
-}
-
-function rnd(start, end) {
-	return Math.floor(Math.random() * (end - start) + start)
 }

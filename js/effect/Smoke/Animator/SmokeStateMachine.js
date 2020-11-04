@@ -42,8 +42,6 @@ export default class SmokeStateMachine extends StateMachine {
 	}
 
 	update() {
-		super.update()
-
 		const currentState = this.currentState
 		switch (currentState) {
 			case this.states.get(PLAYER_STATE.DEATH):
@@ -55,5 +53,7 @@ export default class SmokeStateMachine extends StateMachine {
 				this.currentState = this.states.get(PLAYER_STATE.DEATH)
 				break
 		}
+
+		super.update()
 	}
 }

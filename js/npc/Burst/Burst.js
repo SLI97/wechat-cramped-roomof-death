@@ -16,9 +16,6 @@ export default class Burst extends Entity {
 	}
 
 	init() {
-		this.prePlayerX = DataManager.Instance.player.x
-		this.prePlayerY = DataManager.Instance.player.y
-
 		this.onBurstHandler = this.onBurst.bind(this)
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onBurstHandler)
 	}
@@ -28,17 +25,15 @@ export default class Burst extends Entity {
 		if (this.state === PLAYER_STATE.DEATH) {
 			return
 		}
-		const {prePlayerX, prePlayerY} = this
 		const {x: curPlayerX, y: curPlayerY} = DataManager.Instance.player
-		//如果触发移动事件后，玩家上一步的位置等于我的位置，我他妈直接裂开
-		if (this.x === prePlayerX && this.y === prePlayerY) {
+		if(this.x === curPlayerX && this.y === curPlayerY && this.state === PLAYER_STATE.IDLE){
+			this.state = PLAYER_STATE.ATTACK
+		}else if (this.state === PLAYER_STATE.ATTACK) {
 			this.state = PLAYER_STATE.DEATH
 			//如果我裂开的时候你人在我上面，你直接狗带吧
 			if (this.x === curPlayerX && this.y === curPlayerY) {
 				EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
 			}
 		}
-		this.prePlayerX = curPlayerX
-		this.prePlayerY = curPlayerY
 	}
 }

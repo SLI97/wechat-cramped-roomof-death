@@ -7,9 +7,8 @@ export default class Sprite {
 	constructor(imgSrc = null, width = 0, height = 0, x = 0, y = 0) {
 		if (imgSrc) {
 			const img = ResourceManager.Instance.getImageMap().get(imgSrc)
-			if (img) {
-				this.img = img
-			}
+			if (img) this.img = img
+
 		}
 
 		this.width = width

@@ -47,7 +47,6 @@ export default class IronSkeletonStateMachine extends StateMachine {
 	}
 
 	update() {
-		super.update()
 		const currentState = this.currentState
 		switch (currentState) {
 			case this.states.get(PLAYER_STATE.IDLE):
@@ -61,5 +60,7 @@ export default class IronSkeletonStateMachine extends StateMachine {
 				this.currentState = this.states.get(PLAYER_STATE.IDLE)
 				break
 		}
+
+		super.update()
 	}
 }

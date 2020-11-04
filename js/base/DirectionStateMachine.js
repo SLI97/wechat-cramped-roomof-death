@@ -14,16 +14,6 @@ export default class DirectionStateMachine extends SubStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
 
-		this.topAnimations = []
-		this.bottomAnimations = []
-		this.leftAnimations = []
-		this.rightAnimations = []
-
-		this.topClass = State
-		this.bottomClass = State
-		this.leftClass = State
-		this.rightClass = State
-
 		this.imageMap = ResourceManager.Instance.getImageMap()
 
 		this.init()
@@ -36,11 +26,17 @@ export default class DirectionStateMachine extends SubStateMachine {
 	}
 
 	initClass() {
-
+		this.topClass = State
+		this.bottomClass = State
+		this.leftClass = State
+		this.rightClass = State
 	}
 
 	initAnimations() {
-
+		this.topAnimations = []
+		this.bottomAnimations = []
+		this.leftAnimations = []
+		this.rightAnimations = []
 	}
 
 	initState() {
@@ -48,7 +44,7 @@ export default class DirectionStateMachine extends SubStateMachine {
 		this.states.set(DIRECTION_ENUM.BOTTOM, new this.bottomClass(this.owner, this.fsm, this.bottomAnimations))
 		this.states.set(DIRECTION_ENUM.LEFT, new this.leftClass(this.owner, this.fsm, this.leftAnimations))
 		this.states.set(DIRECTION_ENUM.RIGHT, new this.rightClass(this.owner, this.fsm, this.rightAnimations))
-		this.currentState = this.states.get(DIRECTION_ENUM.BOTTOM)
+		this.currentState = this.states.get(this.owner.direction)
 	}
 
 	update() {

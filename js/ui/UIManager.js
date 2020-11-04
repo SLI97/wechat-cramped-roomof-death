@@ -55,34 +55,51 @@ export default class UIManager extends Singleton {
 		return this[uis].get(type)
 	}
 
-	fadeIn() {
+	/***
+	 * 全局淡入淡出函数
+	 * @param duration  持续时长，单位(ms)
+	 * @returns {Promise<any>}
+	 */
+	fadeIn(duration) {
 		this.oldFrame = DataManager.Instance.frame
-		this.aniId = window.requestAnimationFrame(this.fadeInHandler.bind(this), canvas)
+		this.fadeInPromise = new Promise((resolve, reject) => {
+			this.fadeInPromiseResolve = resolve
+		})
+		window.cancelAnimationFrame(this.aniId)
+		this.aniId = window.requestAnimationFrame(this.fadeInHandler.bind(this, duration), canvas)
+		return this.fadeInPromise
 	}
 
-	fadeOut() {
+	fadeOut(duration) {
 		this.oldFrame = DataManager.Instance.frame
-		this.aniId = window.requestAnimationFrame(this.fadeOutHandler.bind(this), canvas)
+		this.fadeOutPromise = new Promise((resolve, reject) => {
+			this.fadeOutPromiseResolve = resolve
+		})
+		window.cancelAnimationFrame(this.aniId)
+		this.aniId = window.requestAnimationFrame(this.fadeOutHandler.bind(this, duration), canvas)
+		return this.fadeOutPromise
 	}
 
-	fadeInHandler() {
-		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 10
+	fadeInHandler(duration) {
+
+		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / (duration * 60 / 1000)
 		CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${ fadePercent})`
 		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		if (fadePercent > 1) {
 			window.cancelAnimationFrame(this.aniId)
-			this.fadeOut()
+			this.fadeInPromiseResolve()
 		} else {
 			this.aniId = window.requestAnimationFrame(this.fadeInHandler.bind(this), canvas)
 		}
 	}
 
-	fadeOutHandler() {
-		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 10
+	fadeOutHandler(duration) {
+		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / (duration * 60 / 1000)
 		CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${1 - fadePercent})`
 		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		if (fadePercent > 1) {
 			window.cancelAnimationFrame(this.aniId)
+			this.fadeOutPromiseResolve()
 		} else {
 			this.aniId = window.requestAnimationFrame(this.fadeOutHandler.bind(this), canvas)
 		}
