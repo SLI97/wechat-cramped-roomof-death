@@ -29,14 +29,13 @@ export default class Spikes extends Sprite {
 	init({x, y, count, type}) {
 		this.x = x
 		this.y = y
+		this.fsm = new SpikesStateMachine(this)
+		this.fsm.setParams(PARAMS_NAME.SPIKES_TYPE, SPIKES_TYPE_MAP_POINT[type])
 		this.curPointCount = count
 		this.totalPointCount = SPIKES_TYPE_MAP_POINT[type]
 
 		this.onLoopHandler = this.onLoop.bind(this)
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onLoopHandler)
-
-		this.fsm = new SpikesStateMachine(this)
-		this.fsm.setParams(PARAMS_NAME.SPIKES_TYPE, SPIKES_TYPE_MAP_POINT[type])
 	}
 
 	update() {

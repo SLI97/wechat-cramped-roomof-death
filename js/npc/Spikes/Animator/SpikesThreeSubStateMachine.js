@@ -1,20 +1,19 @@
-import {SPIKES_TYPE_MAP_POINT, SPIKES_CUR_POINT_TYPE} from '../../../enums/index'
+import {
+	SPIKES_POINT_MAP_NUMBER,
+	SPIKES_CUR_POINT_TYPE
+} from '../../../enums/index'
 import SubStateMachine from '../../../base/SubStateMachine'
 import ResourceManager from '../../../runtime/ResourceManager'
-
-import {PARAMS_NAME} from './SpikesStateMachine'
+import {
+	PARAMS_NAME
+} from './SpikesStateMachine'
 import SpikesThreePointZeroState from './SpikesThree/SpikesThreePointZeroState'
 import SpikesThreePointOneState from './SpikesThree/SpikesThreePointOneState'
 import SpikesThreePointTwoState from './SpikesThree/SpikesThreePointTwoState'
 import SpikesThreePointThreeState from './SpikesThree/SpikesThreePointThreeState'
 import SpikesThreePointFourState from './SpikesThree/SpikesThreePointFourState'
 
-const SPIKES_POINT_MAP_NUMBER = {
-	ZERO: 0,
-	ONE: 1,
-}
-
-const IMG_DOOR_PREFIX = 'images/bg/bg'
+const IMG_SPIKES_PREFIX = 'images/spikes/spikes'
 
 export default class SpikesOneSubStateMachine extends SubStateMachine {
 	constructor(owner, fsm) {
@@ -31,28 +30,29 @@ export default class SpikesOneSubStateMachine extends SubStateMachine {
 		this.zeroAnimations = []
 		this.oneAnimations = []
 		this.twoAnimations = []
+		this.threeAnimations = []
 		this.fourAnimations = []
 
 		const imageMap = ResourceManager.Instance.getImageMap()
 
-		for (let i = 13; i <= 16; i++) {
-			this.zeroAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		for (let i = 14; i <= 14; i++) {
+			this.zeroAnimations.push(imageMap.get(`${IMG_SPIKES_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 1; i <= 4; i++) {
-			this.oneAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		for (let i = 15; i <= 15; i++) {
+			this.oneAnimations.push(imageMap.get(`${IMG_SPIKES_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 1; i <= 4; i++) {
-			this.twoAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		for (let i = 16; i <= 16; i++) {
+			this.twoAnimations.push(imageMap.get(`${IMG_SPIKES_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 1; i <= 4; i++) {
-			this.threeAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		for (let i = 17; i <= 17; i++) {
+			this.threeAnimations.push(imageMap.get(`${IMG_SPIKES_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 1; i <= 4; i++) {
-			this.fourAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		for (let i = 18; i <= 21; i++) {
+			this.fourAnimations.push(imageMap.get(`${IMG_SPIKES_PREFIX} (${i }).png`))
 		}
 	}
 
@@ -89,7 +89,7 @@ export default class SpikesOneSubStateMachine extends SubStateMachine {
 		}
 	}
 
-	switch(curCount) {
+	switch (curCount) {
 		const value = this.params.get(PARAMS_NAME.CUR_POINT_COUNT).value
 		if (SPIKES_POINT_MAP_NUMBER[curCount] === value) {
 			return

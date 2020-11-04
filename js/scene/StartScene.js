@@ -18,7 +18,7 @@ export default class StartScene extends Scene {
 	}
 
 	beginScene() {
-		UIManager.Instance.fadeOut(1000)
+		// UIManager.Instance.fadeOut(1000)
 		//播放游戏开始音乐
 		ResourceManager.Instance.load().then(() => {
 			this.sceneManager.setScene(new MainMenuScene(SceneManager.Instance))

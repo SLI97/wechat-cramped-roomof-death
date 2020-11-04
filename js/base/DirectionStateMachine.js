@@ -16,6 +16,10 @@ export default class DirectionStateMachine extends SubStateMachine {
 
 		this.imageMap = ResourceManager.Instance.getImageMap()
 
+		this.topAnimations = []
+		this.bottomAnimations = []
+		this.leftAnimations = []
+		this.rightAnimations = []
 		this.init()
 	}
 
@@ -33,10 +37,10 @@ export default class DirectionStateMachine extends SubStateMachine {
 	}
 
 	initAnimations() {
-		this.topAnimations = []
-		this.bottomAnimations = []
-		this.leftAnimations = []
-		this.rightAnimations = []
+		// this.topAnimations = []
+		// this.bottomAnimations = []
+		// this.leftAnimations = []
+		// this.rightAnimations = []
 	}
 
 	initState() {

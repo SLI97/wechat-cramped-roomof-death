@@ -82,19 +82,19 @@ export default class UIManager extends Singleton {
 
 	fadeInHandler(duration) {
 
-		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / (duration * 60 / 1000)
+		const fadePercent = (DataManager.Instance.frame - this.oldFrame) /60
 		CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${ fadePercent})`
 		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		if (fadePercent > 1) {
 			window.cancelAnimationFrame(this.aniId)
 			this.fadeInPromiseResolve()
 		} else {
-			this.aniId = window.requestAnimationFrame(this.fadeInHandler.bind(this), canvas)
+			this.aniId = window.requestAnimationFrame(this.fadeInHandler.bind(this,duration), canvas)
 		}
 	}
 
 	fadeOutHandler(duration) {
-		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / (duration * 60 / 1000)
+		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 60
 		CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${1 - fadePercent})`
 		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		if (fadePercent > 1) {

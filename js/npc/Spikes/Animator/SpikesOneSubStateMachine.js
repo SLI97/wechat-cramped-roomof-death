@@ -4,11 +4,9 @@ import ResourceManager from '../../../runtime/ResourceManager'
 import SpikesOnePointZeroState from './SpikesOne/SpikesOnePointZeroState'
 import SpikesOnePointOneState from './SpikesOne/SpikesOnePointOneState'
 import SpikesOnePointTwoState from './SpikesOne/SpikesOnePointTwoState'
-
 import {PARAMS_NAME} from './SpikesStateMachine'
 
-
-const IMG_DOOR_PREFIX = 'images/bg/bg'
+const IMG_SPIKES_PREFIX = 'images/spikes/spikes'
 
 export default class SpikesOneSubStateMachine extends SubStateMachine {
 	constructor(owner, fsm) {
@@ -28,16 +26,16 @@ export default class SpikesOneSubStateMachine extends SubStateMachine {
 
 		const imageMap = ResourceManager.Instance.getImageMap()
 
-		for (let i = 13; i <= 16; i++) {
-			this.zeroAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		for (let i = 1; i <= 1; i++) {
+			this.zeroAnimations.push(imageMap.get(`${IMG_SPIKES_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 1; i <= 4; i++) {
-			this.oneAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		for (let i = 2; i <= 2; i++) {
+			this.oneAnimations.push(imageMap.get(`${IMG_SPIKES_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 1; i <= 4; i++) {
-			this.twoAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		for (let i = 3; i <= 6; i++) {
+			this.twoAnimations.push(imageMap.get(`${IMG_SPIKES_PREFIX} (${i }).png`))
 		}
 	}
 
@@ -50,6 +48,7 @@ export default class SpikesOneSubStateMachine extends SubStateMachine {
 
 	update() {
 		const currentState = this.currentState
+		// console.log(currentState)
 		switch (currentState) {
 			case this.states.get(SPIKES_CUR_POINT_TYPE.ZERO):
 				this.switch(SPIKES_CUR_POINT_TYPE.ZERO)

@@ -17,11 +17,11 @@ export default class MainMenuScene extends Scene {
 	}
 
 	beginScene() {
-		UIManager.Instance.fadeOut(1000)
+		// UIManager.Instance.fadeOut(1000)
 		// MusicManager.Instance.play()
 		EventManager.Instance.on(EVENT_ENUM.GAME_START, this.startGameHandler)
 		const button = UIManager.Instance.get(UI_ENUM.GAME_START)
-		button.onShow()
+		// button.onShow()
 		this.startGame()
 	}
 
@@ -32,7 +32,7 @@ export default class MainMenuScene extends Scene {
 		EventManager.Instance.off(EVENT_ENUM.GAME_START, this.startGameHandler)
 		const button = UIManager.Instance.get(UI_ENUM.GAME_START)
 		button.onHide()
-		UIManager.Instance.fadeIn(1000)
+		// UIManager.Instance.fadeIn(1000)
 	}
 
 	startGame() {

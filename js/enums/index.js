@@ -132,8 +132,7 @@ export const SPIKES_TYPE_MAP_POINT = {
 /***
  * 尖刺当前点数枚举
  */
-export
-const SPIKES_CUR_POINT_TYPE = {
+export const SPIKES_CUR_POINT_TYPE = {
 	ZERO: 'ZERO',
 	ONE: 'ONE',
 	TWO: 'TWO',
@@ -145,7 +144,7 @@ const SPIKES_CUR_POINT_TYPE = {
 /***
  * 尖刺点数类型和数字映射
  */
-const SPIKES_POINT_MAP_NUMBER = {
+export const SPIKES_POINT_MAP_NUMBER = {
 	ZERO: 0,
 	ONE: 1,
 	TWO: 2,

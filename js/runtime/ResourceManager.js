@@ -34,6 +34,9 @@ const IMG_ATTACK_COUNT = 32
 const IMG_SMOKE_PREFIX = 'images/smoke/smoke'
 const IMG_SMOKE_COUNT = 48
 
+const IMG_SPIKES_PREFIX = 'images/spikes/spikes'
+const IMG_SPIKES_COUNT = 30
+
 /***
  * 资源管理类，主要负责加载图片的加载（监听img的onload事件全部执行）
  */
@@ -65,6 +68,7 @@ export default class ResourceManager extends Singleton {
 			const ironskeleton = this.loadIronSkeletonImage()
 			// const woodenskeleton = this.loadWoodenSkeletonImage()
 			const smoke = this.loadSmokeImage()
+			const spikes = this.loadSpikesImage()
 			const allImg = [
 				...bg,
 				...idle,
@@ -75,7 +79,8 @@ export default class ResourceManager extends Singleton {
 				...blockside,
 				...blockface,
 				...ironskeleton,
-				...smoke
+				...smoke,
+				...spikes,
 			]
 			this.totalCount = allImg.length
 			Promise.all(allImg).then(() => {
@@ -169,6 +174,14 @@ export default class ResourceManager extends Singleton {
 		const promiseList = []
 		for (let i = 0; i < IMG_SMOKE_COUNT; i++) {
 			promiseList.push(this.loadImage(`${IMG_SMOKE_PREFIX} (${i + 1}).png`))
+		}
+		return promiseList
+	}
+
+	loadSpikesImage(){
+		const promiseList = []
+		for (let i = 0; i < IMG_SPIKES_COUNT; i++) {
+			promiseList.push(this.loadImage(`${IMG_SPIKES_PREFIX} (${i + 1}).png`))
 		}
 		return promiseList
 	}

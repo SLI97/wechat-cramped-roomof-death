@@ -215,9 +215,9 @@ export default class Player extends Entity {
 		const bursts = DataManager.Instance.bursts.filter(burst => burst.state !== PLAYER_STATE.DEATH)
 
 		const {
-			row,
-			column
-		} = DataManager.Instance.getMapCount()
+      mapRowCount:row,
+      mapColumnCount:column
+		} = DataManager.Instance
 
 		//按钮方向——向上
 		if (type === CONTROLLER_ENUM.TOP) {

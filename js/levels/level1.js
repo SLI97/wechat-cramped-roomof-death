@@ -428,12 +428,25 @@ const enemies = [{
 	type: ENEMY_TYPE_ENUM.SKELETON_IRON
 }]
 
-const spkies = [{
-	x: 1,
-	y: 1,
-	type: ENEMY_TYPE_ENUM.SPIKES_ONE,
-	count: 0
-}]
+const spikes = [{
+		x: 6,
+		y: 6,
+		type: ENEMY_TYPE_ENUM.SPIKES_ONE,
+		count: 0
+	},
+	{
+		x: 5,
+		y: 6,
+		type: ENEMY_TYPE_ENUM.SPIKES_TWO,
+		count: 0
+	},
+	{
+		x: 4,
+		y: 6,
+		type: ENEMY_TYPE_ENUM.SPIKES_THREE,
+		count: 0
+	}
+]
 
 const bursts = [{
 	x: 1,
@@ -454,7 +467,7 @@ const level1 = {
 	mapInfo,
 	player,
 	enemies,
-	spkies,
+	spikes,
 	bursts,
 	door
 }

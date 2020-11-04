@@ -50,12 +50,16 @@ export default class BattleScene extends Scene {
 		EventManager.Instance.on(EVENT_ENUM.RESTART_LEVEL, this.restartHandler)
 		EventManager.Instance.on(EVENT_ENUM.NEXT_LEVEL, this.nextLevelHandler)
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.checkFinishCurLevelHandler)
-		this.calcOffset()
 		this.onBindUI()
 
 		this.initLevel()
+		this.calcOffset()
 
-		canvas.addEventListener('touchstart', this.onShake.bind(this))
+		// canvas.addEventListener('touchstart', this.onShake.bind(this))
+		// canvas.addEventListener('touchstart', 	()=>{
+		// 	// UIManager.Instance.fadeIn()
+		// 	this.onShake()
+		// })
 	}
 
 	updateScene() {
@@ -83,6 +87,12 @@ export default class BattleScene extends Scene {
 			})
 		}
 
+		if (DataManager.Instance.spikes instanceof Array && DataManager.Instance.spikes.length) {
+			DataManager.Instance.spikes.forEach(spike => {
+				spike.update()
+			})
+		}
+
 		if (DataManager.Instance.smokes instanceof Array && DataManager.Instance.smokes.length) {
 			DataManager.Instance.smokes.forEach(smoke => {
 				smoke.update()
@@ -102,6 +112,10 @@ export default class BattleScene extends Scene {
 
 		DataManager.Instance.enemies.forEach(enemy => {
 			enemy.render()
+		})
+
+		DataManager.Instance.spikes.forEach(spike => {
+			spike.render()
 		})
 
 		if (DataManager.Instance.player) {
@@ -128,7 +142,7 @@ export default class BattleScene extends Scene {
 			this.generatePlayer()
 			this.generateEnemy()
 			// this.generateBursts()
-			// this.generateSpikes()
+			this.generateSpikes()
 			this.generateDoor()
 
 			UIManager.Instance.fadeOut(1000)
@@ -172,9 +186,7 @@ export default class BattleScene extends Scene {
 	generateSpikes() {
 		const list = this.level.spikes.map(item => {
 			let enemy = null
-			if (item.type === ENEMY_TYPE_ENUM.BURST_FLOOR) {
-				enemy = new Spikes(item)
-			}
+			enemy = new Spikes(item)
 			return enemy
 		})
 		DataManager.Instance.spikes = list
@@ -269,10 +281,11 @@ export default class BattleScene extends Scene {
 	 * @param frequency 频率
 	 */
 	onShakeHandler(shakeAmount = 50, duration = 1000, frequency = 4) {
-		const frameOffset = DataManager.Instance.frame - this.oldFrame
+		const frameOffset = (DataManager.Instance.frame - this.oldFrame) / 60 * 1000
 		const Phase = (DataManager.Instance.frame - this.oldFrame) / 60 * 2 * (Math.PI) * frequency
 		const offset = shakeAmount * Math.sin(Phase)
 		DataManager.Instance.offset.width = this.oldOffsetWidth + offset
+		console.log(frameOffset)
 		if (frameOffset > duration) {
 			DataManager.Instance.offset.width = this.oldOffsetWidth
 			window.cancelAnimationFrame(this.aniId)
@@ -286,7 +299,10 @@ export default class BattleScene extends Scene {
 	 * 计算设备宽高把canvas整体偏移到屏幕中央
 	 */
 	calcOffset() {
-		const {mapRowCount, mapColumnCount} = DataManager.Instance
+		const {
+			mapRowCount,
+			mapColumnCount
+		} = DataManager.Instance
 		const disX = (SCREEN_WIDTH - (BG_WIDTH * mapRowCount)) / 2
 		const disY = (SCREEN_HEIGHT - (BG_HEIGHT * mapColumnCount)) / 2
 		DataManager.Instance.offset = {
