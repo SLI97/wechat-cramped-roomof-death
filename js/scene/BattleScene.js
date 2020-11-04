@@ -41,7 +41,6 @@ export default class BattleScene extends Scene {
 		this.restartHandler = this.restart.bind(this)
 		this.nextLevelHandler = this.nextLevel.bind(this)
 		this.checkFinishCurLevelHandler = this.checkFinishCurLevel.bind(this)
-
 		this.isLoaded = false
 	}
 
@@ -51,11 +50,12 @@ export default class BattleScene extends Scene {
 		EventManager.Instance.on(EVENT_ENUM.RESTART_LEVEL, this.restartHandler)
 		EventManager.Instance.on(EVENT_ENUM.NEXT_LEVEL, this.nextLevelHandler)
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.checkFinishCurLevelHandler)
+		this.calcOffset()
 		this.onBindUI()
 
 		this.initLevel()
-		this.calcOffset()
-		this.isLoaded = true
+
+		canvas.addEventListener('touchstart', this.onShake.bind(this))
 	}
 
 	updateScene() {
@@ -114,6 +114,7 @@ export default class BattleScene extends Scene {
 	initLevel() {
 		const level = LEVELS['level' + DataManager.Instance.levelIndex]
 		if (level) {
+			this.isLoaded = false
 			UIManager.Instance.fadeIn(1000)
 			DataManager.Instance.reset()
 
@@ -131,6 +132,8 @@ export default class BattleScene extends Scene {
 			this.generateDoor()
 
 			UIManager.Instance.fadeOut(1000)
+
+			this.isLoaded = true
 		} else {
 			this.sceneManager.setScene(new MainMenuScene(SceneManager.Instance))
 		}
@@ -246,6 +249,37 @@ export default class BattleScene extends Scene {
 		UIManager.Instance.get(UI_ENUM.CTRL_RIGHT).onHide()
 		UIManager.Instance.get(UI_ENUM.CTRL_TURN_LEFT).onHide()
 		UIManager.Instance.get(UI_ENUM.CTRL_TURN_RIGHT).onHide()
+	}
+
+	onShake() {
+		this.oldFrame = DataManager.Instance.frame
+		this.oldOffsetWidth = DataManager.Instance.offset.width
+		this.shakePromise = new Promise((resolve, reject) => {
+			this.shakePromiseResolve = resolve
+		})
+		window.cancelAnimationFrame(this.aniId)
+		this.aniId = window.requestAnimationFrame(this.onShakeHandler.bind(this), canvas)
+		return this.fadeInPromise
+	}
+
+	/***
+	 *
+	 * @param shakeAmount 振幅
+	 * @param duration 持续时间
+	 * @param frequency 频率
+	 */
+	onShakeHandler(shakeAmount = 50, duration = 1000, frequency = 4) {
+		const frameOffset = DataManager.Instance.frame - this.oldFrame
+		const Phase = (DataManager.Instance.frame - this.oldFrame) / 60 * 2 * (Math.PI) * frequency
+		const offset = shakeAmount * Math.sin(Phase)
+		DataManager.Instance.offset.width = this.oldOffsetWidth + offset
+		if (frameOffset > duration) {
+			DataManager.Instance.offset.width = this.oldOffsetWidth
+			window.cancelAnimationFrame(this.aniId)
+			this.shakePromiseResolve()
+		} else {
+			this.aniId = window.requestAnimationFrame(this.onShakeHandler.bind(this), canvas)
+		}
 	}
 
 	/***
