@@ -40,9 +40,9 @@ export default class Entity extends Sprite {
   set direction(value) {
     this._direction = value
     if (this.fsm) {
-      if(DIRECTION_ORDER.findIndex(i => i === this._direction) !== this.fsm.getParams(PARAMS_NAME.DIRECTION)){
+      // if(DIRECTION_ORDER.findIndex(i => i === this._direction) !== this.fsm.getParams(PARAMS_NAME.DIRECTION)){
         this.fsm.setParams(PARAMS_NAME.DIRECTION, DIRECTION_ORDER.findIndex(i => i === this._direction))
-      }
+      // }
     }
   }
 

@@ -7,6 +7,9 @@ const IMG_PREFIX = 'images/ctrl/ctrl'
 const START_BUTTON_WIDTH = 120
 const START_BUTTON_HEIGHT = 120
 
+const CTRL_WIDTH = 48
+const CTRL_HEIGHT = 48
+
 const screenWidth = window.innerWidth
 const screenHeight = window.innerHeight
 
@@ -21,10 +24,10 @@ export default class RestartButton extends Button {
 
 	init() {
 		this.position = {
-			// startX: (screenWidth / 2) - (CTRL_WIDTH * 3 / 2) + xAxis * CTRL_WIDTH,
-			// startY: screenHeight - (CTRL_HEIGHT * 2) - 40 + yAxis * CTRL_HEIGHT,
-			// endX: (screenWidth / 2) - (CTRL_WIDTH * 3 / 2) + xAxis * CTRL_WIDTH + CTRL_WIDTH,
-			// endY: screenHeight - (CTRL_HEIGHT * 2) - 40 + yAxis * CTRL_HEIGHT + CTRL_HEIGHT,
+			startX: 0,
+			startY: 0,
+			endX:  0+START_BUTTON_WIDTH,
+			endY: 0+START_BUTTON_HEIGHT,
 			width: START_BUTTON_WIDTH,
 			height: START_BUTTON_HEIGHT
 		}

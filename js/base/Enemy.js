@@ -1,7 +1,9 @@
 import DataManager from '../runtime/DataManager'
+import EventManager from '../runtime/EventManager'
 import Entity from './Entity'
 import {
 	DIRECTION_ENUM,
+	EVENT_ENUM,
 	PLAYER_STATE
 } from '../enums/index'
 
@@ -16,15 +18,22 @@ export default class Enemy extends Entity {
 		super(dto, fsm, null, ENEMY_WIDTH, ENEMY_HEIGHT)
 	}
 
+	init(){
+		this.onDeadHandler = this.onDead.bind(this)
+		this.onChangeDirectionHandler = this.onChangeDirection.bind(this)
+		EventManager.Instance.on(EVENT_ENUM.ATTACK_ENEMY, this.onDeadHandler)
+		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onChangeDirectionHandler)
+		this.onChangeDirectionHandler(false)
+	}
+
 	update() {
 		super.update()
-		this.changeDirection()
 	}
 
 	/***
 	 * 根据玩家在敌人的方位方便敌人的朝向
 	 */
-	changeDirection() {
+	onChangeDirection(check = true) {
 		if (this.state === PLAYER_STATE.DEATH) {
 			return
 		}
@@ -34,7 +43,7 @@ export default class Enemy extends Entity {
 		} = DataManager.Instance.player
 		const disX = Math.abs(playerX - this.x)
 		const disY = Math.abs(playerY - this.y)
-		if (disX === disY) {
+		if (disX === disY && check) {
 			return
 		}
 
@@ -53,6 +62,16 @@ export default class Enemy extends Entity {
 			//第四象限
 		} else if (playerX >= this.x && playerY >= this.y) {
 			this.direction = disX >= disY ? DIRECTION_ENUM.RIGHT : DIRECTION_ENUM.BOTTOM
+		}
+	}
+	
+
+	onDead(id) {
+		if (this.state === PLAYER_STATE.DEATH) {
+			return
+		}
+		if (this.id === id) {
+			this.state = PLAYER_STATE.DEATH
 		}
 	}
 }

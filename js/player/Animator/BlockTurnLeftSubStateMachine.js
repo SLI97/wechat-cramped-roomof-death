@@ -9,10 +9,6 @@ import DirectionStateMachine from '../../base/DirectionStateMachine'
 export default class BlockTurnLeftSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.topClass = BlockTurnLeftTopState
-		this.bottomClass = BlockTurnLeftBottomState
-		this.leftClass = BlockTurnLeftLeftState
-		this.rightClass = BlockTurnLeftRightState
 	}
 
   initClass(){

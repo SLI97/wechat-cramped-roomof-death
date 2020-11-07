@@ -11,6 +11,7 @@ export default class IronSkeleton extends Enemy {
   }
 
   init() {
+    super.init()
     this.type = ENEMY_TYPE_ENUM.SKELETON_IRON
   }
 }

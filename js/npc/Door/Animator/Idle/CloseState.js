@@ -1,5 +1,6 @@
 import CanvasManager from '../../../../runtime/CanvasManager'
 import NoLoopState from '../../../../base/NoLoopState'
+import DataManager from '../../../../runtime/DataManager'
 
 export default class CloseState extends NoLoopState {
 	constructor(owner,fsm,animations) {
@@ -8,6 +9,7 @@ export default class CloseState extends NoLoopState {
 
 	render() {
 		const image = this.animations[this.index]
+    const {offset,dpr} = DataManager.Instance
 		const {
 			x,
 			y,
@@ -17,10 +19,10 @@ export default class CloseState extends NoLoopState {
 		if (image) {
 			CanvasManager.Ctx.drawImage(
 				image,
-				(x * 32) + this.offset.width - 32 - 15,
-				(y * 32) + this.offset.height - 32 - 18,
-				width,
-				height
+				((x * 32) - 32 - 16)* dpr + offset.width,
+				((y * 32) - 32 - 16)* dpr + offset.height,
+				width * dpr,
+				height * dpr
 			)
 		}
 	}

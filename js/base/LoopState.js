@@ -11,7 +11,7 @@ export default class LoopState extends State {
 
 	render() {
 		const image = this.animations[this.index]
-		const {offset} = DataManager.Instance
+		const {offset,dpr} = DataManager.Instance
 		const {
 			x,
 			y,
@@ -21,10 +21,10 @@ export default class LoopState extends State {
 		if (image) {
 			CanvasManager.Ctx.drawImage(
 				image,
-				(x * 32) + offset.width - 32 - 15,
-				(y * 32) + offset.height - 32 - 18,
-				width,
-				height
+				((x * 32) - 32 - 16)* dpr + offset.width,
+				((y * 32) - 32 - 16)* dpr + offset.height,
+				width * dpr,
+				height * dpr
 			)
 		}
 	}

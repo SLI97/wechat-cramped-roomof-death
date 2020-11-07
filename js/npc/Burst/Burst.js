@@ -25,7 +25,7 @@ export default class Burst extends Entity {
 		if (this.state === PLAYER_STATE.DEATH) {
 			return
 		}
-		const {x: curPlayerX, y: curPlayerY} = DataManager.Instance.player
+		const {targetX: curPlayerX, targetY: curPlayerY} = DataManager.Instance.player
 		if(this.x === curPlayerX && this.y === curPlayerY && this.state === PLAYER_STATE.IDLE){
 			this.state = PLAYER_STATE.ATTACK
 		}else if (this.state === PLAYER_STATE.ATTACK) {

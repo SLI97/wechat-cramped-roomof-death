@@ -53,12 +53,13 @@ export default class BattleScene extends Scene {
 		this.onBindUI()
 
 		this.initLevel()
-		this.calcOffset()
 
 		// canvas.addEventListener('touchstart', this.onShake.bind(this))
 		// canvas.addEventListener('touchstart', 	()=>{
-		// 	// UIManager.Instance.fadeIn()
-		// 	this.onShake()
+		// 	UIManager.Instance.fadeIn().then(()=>{
+		// 		UIManager.Instance.fadeOut()
+		// 	})
+		// this.onShake()
 		// })
 	}
 
@@ -73,12 +74,16 @@ export default class BattleScene extends Scene {
 
 	endScene() {
 		this.unBindUI()
-		UIManager.Instance.fadeIn(1000)
+		UIManager.Instance.fadeIn()
 	}
 
 	update() {
 		if (DataManager.Instance.player) {
 			DataManager.Instance.player.update()
+		}
+
+		if (DataManager.Instance.door) {
+			DataManager.Instance.door.update()
 		}
 
 		if (DataManager.Instance.enemies instanceof Array && DataManager.Instance.enemies.length) {
@@ -98,6 +103,12 @@ export default class BattleScene extends Scene {
 				smoke.update()
 			})
 		}
+
+		if (DataManager.Instance.bursts instanceof Array && DataManager.Instance.bursts.length) {
+			DataManager.Instance.bursts.forEach(burst => {
+				burst.update()
+			})
+		}
 	}
 
 	render() {
@@ -106,59 +117,84 @@ export default class BattleScene extends Scene {
 		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		Background.Instance.render()
 
-		DataManager.Instance.smokes.forEach(smoke => {
-			smoke.render()
-		})
+		if (DataManager.Instance.door) {
+			DataManager.Instance.door.render()
+		}
 
-		DataManager.Instance.enemies.forEach(enemy => {
-			enemy.render()
-		})
 
-		DataManager.Instance.spikes.forEach(spike => {
-			spike.render()
-		})
+		if(DataManager.Instance.smokes.length){
+			DataManager.Instance.smokes.forEach(smoke => {
+				smoke.render()
+			})
+		}
+
+		if(DataManager.Instance.bursts.length){
+			DataManager.Instance.bursts.forEach(burst => {
+				burst.render()
+			})
+		}
+
+		if(DataManager.Instance.spikes.length){
+			DataManager.Instance.spikes.forEach(spike => {
+				spike.render()
+			})
+		}
+
+		if(DataManager.Instance.enemies.length){
+			DataManager.Instance.enemies.forEach(enemy => {
+				enemy.render()
+			})
+		}
 
 		if (DataManager.Instance.player) {
 			DataManager.Instance.player.render()
 		}
 
 		UIManager.Instance.render()
+
 	}
 
 	initLevel() {
 		const level = LEVELS['level' + DataManager.Instance.levelIndex]
 		if (level) {
-			this.isLoaded = false
-			UIManager.Instance.fadeIn(1000)
-			DataManager.Instance.reset()
+			UIManager.Instance.fadeIn().then(() => {
+				DataManager.Instance.reset()
+				this.level = level
+				this.isLoaded = false
 
-			this.level = level
+				//地图信息
+				DataManager.Instance.mapInfo = this.level.mapInfo.concat()
+				DataManager.Instance.mapRowCount = this.level.mapInfo.length || 0
+				DataManager.Instance.mapColumnCount = this.level.mapInfo[0].length || 0
+				this.adaptScreen()
 
-			//地图信息
-			DataManager.Instance.mapInfo = this.level.mapInfo.concat()
-			DataManager.Instance.mapRowCount = this.level.mapInfo.length || 0
-			DataManager.Instance.mapColumnCount = this.level.mapInfo[0].length || 0
+				this.generatePlayer()
+				this.generateEnemy()
+				this.generateBursts()
+				this.generateSpikes()
+				this.generateDoor()
 
-			this.generatePlayer()
-			this.generateEnemy()
-			// this.generateBursts()
-			this.generateSpikes()
-			this.generateDoor()
+				UIManager.Instance.fadeOut()
 
-			UIManager.Instance.fadeOut(1000)
-
-			this.isLoaded = true
+				this.isLoaded = true
+			})
 		} else {
 			this.sceneManager.setScene(new MainMenuScene(SceneManager.Instance))
 		}
 	}
 
 	generatePlayer() {
+		if(!this.level.player){
+			return
+		}
 		const player = new Player(this.level.player)
 		DataManager.Instance.player = player
 	}
 
 	generateEnemy() {
+		if(!this.level.enemies){
+			return
+		}
 		const list = this.level.enemies.map(item => {
 			let enemy = null
 			if (item.type === ENEMY_TYPE_ENUM.SKELETON_WOODEN) {
@@ -166,13 +202,15 @@ export default class BattleScene extends Scene {
 			} else if (item.type === ENEMY_TYPE_ENUM.SKELETON_IRON) {
 				enemy = new IronSkeleton(item)
 			}
-			enemy.direction = item.direction
 			return enemy
 		})
 		DataManager.Instance.enemies = list
 	}
 
 	generateBursts() {
+		if(!this.level.bursts){
+			return
+		}
 		const list = this.level.bursts.map(item => {
 			let enemy = null
 			if (item.type === ENEMY_TYPE_ENUM.BURST_FLOOR) {
@@ -184,6 +222,9 @@ export default class BattleScene extends Scene {
 	}
 
 	generateSpikes() {
+		if(!this.level.spikes){
+			return
+		}
 		const list = this.level.spikes.map(item => {
 			let enemy = null
 			enemy = new Spikes(item)
@@ -193,6 +234,9 @@ export default class BattleScene extends Scene {
 	}
 
 	generateDoor() {
+		if(!this.level.door){
+			return
+		}
 		const door = new Door(this.level.door)
 		DataManager.Instance.door = door
 	}
@@ -210,12 +254,37 @@ export default class BattleScene extends Scene {
 
 	revoke() {
 		const item = DataManager.Instance.records.pop()
+		console.log(item)
 		if (item) {
-			DataManager.Instance.player = item.player
-			DataManager.Instance.enemies = item.enemies
-			DataManager.Instance.spikes = item.spikes
-			DataManager.Instance.bursts = item.bursts
-			DataManager.Instance.door = item.door
+			DataManager.Instance.player.x = DataManager.Instance.player.targetX = item.player.targetX
+			DataManager.Instance.player.y = DataManager.Instance.player.targetY = item.player.targetY
+			DataManager.Instance.player.state = item.player._state
+			DataManager.Instance.player.direction = item.player._direction
+
+			// for (let i = 0; i < item.enemies.length; i++) {
+			// 	const item = item.enemies[i]
+			// 	DataManager.Instance.enemies[i].x = item.x
+			// 	DataManager.Instance.enemies[i].y = item.y
+			// 	DataManager.Instance.enemies[i].state = item.state
+			// 	DataManager.Instance.enemies[i].direction = item.direction
+			// }
+
+			// for (let i = 0; i < item.spikes.length; i++) {
+			// 	const item = item.spikes[i]
+			// 	DataManager.Instance.spikes[i].x = item.x
+			// 	DataManager.Instance.spikes[i].y = item.y
+			// 	DataManager.Instance.spikes[i].state = item.state
+			// 	DataManager.Instance.spikes[i].direction = item.direction
+			// }
+
+			// for (let i = 0; i < item.bursts.length; i++) {
+			// 	const item = item.bursts[i]
+			// 	DataManager.Instance.bursts[i].x = item.x
+			// 	DataManager.Instance.bursts[i].y = item.y
+			// 	DataManager.Instance.bursts[i].state = item.state
+			// }
+
+			// DataManager.Instance.door = item.door
 		} else {
 			//TODO 播放游戏音频
 		}
@@ -241,7 +310,7 @@ export default class BattleScene extends Scene {
 	}
 
 	nextLevel() {
-		DataManager.Instance.levelIndex += 1
+		// DataManager.Instance.levelIndex += 1
 		this.initLevel()
 	}
 
@@ -252,6 +321,8 @@ export default class BattleScene extends Scene {
 		UIManager.Instance.get(UI_ENUM.CTRL_RIGHT).onShow()
 		UIManager.Instance.get(UI_ENUM.CTRL_TURN_LEFT).onShow()
 		UIManager.Instance.get(UI_ENUM.CTRL_TURN_RIGHT).onShow()
+		UIManager.Instance.get(UI_ENUM.RESTART).onShow()
+		UIManager.Instance.get(UI_ENUM.REVOKE).onShow()
 	}
 
 	unBindUI() {
@@ -261,6 +332,8 @@ export default class BattleScene extends Scene {
 		UIManager.Instance.get(UI_ENUM.CTRL_RIGHT).onHide()
 		UIManager.Instance.get(UI_ENUM.CTRL_TURN_LEFT).onHide()
 		UIManager.Instance.get(UI_ENUM.CTRL_TURN_RIGHT).onHide()
+		UIManager.Instance.get(UI_ENUM.RESTART).onHide()
+		UIManager.Instance.get(UI_ENUM.REVOKE).onHide()
 	}
 
 	onShake() {
@@ -298,13 +371,16 @@ export default class BattleScene extends Scene {
 	/***
 	 * 计算设备宽高把canvas整体偏移到屏幕中央
 	 */
-	calcOffset() {
+	adaptScreen() {
+		DataManager.Instance.dpr = SCREEN_WIDTH / 375
+		console.log(	DataManager.Instance.dpr)
+
 		const {
 			mapRowCount,
 			mapColumnCount
 		} = DataManager.Instance
-		const disX = (SCREEN_WIDTH - (BG_WIDTH * mapRowCount)) / 2
-		const disY = (SCREEN_HEIGHT - (BG_HEIGHT * mapColumnCount)) / 2
+		const disX = (SCREEN_WIDTH - (BG_WIDTH * mapRowCount * 	DataManager.Instance.dpr)) / 2
+		const disY = (SCREEN_HEIGHT - (BG_HEIGHT * mapColumnCount * 	DataManager.Instance.dpr)) / 2
 		DataManager.Instance.offset = {
 			width: disX,
 			height: disY

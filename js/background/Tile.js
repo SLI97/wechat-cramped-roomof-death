@@ -17,18 +17,18 @@ export default class Tile extends Sprite {
   }
 
   init() {
-    if (this.type === TILE_TYPE_ENUM.WALL_ROW_START ||
-      this.type === TILE_TYPE_ENUM.WALL_ROW_CENTER ||
-      this.type === TILE_TYPE_ENUM.WALL_ROW_END ||
-      this.type === TILE_TYPE_ENUM.WALL_COLUMN_START ||
-      this.type === TILE_TYPE_ENUM.WALL_COLUMN_CENTER ||
-      this.type === TILE_TYPE_ENUM.WALL_COLUMN_END
+    if (this.type === TILE_TYPE_ENUM.WALL_LEFT_TOP ||
+      this.type === TILE_TYPE_ENUM.WALL_ROW ||
+      this.type === TILE_TYPE_ENUM.WALL_RIGHT_TOP ||
+      this.type === TILE_TYPE_ENUM.WALL_LEFT_BOTTOM ||
+      this.type === TILE_TYPE_ENUM.WALL_RIGHT_BOOTM ||
+      this.type === TILE_TYPE_ENUM.WALL_COLUMN
     ) {
       this.moveable = false
       this.turnable = false
-    } else if (this.type === TILE_TYPE_ENUM.CLIFF_ROW_START ||
-      this.type === TILE_TYPE_ENUM.CLIFF_ROW_CENTER ||
-      this.type === TILE_TYPE_ENUM.CLIFF_ROW_END
+    } else if (this.type === TILE_TYPE_ENUM.CLIFF_LEFT ||
+      this.type === TILE_TYPE_ENUM.CLIFF_CENTER ||
+      this.type === TILE_TYPE_ENUM.CLIFF_RIGHT
     ) {
       this.moveable = false
       this.turnable = true
@@ -39,16 +39,16 @@ export default class Tile extends Sprite {
   }
 
   render() {
-    const {offset} = DataManager.Instance
+    const {offset,dpr} = DataManager.Instance
     if (!this.img) {
       return
     }
     CanvasManager.Ctx.drawImage(
       this.img,
-      (this.x * 32) + offset.width,
-      (this.y * 32) + offset.height,
-      this.width,
-      this.height
+      ((this.x * 32) ) * dpr+ offset.width,
+      ((this.y * 32) )* dpr + offset.height,
+      this.width * dpr,
+      this.height * dpr
     )
   }
 }

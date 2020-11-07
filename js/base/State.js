@@ -16,7 +16,7 @@ export default class State {
 		this.isLoop = isLoop
 		this.index = 0
 		this[timer] = null
-		this.interval = 1000 / 6
+		this.interval = 1000 / 8
 	}
 
 	play() {

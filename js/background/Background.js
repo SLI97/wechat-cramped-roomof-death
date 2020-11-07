@@ -1,15 +1,17 @@
 import DataManager from '../runtime/DataManager'
 import Tile from './Tile'
 import Singleton from '../base/Singleton'
-import {randomByRange} from '../util/index'
+import {
+	randomByRange
+} from '../util/index'
 
 const IMG_PREFIX = 'images/bg/bg'
 
 export default class Background extends Singleton {
 
-  static get Instance() {
-    return super.GetInstance(Background)
-  }
+	static get Instance() {
+		return super.GetInstance(Background)
+	}
 
 	constructor() {
 		super()
@@ -18,7 +20,9 @@ export default class Background extends Singleton {
 
 	initTile() {
 		this.tileMap = []
-		const {mapInfo} = DataManager.Instance
+		const {
+			mapInfo
+		} = DataManager.Instance
 
 		for (let i = 0; i < mapInfo.length; i++) {
 			const colum = mapInfo[i]
@@ -31,11 +35,11 @@ export default class Background extends Singleton {
 					continue
 				}
 				let number = parseInt(item.src)
-				if (number === 1) {
+				if (number === 1 && i % 2 === 0 && j % 2 === 1) {
 					number += randomByRange(0, 4)
-				} else if (number === 5) {
+				} else if (number === 5 && i % 2 === 0 && j % 2 === 1) {
 					number += randomByRange(0, 4)
-				} else if (number === 9) {
+				} else if (number === 9 && i % 2 === 0 && j % 2 === 1) {
 					number += randomByRange(0, 4)
 				}
 
@@ -48,8 +52,7 @@ export default class Background extends Singleton {
 		}
 	}
 
-	update() {
-	}
+	update() {}
 
 	render() {
 		this.tileMap.forEach((list) => {

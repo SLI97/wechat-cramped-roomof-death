@@ -9,10 +9,6 @@ const IMG_WOODENSKELETON_PREFIX = 'images/woodenskeleton/woodenskeleton'
 export default class IdleSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.topClass = IdleTopState
-		this.bottomClass = IdleBottomState
-		this.leftClass = IdleLeftState
-		this.rightClass = IdleRightState
 	}
 
   initClass(){
@@ -28,7 +24,7 @@ export default class IdleSubStateMachine extends DirectionStateMachine {
 		this.leftAnimations = []
 		this.rightAnimations = []
 
-		for (let i = 13; i <= 16; i++) {
+		for (let i = 9; i <= 12; i++) {
 			this.topAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
 		}
 
@@ -36,11 +32,11 @@ export default class IdleSubStateMachine extends DirectionStateMachine {
 			this.bottomAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 9; i <= 12; i++) {
+		for (let i = 5; i <= 8; i++) {
 			this.leftAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 5; i <= 8; i++) {
+		for (let i = 13; i <= 16; i++) {
 			this.rightAnimations.push(this.imageMap.get(`${IMG_WOODENSKELETON_PREFIX} (${i }).png`))
 		}
 	}

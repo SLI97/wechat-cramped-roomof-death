@@ -5,6 +5,7 @@ import DeathSubStateMachine from './DeathSubStateMachine'
 import AttackSubStateMachine from './AttackSubStateMachine'
 
 const PARAMS_NAME = {
+	IDLE: 'IDLE',
 	ATTACK: 'ATTACK',
 	DEATH: 'DEATH',
 	DIRECTION: 'DIRECTION',
@@ -24,12 +25,12 @@ export default class WoodenSkeletonStateMachine extends StateMachine {
 	}
 
 	initParams() {
-		this.params.set(PARAMS_NAME.ATTACK, {
+		this.params.set(PARAMS_NAME.IDLE, {
 			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
 			value: false,
 		})
 
-		this.params.set(PARAMS_NAME.BLOCK, {
+		this.params.set(PARAMS_NAME.ATTACK, {
 			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
 			value: false,
 		})
@@ -63,7 +64,9 @@ export default class WoodenSkeletonStateMachine extends StateMachine {
 				}
 				break
 			case this.states.get(PLAYER_STATE.ATTACK):
-				if (this.params.get(PARAMS_NAME.DEATH).value) {
+				if(this.params.get(PARAMS_NAME.IDLE).value){
+					this.currentState = this.states.get(PLAYER_STATE.IDLE)
+				}	else if (this.params.get(PARAMS_NAME.DEATH).value) {
 					this.currentState = this.states.get(PLAYER_STATE.DEATH)
 				}
 				break

@@ -11,6 +11,8 @@ import ControllerLeftButton from './Controller/ControllerLeftButton'
 import ControllerRightButton from './Controller/ControllerRightButton'
 import ControllerTurnLeftButton from './Controller/ControllerTurnLeftButton'
 import ControllerTurnRightButton from './Controller/ControllerTurnRightButton'
+import RestartButton from './RestartButton'
+import RevokeButton from './RevokeButton'
 
 const SCREEN_WIDTH = window.innerWidth
 const SCREEN_HEIGHT = window.innerHeight
@@ -34,6 +36,8 @@ export default class UIManager extends Singleton {
 	init() {
 		this.oldFrame = 0
 		this.aniId = 0
+		this.isFading = false
+		this.fadePercent = 0
 
 		this[uis] = new Map()
 		this[uis].set(UI_ENUM.GAME_START, new StartButton())
@@ -43,11 +47,18 @@ export default class UIManager extends Singleton {
 		this[uis].set(UI_ENUM.CTRL_RIGHT, new ControllerRightButton())
 		this[uis].set(UI_ENUM.CTRL_TURN_LEFT, new ControllerTurnLeftButton())
 		this[uis].set(UI_ENUM.CTRL_TURN_RIGHT, new ControllerTurnRightButton())
+		this[uis].set(UI_ENUM.RESTART, new RestartButton())
+		this[uis].set(UI_ENUM.REVOKE, new RevokeButton())
 	}
 
 	render() {
 		for (const [key, value] of this[uis]) {
 			value.render()
+		}
+
+		if(this.isFading){
+			CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${ this.fadePercent})`
+			CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		}
 	}
 
@@ -60,7 +71,8 @@ export default class UIManager extends Singleton {
 	 * @param duration  持续时长，单位(ms)
 	 * @returns {Promise<any>}
 	 */
-	fadeIn(duration) {
+	fadeIn(duration = 100) {
+		this.isFading = true
 		this.oldFrame = DataManager.Instance.frame
 		this.fadeInPromise = new Promise((resolve, reject) => {
 			this.fadeInPromiseResolve = resolve
@@ -70,7 +82,8 @@ export default class UIManager extends Singleton {
 		return this.fadeInPromise
 	}
 
-	fadeOut(duration) {
+	fadeOut(duration = 100) {
+		this.isFading = true
 		this.oldFrame = DataManager.Instance.frame
 		this.fadeOutPromise = new Promise((resolve, reject) => {
 			this.fadeOutPromiseResolve = resolve
@@ -81,27 +94,24 @@ export default class UIManager extends Singleton {
 	}
 
 	fadeInHandler(duration) {
-
-		const fadePercent = (DataManager.Instance.frame - this.oldFrame) /60
-		CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${ fadePercent})`
-		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-		if (fadePercent > 1) {
+		this.fadePercent = (DataManager.Instance.frame - this.oldFrame) / (60 * duration / 1000)
+		if (this.fadePercent > 1) {
 			window.cancelAnimationFrame(this.aniId)
 			this.fadeInPromiseResolve()
+			this.isFading = false
 		} else {
-			this.aniId = window.requestAnimationFrame(this.fadeInHandler.bind(this,duration), canvas)
+			this.aniId = window.requestAnimationFrame(this.fadeInHandler.bind(this, duration), canvas)
 		}
 	}
 
 	fadeOutHandler(duration) {
-		const fadePercent = (DataManager.Instance.frame - this.oldFrame) / 60
-		CanvasManager.Ctx.fillStyle = `rgba(0, 0, 0,${1 - fadePercent})`
-		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-		if (fadePercent > 1) {
+		this.fadePercent = 1- (DataManager.Instance.frame - this.oldFrame) / (60 * duration / 1000)
+		if (this.fadePercent > 1) {
 			window.cancelAnimationFrame(this.aniId)
 			this.fadeOutPromiseResolve()
+			this.isFading = false
 		} else {
-			this.aniId = window.requestAnimationFrame(this.fadeOutHandler.bind(this), canvas)
+			this.aniId = window.requestAnimationFrame(this.fadeOutHandler.bind(this, duration), canvas)
 		}
 	}
 }

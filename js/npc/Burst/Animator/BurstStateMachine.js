@@ -10,7 +10,7 @@ const PARAMS_NAME = {
 	DEATH: 'DEATH'
 }
 
-const IMG_DOOR_PREFIX = 123
+const IMG_BURST_PREFIX = 'images/burst/burst'
 
 export default class BurstStateMachine extends StateMachine {
 	constructor(owner) {
@@ -44,16 +44,16 @@ export default class BurstStateMachine extends StateMachine {
 		this.attackAnimations = []
 		this.deathAnimations = []
 
-		for (let i = 13; i <= 16; i++) {
-			this.idleAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		for (let i = 1; i <= 1; i++) {
+			this.idleAnimations.push(imageMap.get(`${IMG_BURST_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 13; i <= 16; i++) {
-			this.attackAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		for (let i = 2; i <= 2; i++) {
+			this.attackAnimations.push(imageMap.get(`${IMG_BURST_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 13; i <= 16; i++) {
-			this.deathAnimations.push(imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
+		for (let i = 3; i <= 7; i++) {
+			this.deathAnimations.push(imageMap.get(`${IMG_BURST_PREFIX} (${i }).png`))
 		}
 	}
 
@@ -66,6 +66,7 @@ export default class BurstStateMachine extends StateMachine {
 
 	update() {
 		const currentState = this.currentState
+		// console.log(currentState)
 		switch (currentState) {
 			case this.states.get(PLAYER_STATE.IDLE):
 				if (this.params.get(PARAMS_NAME.ATTACK).value) {

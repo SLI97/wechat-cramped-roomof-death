@@ -95,6 +95,10 @@ export default class SpikesOneSubStateMachine extends SubStateMachine {
 			return
 		}
 
-		this.currentState = this.states.get(SPIKES_POINT_MAP_NUMBER[curCount])
+		for(const key in SPIKES_POINT_MAP_NUMBER){
+			if(SPIKES_POINT_MAP_NUMBER[key] === value){
+				this.currentState = this.states.get(key)
+			}
+		}
 	}
 }

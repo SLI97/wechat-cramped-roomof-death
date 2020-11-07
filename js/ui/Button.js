@@ -1,5 +1,6 @@
 import Sprite from '../base/Sprite'
 import CanvasManager from '../runtime/CanvasManager'
+import DataManager from "../runtime/DataManager";
 
 
 /***
@@ -10,6 +11,7 @@ export default class Button extends Sprite {
 		super(img)
 		this.visible = false
 		this.touchHandler = this.touchEventHandler.bind(this)
+		this.init()
 	}
 
 	render() {
@@ -18,12 +20,13 @@ export default class Button extends Sprite {
 		}
 
 		const {startX, startY, width, height} = this.position
+    const {offset,dpr} = DataManager.Instance
 		CanvasManager.Ctx.drawImage(
 			this.img,
-			startX,
+			startX ,
 			startY,
-			width,
-			height
+      width * dpr,
+      height * dpr
 		)
 	}
 

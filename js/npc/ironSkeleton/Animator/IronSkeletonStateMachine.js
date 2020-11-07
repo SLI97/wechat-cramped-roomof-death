@@ -24,11 +24,6 @@ export default class IronSkeletonStateMachine extends StateMachine {
 	}
 
 	initParams() {
-		this.params.set(PARAMS_NAME.BLOCK, {
-			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
-			value: false,
-		})
-
 		this.params.set(PARAMS_NAME.DEATH, {
 			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
 			value: false,

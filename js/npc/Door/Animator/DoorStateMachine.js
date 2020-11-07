@@ -5,6 +5,7 @@ import IdleStateMachine from './IdleStateMachine'
 
 const PARAMS_NAME = {
 	DEATH: 'DEATH',
+	IDLE: 'IDLE',
 	DIRECTION: 'DIRECTION',
 }
 
@@ -21,6 +22,11 @@ export default class DoorStateMachine extends StateMachine {
 	}
 
 	initParams() {
+		this.params.set(PARAMS_NAME.IDLE, {
+			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
+			value: false
+		})
+
 		this.params.set(PARAMS_NAME.DEATH, {
 			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
 			value: false
@@ -42,12 +48,12 @@ export default class DoorStateMachine extends StateMachine {
 		const currentState = this.currentState
 		switch (currentState) {
 			case this.states.get(PLAYER_STATE.IDLE):
-				if (!this.params.get(PARAMS_NAME.DEATH).value) {
+				if (this.params.get(PARAMS_NAME.DEATH).value) {
 					this.currentState = this.states.get(PLAYER_STATE.DEATH)
 				}
 				break
 			case this.states.get(PLAYER_STATE.DEATH):
-				if (this.params.get(PARAMS_NAME.OPEN).value) {
+				if (this.params.get(PARAMS_NAME.IDLE).value) {
 					this.currentState = this.states.get(PARAMS_NAME.IDLE)
 				}
 				break

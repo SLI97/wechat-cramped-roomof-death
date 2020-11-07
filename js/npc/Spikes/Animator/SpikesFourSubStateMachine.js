@@ -65,7 +65,7 @@ export default class SpikesOneSubStateMachine extends SubStateMachine {
     this.states.set(SPIKES_CUR_POINT_TYPE.TWO, new SpikesFourPointTwoState(this.owner, this.fsm, this.twoAnimations))
     this.states.set(SPIKES_CUR_POINT_TYPE.THREE, new SpikesFourPointThreeState(this.owner, this.fsm, this.threeAnimations))
     this.states.set(SPIKES_CUR_POINT_TYPE.FOUR, new SpikesFourPointFourState(this.owner, this.fsm, this.fourAnimations))
-    this.states.set(SPIKES_CUR_POINT_TYPE.FOUR, new SpikesFourPointFiveState(this.owner, this.fsm, this.fiveAnimations))
+    this.states.set(SPIKES_CUR_POINT_TYPE.FIVE, new SpikesFourPointFiveState(this.owner, this.fsm, this.fiveAnimations))
     this.currentState = this.states.get(SPIKES_CUR_POINT_TYPE.ZERO)
   }
 
@@ -98,10 +98,14 @@ export default class SpikesOneSubStateMachine extends SubStateMachine {
 
   switch(curCount) {
     const value = this.params.get(PARAMS_NAME.CUR_POINT_COUNT).value
-    if (SPIKES_POINT_MAP_NUMBER[curCount] === value) {
-      return
-    }
+		if (SPIKES_POINT_MAP_NUMBER[curCount] === value) {
+			return
+		}
 
-    this.currentState = this.states.get(SPIKES_POINT_MAP_NUMBER[curCount])
+		for(const key in SPIKES_POINT_MAP_NUMBER){
+			if(SPIKES_POINT_MAP_NUMBER[key] === value){
+				this.currentState = this.states.get(key)
+			}
+		}
   }
 }

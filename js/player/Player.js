@@ -24,7 +24,7 @@ const PLAYER_HEIGHT = 128
 export default class Player extends Entity {
 
 	constructor(dto) {
-		super(dto,PlayerStateMachine, null, PLAYER_WIDTH, PLAYER_HEIGHT)
+		super(dto, PlayerStateMachine, null, PLAYER_WIDTH, PLAYER_HEIGHT)
 	}
 
 	init() {
@@ -37,7 +37,8 @@ export default class Player extends Entity {
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputProcessHandler)
 		EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.onDeadHandler)
 
-		this.isMoveEnd = true
+		this.isMoveEndX = true
+		this.isMoveEndY = true
 
 	}
 
@@ -64,17 +65,17 @@ export default class Player extends Entity {
 
 		if (Math.abs(this.targetX - this.x) < 0.01) {
 			this.x = this.targetX
-			this.onMoveEnd()
+			this.onMoveEnd('X')
 		}
 		if (Math.abs(this.targetY - this.y) < 0.01) {
 			this.y = this.targetY
-			this.onMoveEnd()
+			this.onMoveEnd('Y')
 		}
 	}
 
-	onMoveEnd() {
-		if (!this.isMoveEnd) {
-			this.isMoveEnd = true
+	onMoveEnd(type) {
+		if (!this[`isMoveEnd${type}`]) {
+			this[`isMoveEnd${type}`] = true
 			EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
 		}
 	}
@@ -91,17 +92,21 @@ export default class Player extends Entity {
 	 * @param type
 	 */
 	inputProcess(type) {
-		if (this.state === PLAYER_STATE.ATTACK) {
+		if (!this.isMoveEndX || !this.isMoveEndY) {
 			return
 		}
+
+		// if (this.state === PLAYER_STATE.ATTACK) {
+		// 	return
+		// }
 
 		const id = this.attackEnemy(type)
 		if (id !== -1) {
 			console.log('attack!')
-			this.state = PLAYER_STATE.ATTACK
-			EventManager.Instance.emit(EVENT_ENUM.ATTACK_ENEMY, id)
 			EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
 			EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
+			this.state = PLAYER_STATE.ATTACK
+			EventManager.Instance.emit(EVENT_ENUM.ATTACK_ENEMY, id)
 			return
 		}
 
@@ -118,18 +123,24 @@ export default class Player extends Entity {
 	 * @param type 控制类型CONTROLLER_ENUM之一
 	 */
 	move(type) {
+		EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
+		EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
 		if (type === CONTROLLER_ENUM.TOP) {
 			this.targetY -= 1
 			this.state = PLAYER_STATE.IDLE
+			this.isMoveEndY = false
 		} else if (type === CONTROLLER_ENUM.BOTTOM) {
 			this.targetY += 1
 			this.state = PLAYER_STATE.IDLE
+			this.isMoveEndY = false
 		} else if (type === CONTROLLER_ENUM.LEFT) {
 			this.targetX -= 1
 			this.state = PLAYER_STATE.IDLE
+			this.isMoveEndX = false
 		} else if (type === CONTROLLER_ENUM.RIGHT) {
 			this.targetX += 1
 			this.state = PLAYER_STATE.IDLE
+			this.isMoveEndX = false
 		} else if (type === CONTROLLER_ENUM.TURNLEFT) {
 			this.state = PLAYER_STATE.TURNLEFT
 			if (this.direction === DIRECTION_ENUM.TOP) {
@@ -155,9 +166,6 @@ export default class Player extends Entity {
 			}
 			this.state = PLAYER_STATE.TURNRIGHT
 		}
-		EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
-		EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
-		this.isMoveEnd = false
 
 		// this.showSmoke()
 	}
@@ -208,15 +216,23 @@ export default class Player extends Entity {
 	 * @param type
 	 */
 	WillBlock(type) {
-		const {targetX:x, targetY:y, direction} = this
+		const {
+			targetX: x,
+			targetY: y,
+			direction
+		} = this
 		const tileInfo = Background.Instance.getTileMap()
 		const enemies = DataManager.Instance.enemies.filter(enemy => enemy.state !== PLAYER_STATE.DEATH)
-		const {x: doorX, y: doorY, state: doorState} = DataManager.Instance.door
+		const {
+			x: doorX,
+			y: doorY,
+			state: doorState
+		} = DataManager.Instance.door
 		const bursts = DataManager.Instance.bursts.filter(burst => burst.state !== PLAYER_STATE.DEATH)
 
 		const {
-      mapRowCount:row,
-      mapColumnCount:column
+			mapRowCount: row,
+			mapColumnCount: column
 		} = DataManager.Instance
 
 		//按钮方向——向上
@@ -237,7 +253,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[x][weaponNextY]
 
 				//判断门
-				if (doorX === x && doorY === playerNextY && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === x && doorY === playerNextY) || (doorX === x && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKFRONT
 					return true
 				}
@@ -262,8 +278,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKFRONT
 					return true
 				}
@@ -281,7 +296,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[x][weaponNextY]
 
 				//判断门
-				if (doorX === x && doorY === playerNextY && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === x && doorY === playerNextY) || (doorX === x && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKBACK
 					return true
 				}
@@ -306,8 +321,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKBACK
 					return true
 				}
@@ -326,7 +340,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
 
 				//判断门
-				if (doorX === x && doorY === playerNextY && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === x && doorY === playerNextY) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 					return true
 				}
@@ -351,8 +365,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 					return true
 				}
@@ -371,7 +384,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
 
 				//判断门
-				if (doorX === x && doorY === playerNextY && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === x && doorY === playerNextY) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKLEFT
 					return true
 				}
@@ -396,8 +409,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKLEFT
 					return true
 				}
@@ -421,7 +433,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[x][weaponNextY]
 
 				//判断门
-				if (doorX === x && doorY === playerNextY && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === x && doorY === playerNextY) || (doorX === x && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKBACK
 					return true
 				}
@@ -446,8 +458,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKBACK
 					return true
 				}
@@ -465,7 +476,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[x][weaponNextY]
 
 				//判断门
-				if (doorX === x && doorY === playerNextY && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === x && doorY === playerNextY) || (doorX === x && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKFRONT
 					return true
 				}
@@ -490,8 +501,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKFRONT
 					return true
 				}
@@ -510,7 +520,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
 
 				//判断门
-				if (doorX === x && doorY === playerNextY && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === x && doorY === playerNextY) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKLEFT
 					return true
 				}
@@ -535,8 +545,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKLEFT
 					return true
 				}
@@ -555,7 +564,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
 
 				//判断门
-				if (doorX === x && doorY === playerNextY && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === x && doorY === playerNextY) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 					return true
 				}
@@ -580,8 +589,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 					return true
 				}
@@ -607,7 +615,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
 
 				//判断门
-				if (doorX === playerNextX && doorY === y && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKLEFT
 					return true
 				}
@@ -632,8 +640,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKLEFT
 					return true
 				}
@@ -653,7 +660,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
 
 				//判断门
-				if (doorX === playerNextX && doorY === y && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 					return true
 				}
@@ -678,8 +685,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 					return true
 				}
@@ -698,7 +704,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][y]
 
 				//判断门
-				if (doorX === playerNextX && doorY === y && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === y)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKFRONT
 					return true
 				}
@@ -723,8 +729,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKFRONT
 					return true
 				}
@@ -743,7 +748,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][y]
 
 				//判断门
-				if (doorX === playerNextX && doorY === y && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === y)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKBACK
 					return true
 				}
@@ -768,8 +773,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKBACK
 					return true
 				}
@@ -794,7 +798,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
 
 				//判断门
-				if (doorX === playerNextX && doorY === y && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 					return true
 				}
@@ -819,8 +823,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKRIGHT
 					return true
 				}
@@ -839,7 +842,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
 
 				//判断门
-				if (doorX === playerNextX && doorY === y && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKLEFT
 					return true
 				}
@@ -864,8 +867,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKLEFT
 					return true
 				}
@@ -883,7 +885,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][y]
 
 				//判断门
-				if (doorX === playerNextX && doorY === y && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === y)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKBACK
 					return true
 				}
@@ -908,8 +910,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKBACK
 					return true
 				}
@@ -927,7 +928,7 @@ export default class Player extends Entity {
 				const nextWeaponTile = tileInfo[weaponNextX][y]
 
 				//判断门
-				if (doorX === playerNextX && doorY === y && doorState !== PLAYER_STATE.DEATH) {
+				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === y)) && doorState !== PLAYER_STATE.DEATH) {
 					this.state = PLAYER_STATE.BLOCKFRONT
 					return true
 				}
@@ -952,8 +953,7 @@ export default class Player extends Entity {
 				}
 
 				//最后判断地图元素
-				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {
-				} else {
+				if ((nextPlayerTile && nextPlayerTile.moveable) && (!nextWeaponTile || nextWeaponTile.turnable)) {} else {
 					this.state = PLAYER_STATE.BLOCKFRONT
 					return true
 				}
@@ -978,8 +978,8 @@ export default class Player extends Entity {
 			}
 
 			//判断门
-			if ((doorX === x && doorY === nextY || doorX === nextX && doorY === y || doorX === nextX && doorY === nextY)
-				&& doorState !== PLAYER_STATE.DEATH) {
+			if ((doorX === x && doorY === nextY || doorX === nextX && doorY === y || doorX === nextX && doorY === nextY) &&
+				doorState !== PLAYER_STATE.DEATH) {
 				this.state = PLAYER_STATE.BLOCKTURNLEFT
 				return true
 			}
@@ -1013,8 +1013,7 @@ export default class Player extends Entity {
 				(!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
 				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
 				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
-			) {
-			} else {
+			) {} else {
 				this.state = PLAYER_STATE.BLOCKTURNLEFT
 				return true
 			}
@@ -1038,8 +1037,8 @@ export default class Player extends Entity {
 			}
 
 			//判断门
-			if ((doorX === x && doorY === nextY || doorX === nextX && doorY === y || doorX === nextX && doorY === nextY)
-				&& doorState !== PLAYER_STATE.DEATH) {
+			if ((doorX === x && doorY === nextY || doorX === nextX && doorY === y || doorX === nextX && doorY === nextY) &&
+				doorState !== PLAYER_STATE.DEATH) {
 				this.state = PLAYER_STATE.BLOCKTURNRIGHT
 				return true
 			}
@@ -1072,8 +1071,7 @@ export default class Player extends Entity {
 				(!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
 				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
 				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
-			) {
-			} else {
+			) {} else {
 				this.state = PLAYER_STATE.BLOCKTURNRIGHT
 				return true
 			}

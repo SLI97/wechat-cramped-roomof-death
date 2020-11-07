@@ -15,6 +15,7 @@ export default class DataManager extends Singleton {
 
 	reset() {
 		this.frame = 0
+		this.dpr = 1
 
 		//地图偏移
 		this.offset = {
@@ -37,6 +38,6 @@ export default class DataManager extends Singleton {
 
 		this.records = []
 
-		this.levelIndex = 1
+		this.levelIndex = 21
 	}
 }

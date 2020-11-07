@@ -33,10 +33,10 @@ export default class StateMachine {
 	}
 
 	update() {
-		if (this.currentState) {
+		if (this.currentState instanceof SubStateMachine) {
 			this.currentState.update()
-			this.resetTrigger()
 		}
+		this.resetTrigger()
 	}
 
 	render() {

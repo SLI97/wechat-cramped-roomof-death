@@ -4,7 +4,7 @@ import CloseBottomState from './Idle/CloseBottomState'
 import CloseLeftState from './Idle/CloseLeftState'
 import CloseRightState from './Idle/CloseRightState'
 
-const IMG_DOOR_PREFIX = 'images/bg/bg'
+const IMG_DOOR_PREFIX = 'images/door/door'
 
 export default class IdleStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
@@ -24,19 +24,19 @@ export default class IdleStateMachine extends DirectionStateMachine {
 		this.leftAnimations = []
 		this.rightAnimations = []
 
-		for (let i = 20; i <= 20; i++) {
+		for (let i = 1; i <= 1; i++) {
 			this.topAnimations.push(this.imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 20; i <= 20; i++) {
+		for (let i = 1; i <= 1; i++) {
 			this.bottomAnimations.push(this.imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 20; i <= 20; i++) {
+		for (let i = 2; i <= 2; i++) {
 			this.leftAnimations.push(this.imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 20; i <= 20; i++) {
+		for (let i = 2; i <= 2; i++) {
 			this.rightAnimations.push(this.imageMap.get(`${IMG_DOOR_PREFIX} (${i }).png`))
 		}
 	}

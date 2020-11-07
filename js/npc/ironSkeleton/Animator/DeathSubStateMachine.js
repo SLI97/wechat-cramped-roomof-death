@@ -9,10 +9,6 @@ const IMG_IRONSKELETON_PREFIX = 'images/ironskeleton/ironskeleton'
 export default class DeathSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
 		super(owner, fsm)
-		this.topClass = DeathTopState
-		this.bottomClass = DeathBottomState
-		this.leftClass = DeathLeftState
-		this.rightClass = DeathRightState
 	}
 
   initClass(){

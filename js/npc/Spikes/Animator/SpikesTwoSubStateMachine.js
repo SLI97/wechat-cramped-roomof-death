@@ -41,7 +41,7 @@ export default class SpikesTwoSubStateMachine extends SubStateMachine {
 		}
 
     for (let i = 10; i <= 13; i++) {
-      this.twoAnimations.push(imageMap.get(`${IMG_SPIKES_PREFIX} (${i }).png`))
+      this.threeAnimations.push(imageMap.get(`${IMG_SPIKES_PREFIX} (${i }).png`))
     }
 	}
 
@@ -55,7 +55,6 @@ export default class SpikesTwoSubStateMachine extends SubStateMachine {
 
 	update() {
 		const currentState = this.currentState
-		// console.log(currentState)
 		switch (currentState) {
 			case this.states.get(SPIKES_CUR_POINT_TYPE.ZERO):
 				this.switch(SPIKES_CUR_POINT_TYPE.ZERO)
@@ -81,6 +80,10 @@ export default class SpikesTwoSubStateMachine extends SubStateMachine {
 			return
 		}
 
-		this.currentState = this.states.get(SPIKES_POINT_MAP_NUMBER[curCount])
+		for(const key in SPIKES_POINT_MAP_NUMBER){
+			if(SPIKES_POINT_MAP_NUMBER[key] === value){
+				this.currentState = this.states.get(key)
+			}
+		}
 	}
 }

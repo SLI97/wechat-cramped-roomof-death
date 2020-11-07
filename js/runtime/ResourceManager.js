@@ -2,7 +2,10 @@ import Singleton from '../base/Singleton'
 
 
 const IMG_BG_PREFIX = 'images/bg/bg'
-const IMG_BG_COUNT = 20
+const IMG_BG_COUNT = 19
+
+const IMG_DOOR_PREFIX = 'images/door/door'
+const IMG_DOOR_COUNT = 2
 
 const IMG_IDLE_PREFIX = 'images/idle/idle'
 const IMG_IDLE_COUNT = 16
@@ -37,6 +40,9 @@ const IMG_SMOKE_COUNT = 48
 const IMG_SPIKES_PREFIX = 'images/spikes/spikes'
 const IMG_SPIKES_COUNT = 30
 
+const IMG_BURST_PREFIX = 'images/burst/burst'
+const IMG_BURST_COUNT = 7
+
 /***
  * 资源管理类，主要负责加载图片的加载（监听img的onload事件全部执行）
  */
@@ -66,9 +72,11 @@ export default class ResourceManager extends Singleton {
 			const blockside = this.loadBlockSideImage()
 			const blockface = this.loadBlockFaceImage()
 			const ironskeleton = this.loadIronSkeletonImage()
-			// const woodenskeleton = this.loadWoodenSkeletonImage()
+			const woodenskeleton = this.loadWoodenSkeletonImage()
 			const smoke = this.loadSmokeImage()
 			const spikes = this.loadSpikesImage()
+			const burst = this.loadBurstImage()
+			const door = this.loadDoorImage()
 			const allImg = [
 				...bg,
 				...idle,
@@ -79,8 +87,11 @@ export default class ResourceManager extends Singleton {
 				...blockside,
 				...blockface,
 				...ironskeleton,
+				...woodenskeleton,
 				...smoke,
 				...spikes,
+				...burst,
+				...door,
 			]
 			this.totalCount = allImg.length
 			Promise.all(allImg).then(() => {
@@ -182,6 +193,22 @@ export default class ResourceManager extends Singleton {
 		const promiseList = []
 		for (let i = 0; i < IMG_SPIKES_COUNT; i++) {
 			promiseList.push(this.loadImage(`${IMG_SPIKES_PREFIX} (${i + 1}).png`))
+		}
+		return promiseList
+	}
+
+	loadBurstImage(){
+		const promiseList = []
+		for (let i = 0; i < IMG_BURST_COUNT; i++) {
+			promiseList.push(this.loadImage(`${IMG_BURST_PREFIX} (${i + 1}).png`))
+		}
+		return promiseList
+	}
+
+	loadDoorImage(){
+		const promiseList = []
+		for (let i = 0; i < IMG_DOOR_COUNT; i++) {
+			promiseList.push(this.loadImage(`${IMG_DOOR_PREFIX} (${i + 1}).png`))
 		}
 		return promiseList
 	}
