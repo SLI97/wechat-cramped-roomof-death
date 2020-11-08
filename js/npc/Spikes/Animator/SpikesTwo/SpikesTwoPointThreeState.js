@@ -6,6 +6,6 @@ export default class SpikesTwoPointThreeState extends SpikesTwoPointState{
 	}
 
 	callback() {
-		this.owner.onLoop()
+		this.owner.backZero()
 	}
 }

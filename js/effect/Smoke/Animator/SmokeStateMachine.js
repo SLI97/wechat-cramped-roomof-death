@@ -8,6 +8,7 @@ import DeathSubStateMachine from './DeathSubStateMachine'
 
 const PARAMS_NAME = {
 	DEATH: 'DEATH',
+	IDLE: 'IDLE',
 	DIRECTION: 'DIRECTION',
 }
 
@@ -24,6 +25,11 @@ export default class SmokeStateMachine extends StateMachine {
 	}
 
 	initParams() {
+		this.params.set(PARAMS_NAME.IDLE, {
+			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
+			value: false
+		})
+
 		this.params.set(PARAMS_NAME.DEATH, {
 			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
 			value: false
@@ -44,13 +50,18 @@ export default class SmokeStateMachine extends StateMachine {
 	update() {
 		const currentState = this.currentState
 		switch (currentState) {
+			case this.states.get(PLAYER_STATE.IDLE):
+				if (this.params.get(PARAMS_NAME.DEATH).value) {
+					this.currentState = this.states.get(PARAMS_NAME.DEATH)
+				}
+				break
 			case this.states.get(PLAYER_STATE.DEATH):
 				if (this.params.get(PARAMS_NAME.IDLE).value) {
 					this.currentState = this.states.get(PARAMS_NAME.IDLE)
 				}
 				break
 			default:
-				this.currentState = this.states.get(PLAYER_STATE.DEATH)
+				this.currentState = this.states.get(PLAYER_STATE.IDLE)
 				break
 		}
 

@@ -1,30 +1,32 @@
 import Button from './Button'
 import EventManager from '../runtime/EventManager'
-import {EVENT_ENUM} from '../enums/index'
+import {
+	EVENT_ENUM
+} from '../enums/index'
 
 const IMG_PREFIX = 'images/ctrl/ctrl'
 
-const START_BUTTON_WIDTH = 120
-const START_BUTTON_HEIGHT = 120
+const START_BUTTON_WIDTH = 200
+const START_BUTTON_HEIGHT = 200
 
-const screenWidth = window.innerWidth
-const screenHeight = window.innerHeight
+const SCREEN_WIDTH = window.innerWidth
+const SCREEN_HEIGHT = window.innerHeight
 
 /***
  * 游戏开始按钮
  */
 export default class StartButton extends Button {
 	constructor() {
-		const imgSrc = `${IMG_PREFIX} (${1}).png`
+		const imgSrc = `${IMG_PREFIX} (${7}).png`
 		super(imgSrc)
 	}
 
 	init() {
 		this.position = {
-			// startX: (screenWidth / 2) - (CTRL_WIDTH * 3 / 2) + xAxis * CTRL_WIDTH,
-			// startY: screenHeight - (CTRL_HEIGHT * 2) - 40 + yAxis * CTRL_HEIGHT,
-			// endX: (screenWidth / 2) - (CTRL_WIDTH * 3 / 2) + xAxis * CTRL_WIDTH + CTRL_WIDTH,
-			// endY: screenHeight - (CTRL_HEIGHT * 2) - 40 + yAxis * CTRL_HEIGHT + CTRL_HEIGHT,
+			startX: SCREEN_WIDTH / 2 - 100,
+			startY: SCREEN_HEIGHT / 2 - 200,
+			endX: SCREEN_WIDTH / 2 + 100,
+			endY: SCREEN_HEIGHT / 2,
 			width: START_BUTTON_WIDTH,
 			height: START_BUTTON_HEIGHT
 		}
@@ -32,6 +34,6 @@ export default class StartButton extends Button {
 	}
 
 	onClick() {
-		EventManager.Instance.emit(EVENT_ENUM.GAME_START)
+		// EventManager.Instance.emit(EVENT_ENUM.GAME_START)
 	}
 }

@@ -7,6 +7,7 @@ import IdleSubStateMachine from './IdleSubStateMachine'
 import DeathSubStateMachine from './DeathSubStateMachine'
 
 const PARAMS_NAME = {
+	IDLE: 'IDLE',
 	DEATH: 'DEATH',
 	DIRECTION: 'DIRECTION',
 }
@@ -24,6 +25,11 @@ export default class IronSkeletonStateMachine extends StateMachine {
 	}
 
 	initParams() {
+		this.params.set(PARAMS_NAME.IDLE, {
+			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
+			value: false,
+		})
+
 		this.params.set(PARAMS_NAME.DEATH, {
 			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
 			value: false,
@@ -50,6 +56,9 @@ export default class IronSkeletonStateMachine extends StateMachine {
 				}
 				break
 			case this.states.get(PLAYER_STATE.DEATH):
+				if (this.params.get(PARAMS_NAME.IDLE).value) {
+					this.currentState = this.states.get(PLAYER_STATE.IDLE)
+				}
 				break
 			default:
 				this.currentState = this.states.get(PLAYER_STATE.IDLE)

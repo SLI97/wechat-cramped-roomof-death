@@ -40,5 +40,6 @@ export default {
   level17,
   level18,
   level19,
+  level20,
   level21,
 }

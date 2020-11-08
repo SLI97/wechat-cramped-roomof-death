@@ -8,7 +8,7 @@ import {
 const mapInfo = [
   [
     {
-      'src': 13,
+      'src': 20,
       'type': TILE_TYPE_ENUM.WALL_LEFT_BOTTOM,
     },
     {
@@ -16,7 +16,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': 5,
+      'src': 22,
       'type': TILE_TYPE_ENUM.WALL_COLUMN,
     },
     {
@@ -106,7 +106,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.WALL_COLUMN,
     },
     {
-      'src': 13,
+      'src': 23,
       'type': TILE_TYPE_ENUM.WALL_LEFT_BOTTOM,
     },
     {
@@ -156,8 +156,8 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': null,
-      'type': null,
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
     },
     {
       'src': 1,
@@ -174,6 +174,22 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
+    },
+    {
+      'src': 1,
+      'type': TILE_TYPE_ENUM.FLOOR,
+    },
+    {
+      'src': 1,
+      'type': TILE_TYPE_ENUM.FLOOR,
+    },
+    {
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
+    },
+    {
       'src': null,
       'type': null,
     },
@@ -186,14 +202,6 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': null,
-      'type': null,
-    },
-    {
-      'src': null,
-      'type': null,
-    },
-    {
       'src': 1,
       'type': TILE_TYPE_ENUM.FLOOR,
     },
@@ -202,19 +210,11 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': 1,
-      'type': TILE_TYPE_ENUM.FLOOR,
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
     },
     {
-      'src': 1,
-      'type': TILE_TYPE_ENUM.FLOOR,
-    },
-    {
-      'src': null,
-      'type': null,
-    },
-    {
-      'src': 13,
+      'src': 20,
       'type': TILE_TYPE_ENUM.WALL_LEFT_BOTTOM,
     },
     {

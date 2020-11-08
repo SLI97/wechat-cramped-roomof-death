@@ -6,6 +6,7 @@ import Background from '../background/Background'
 import CanvasManager from '../runtime/CanvasManager'
 import WoodenSkeleton from '../npc/woodenSkeleton/WoodenSkeleton'
 import EventManager from '../runtime/EventManager'
+import MusicManager from '../runtime/MusicManager'
 import {
 	ENEMY_TYPE_ENUM,
 	EVENT_ENUM,
@@ -41,38 +42,47 @@ export default class BattleScene extends Scene {
 		this.restartHandler = this.restart.bind(this)
 		this.nextLevelHandler = this.nextLevel.bind(this)
 		this.checkFinishCurLevelHandler = this.checkFinishCurLevel.bind(this)
+		this.onShakeHandler = this.onShake.bind(this)
 		this.isLoaded = false
 	}
 
 	beginScene() {
+		this.onBindEvent()
+		this.onBindUI()
+
+		this.initLevel()
+
+	}
+
+	onBindEvent() {
 		EventManager.Instance.on(EVENT_ENUM.RECORD_STEP, this.recordHandler)
 		EventManager.Instance.on(EVENT_ENUM.REVOKE_STEP, this.revokeHandler)
 		EventManager.Instance.on(EVENT_ENUM.RESTART_LEVEL, this.restartHandler)
 		EventManager.Instance.on(EVENT_ENUM.NEXT_LEVEL, this.nextLevelHandler)
 		EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.checkFinishCurLevelHandler)
-		this.onBindUI()
+		EventManager.Instance.on(EVENT_ENUM.SCREEN_SHAKE, this.onShakeHandler)
+	}
 
-		this.initLevel()
-
-		// canvas.addEventListener('touchstart', this.onShake.bind(this))
-		// canvas.addEventListener('touchstart', 	()=>{
-		// 	UIManager.Instance.fadeIn().then(()=>{
-		// 		UIManager.Instance.fadeOut()
-		// 	})
-		// this.onShake()
-		// })
+	offBindEvent() {
+		EventManager.Instance.off(EVENT_ENUM.RECORD_STEP, this.recordHandler)
+		EventManager.Instance.off(EVENT_ENUM.REVOKE_STEP, this.revokeHandler)
+		EventManager.Instance.off(EVENT_ENUM.RESTART_LEVEL, this.restartHandler)
+		EventManager.Instance.off(EVENT_ENUM.NEXT_LEVEL, this.nextLevelHandler)
+		EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.checkFinishCurLevelHandler)
+		EventManager.Instance.off(EVENT_ENUM.SCREEN_SHAKE, this.onShakeHandler)
 	}
 
 	updateScene() {
-		if (!this.isLoaded) {
-			return
+		if (this.isLoaded) {
+			this.update()
+			this.render()
 		}
 
-		this.update()
-		this.render()
+		UIManager.Instance.fadeRender()
 	}
 
 	endScene() {
+		this.offBindEvent()
 		this.unBindUI()
 		UIManager.Instance.fadeIn()
 	}
@@ -109,12 +119,14 @@ export default class BattleScene extends Scene {
 				burst.update()
 			})
 		}
+
+		this.onShakeUpdate()
 	}
 
 	render() {
 		CanvasManager.Ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		CanvasManager.Ctx.fillStyle = BG_COLOR
-		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+		CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH + 100, SCREEN_HEIGHT + 100)
 		Background.Instance.render()
 
 		if (DataManager.Instance.door) {
@@ -122,25 +134,25 @@ export default class BattleScene extends Scene {
 		}
 
 
-		if(DataManager.Instance.smokes.length){
-			DataManager.Instance.smokes.forEach(smoke => {
-				smoke.render()
-			})
-		}
-
-		if(DataManager.Instance.bursts.length){
+		if (DataManager.Instance.bursts.length) {
 			DataManager.Instance.bursts.forEach(burst => {
 				burst.render()
 			})
 		}
 
-		if(DataManager.Instance.spikes.length){
+		if (DataManager.Instance.spikes.length) {
 			DataManager.Instance.spikes.forEach(spike => {
 				spike.render()
 			})
 		}
 
-		if(DataManager.Instance.enemies.length){
+		if (DataManager.Instance.smokes.length) {
+			DataManager.Instance.smokes.forEach(smoke => {
+				smoke.render()
+			})
+		}
+
+		if (DataManager.Instance.enemies.length) {
 			DataManager.Instance.enemies.forEach(enemy => {
 				enemy.render()
 			})
@@ -152,31 +164,44 @@ export default class BattleScene extends Scene {
 
 		UIManager.Instance.render()
 
+		CanvasManager.Ctx.fillStyle = "#aaa"
+		CanvasManager.Ctx.font = "12px Arial"
+		CanvasManager.Ctx.textAlign = 'center'
+		CanvasManager.Ctx.fillText(`Cramped Room of Death Demo`,
+			SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20)
 	}
 
 	initLevel() {
+		// for (const key in LEVELS) {
+		// 	console.log(key, LEVELS[key].mapInfo.length,LEVELS[key].mapInfo[0].length)
+		// }
 		const level = LEVELS['level' + DataManager.Instance.levelIndex]
 		if (level) {
-			UIManager.Instance.fadeIn().then(() => {
+			console.log('level' + DataManager.Instance.levelIndex)
+			UIManager.Instance.fadeIn(200).then(() => {
+				//防止把抖动效果带到下一关，导致下一关错位
+				this.isShaking = false
+
+				CanvasManager.Ctx.fillStyle = `#000`
+				CanvasManager.Ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+				this.isLoaded = false
 				DataManager.Instance.reset()
 				this.level = level
-				this.isLoaded = false
 
 				//地图信息
 				DataManager.Instance.mapInfo = this.level.mapInfo.concat()
 				DataManager.Instance.mapRowCount = this.level.mapInfo.length || 0
 				DataManager.Instance.mapColumnCount = this.level.mapInfo[0].length || 0
 				this.adaptScreen()
+				Background.Instance.initTile()
 
 				this.generatePlayer()
 				this.generateEnemy()
 				this.generateBursts()
 				this.generateSpikes()
 				this.generateDoor()
-
-				UIManager.Instance.fadeOut()
-
 				this.isLoaded = true
+				UIManager.Instance.fadeOut(200)
 			})
 		} else {
 			this.sceneManager.setScene(new MainMenuScene(SceneManager.Instance))
@@ -184,7 +209,8 @@ export default class BattleScene extends Scene {
 	}
 
 	generatePlayer() {
-		if(!this.level.player){
+		if (!this.level.player) {
+			DataManager.Instance.player = null
 			return
 		}
 		const player = new Player(this.level.player)
@@ -192,7 +218,8 @@ export default class BattleScene extends Scene {
 	}
 
 	generateEnemy() {
-		if(!this.level.enemies){
+		if (!this.level.enemies) {
+			DataManager.Instance.enemies = []
 			return
 		}
 		const list = this.level.enemies.map(item => {
@@ -208,7 +235,8 @@ export default class BattleScene extends Scene {
 	}
 
 	generateBursts() {
-		if(!this.level.bursts){
+		if (!this.level.bursts) {
+			DataManager.Instance.bursts = []
 			return
 		}
 		const list = this.level.bursts.map(item => {
@@ -222,7 +250,8 @@ export default class BattleScene extends Scene {
 	}
 
 	generateSpikes() {
-		if(!this.level.spikes){
+		if (!this.level.spikes) {
+			DataManager.Instance.spikes = []
 			return
 		}
 		const list = this.level.spikes.map(item => {
@@ -234,7 +263,8 @@ export default class BattleScene extends Scene {
 	}
 
 	generateDoor() {
-		if(!this.level.door){
+		if (!this.level.door) {
+			DataManager.Instance.door = null
 			return
 		}
 		const door = new Door(this.level.door)
@@ -243,48 +273,82 @@ export default class BattleScene extends Scene {
 
 	record() {
 		const item = {
-			player: Object.assign({}, DataManager.Instance.player),
-			enemies: DataManager.Instance.enemies.concat(),
-			spikes: DataManager.Instance.spikes.concat(),
-			bursts: DataManager.Instance.bursts.concat(),
-			door: Object.assign({}, DataManager.Instance.door),
+			player: {
+				x: DataManager.Instance.player.targetX,
+				y: DataManager.Instance.player.targetY,
+				state: DataManager.Instance.player.state === PLAYER_STATE.ATTACK ? PLAYER_STATE.IDLE : DataManager.Instance.player.state,
+				direction: DataManager.Instance.player.direction
+			},
+			door: {
+				x: DataManager.Instance.door.x,
+				y: DataManager.Instance.door.y,
+				state: DataManager.Instance.door.state,
+				direction: DataManager.Instance.door.direction,
+			},
 		}
+		item.enemies = DataManager.Instance.enemies.map(i => {
+			return {
+				x: i.x,
+				y: i.y,
+				state: i.state,
+				direction: i.direction
+			}
+		})
+
+		item.spikes = DataManager.Instance.spikes.map(i => {
+			return {
+				x: i.x,
+				y: i.y,
+				curPointCount: i.curPointCount,
+			}
+		})
+
+		item.bursts = DataManager.Instance.bursts.map(i => {
+			return {
+				x: i.x,
+				y: i.y,
+				state: i.state,
+			}
+		})
+
 		DataManager.Instance.records.push(item)
 	}
 
 	revoke() {
-		const item = DataManager.Instance.records.pop()
-		console.log(item)
-		if (item) {
-			DataManager.Instance.player.x = DataManager.Instance.player.targetX = item.player.targetX
-			DataManager.Instance.player.y = DataManager.Instance.player.targetY = item.player.targetY
-			DataManager.Instance.player.state = item.player._state
-			DataManager.Instance.player.direction = item.player._direction
+		const data = DataManager.Instance.records.pop()
+		if (data) {
+			DataManager.Instance.player.x = DataManager.Instance.player.targetX = data.player.x
+			DataManager.Instance.player.y = DataManager.Instance.player.targetY = data.player.y
+			DataManager.Instance.player.state = data.player.state
+			DataManager.Instance.player.direction = data.player.direction
 
-			// for (let i = 0; i < item.enemies.length; i++) {
-			// 	const item = item.enemies[i]
-			// 	DataManager.Instance.enemies[i].x = item.x
-			// 	DataManager.Instance.enemies[i].y = item.y
-			// 	DataManager.Instance.enemies[i].state = item.state
-			// 	DataManager.Instance.enemies[i].direction = item.direction
-			// }
+			for (let i = 0; i < data.enemies.length; i++) {
+				const item = data.enemies[i]
+				DataManager.Instance.enemies[i].x = item.x
+				DataManager.Instance.enemies[i].y = item.y
+				DataManager.Instance.enemies[i].state = item.state
+				DataManager.Instance.enemies[i].direction = item.direction
+			}
 
-			// for (let i = 0; i < item.spikes.length; i++) {
-			// 	const item = item.spikes[i]
-			// 	DataManager.Instance.spikes[i].x = item.x
-			// 	DataManager.Instance.spikes[i].y = item.y
-			// 	DataManager.Instance.spikes[i].state = item.state
-			// 	DataManager.Instance.spikes[i].direction = item.direction
-			// }
+			for (let i = 0; i < data.spikes.length; i++) {
+				const item = data.spikes[i]
+				DataManager.Instance.spikes[i].x = item.x
+				DataManager.Instance.spikes[i].y = item.y
+				DataManager.Instance.spikes[i].curPointCount = item.curPointCount
+				DataManager.Instance.spikes[i].direction = item.direction
+			}
 
-			// for (let i = 0; i < item.bursts.length; i++) {
-			// 	const item = item.bursts[i]
-			// 	DataManager.Instance.bursts[i].x = item.x
-			// 	DataManager.Instance.bursts[i].y = item.y
-			// 	DataManager.Instance.bursts[i].state = item.state
-			// }
+			for (let i = 0; i < data.bursts.length; i++) {
+				const item = data.bursts[i]
+				DataManager.Instance.bursts[i].x = item.x
+				DataManager.Instance.bursts[i].y = item.y
+				DataManager.Instance.bursts[i].state = item.state
+			}
 
-			// DataManager.Instance.door = item.door
+			DataManager.Instance.door.x = data.door.x
+			DataManager.Instance.door.y = data.door.y
+			DataManager.Instance.door.state = data.door.state
+			DataManager.Instance.door.direction = data.door.direction
 		} else {
 			//TODO 播放游戏音频
 		}
@@ -310,7 +374,7 @@ export default class BattleScene extends Scene {
 	}
 
 	nextLevel() {
-		// DataManager.Instance.levelIndex += 1
+		DataManager.Instance.levelIndex += 1
 		this.initLevel()
 	}
 
@@ -323,6 +387,7 @@ export default class BattleScene extends Scene {
 		UIManager.Instance.get(UI_ENUM.CTRL_TURN_RIGHT).onShow()
 		UIManager.Instance.get(UI_ENUM.RESTART).onShow()
 		UIManager.Instance.get(UI_ENUM.REVOKE).onShow()
+		UIManager.Instance.get(UI_ENUM.Menu).onShow()
 	}
 
 	unBindUI() {
@@ -334,17 +399,17 @@ export default class BattleScene extends Scene {
 		UIManager.Instance.get(UI_ENUM.CTRL_TURN_RIGHT).onHide()
 		UIManager.Instance.get(UI_ENUM.RESTART).onHide()
 		UIManager.Instance.get(UI_ENUM.REVOKE).onHide()
+		UIManager.Instance.get(UI_ENUM.Menu).onHide()
 	}
 
-	onShake() {
+	onShake(type = 0) {
+		if (this.isShaking) {
+			return
+		}
+		this.isShaking = true
+		this.type = type
 		this.oldFrame = DataManager.Instance.frame
-		this.oldOffsetWidth = DataManager.Instance.offset.width
-		this.shakePromise = new Promise((resolve, reject) => {
-			this.shakePromiseResolve = resolve
-		})
-		window.cancelAnimationFrame(this.aniId)
-		this.aniId = window.requestAnimationFrame(this.onShakeHandler.bind(this), canvas)
-		return this.fadeInPromise
+		this.oldOffset = DataManager.Instance.offset[this.type === 0 ? 'width' : 'height']
 	}
 
 	/***
@@ -353,18 +418,16 @@ export default class BattleScene extends Scene {
 	 * @param duration 持续时间
 	 * @param frequency 频率
 	 */
-	onShakeHandler(shakeAmount = 50, duration = 1000, frequency = 4) {
-		const frameOffset = (DataManager.Instance.frame - this.oldFrame) / 60 * 1000
-		const Phase = (DataManager.Instance.frame - this.oldFrame) / 60 * 2 * (Math.PI) * frequency
-		const offset = shakeAmount * Math.sin(Phase)
-		DataManager.Instance.offset.width = this.oldOffsetWidth + offset
-		console.log(frameOffset)
-		if (frameOffset > duration) {
-			DataManager.Instance.offset.width = this.oldOffsetWidth
-			window.cancelAnimationFrame(this.aniId)
-			this.shakePromiseResolve()
-		} else {
-			this.aniId = window.requestAnimationFrame(this.onShakeHandler.bind(this), canvas)
+	onShakeUpdate(shakeAmount = 2, duration = 200, frequency = 4) {
+		if (this.isShaking) {
+			const frameOffset = (DataManager.Instance.frame - this.oldFrame) / 60 * 1000
+			const Phase = (DataManager.Instance.frame - this.oldFrame) / 60 * 2 * (Math.PI) * frequency
+			const offset = shakeAmount * Math.sin(Phase)
+			DataManager.Instance.offset[this.type === 0 ? 'width' : 'height'] = this.oldOffset + offset
+			if (frameOffset > duration) {
+				DataManager.Instance.offset[this.type === 0 ? 'width' : 'height'] = this.oldOffset
+				this.isShaking = false
+			}
 		}
 	}
 
@@ -372,15 +435,12 @@ export default class BattleScene extends Scene {
 	 * 计算设备宽高把canvas整体偏移到屏幕中央
 	 */
 	adaptScreen() {
-		DataManager.Instance.dpr = SCREEN_WIDTH / 375
-		console.log(	DataManager.Instance.dpr)
-
 		const {
 			mapRowCount,
 			mapColumnCount
 		} = DataManager.Instance
-		const disX = (SCREEN_WIDTH - (BG_WIDTH * mapRowCount * 	DataManager.Instance.dpr)) / 2
-		const disY = (SCREEN_HEIGHT - (BG_HEIGHT * mapColumnCount * 	DataManager.Instance.dpr)) / 2
+		const disX = (SCREEN_WIDTH - (BG_WIDTH * mapRowCount * DataManager.Instance.dpr)) / 2
+		const disY = (SCREEN_HEIGHT - (BG_HEIGHT * mapColumnCount * DataManager.Instance.dpr)) / 2 - 50
 		DataManager.Instance.offset = {
 			width: disX,
 			height: disY

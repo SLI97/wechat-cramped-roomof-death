@@ -5,4 +5,5 @@ export default class DeathState extends NoLoopState {
 		super(owner, fsm, animations)
 	}
 
+	callback() {}
 }

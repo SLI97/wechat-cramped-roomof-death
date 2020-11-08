@@ -9,11 +9,11 @@ import PlayerStateMachine, {
 } from './Animator/PlayerStateMachine'
 import {
 	EVENT_ENUM,
-	ENEMY_TYPE_ENUM,
 	DIRECTION_ENUM,
 	CONTROLLER_ENUM,
 	PLAYER_STATE
 } from '../enums/index'
+import MusicManager from '../runtime/MusicManager'
 
 const PLAYER_WIDTH = 128
 const PLAYER_HEIGHT = 128
@@ -40,6 +40,11 @@ export default class Player extends Entity {
 		this.isMoveEndX = true
 		this.isMoveEndY = true
 
+	}
+
+	off(){
+		EventManager.Instance.off(EVENT_ENUM.PLAYER_CTRL, this.inputProcessHandler)
+		EventManager.Instance.off(EVENT_ENUM.ATTACK_PLAYER, this.onDeadHandler)
 	}
 
 	update() {
@@ -83,8 +88,8 @@ export default class Player extends Entity {
 	/***
 	 * 玩家死亡
 	 */
-	onDead() {
-		this.state = PLAYER_STATE.DEATH
+	onDead(type) {
+		this.state = type
 	}
 
 	/***
@@ -96,22 +101,31 @@ export default class Player extends Entity {
 			return
 		}
 
-		// if (this.state === PLAYER_STATE.ATTACK) {
-		// 	return
-		// }
+		if (this.state === PLAYER_STATE.DEATH || this.state === PLAYER_STATE.AIRDEATH || this.state === PLAYER_STATE.ATTACK) {
+			return
+		}
 
 		const id = this.attackEnemy(type)
 		if (id !== -1) {
-			console.log('attack!')
 			EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
-			EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
+			EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
 			this.state = PLAYER_STATE.ATTACK
 			EventManager.Instance.emit(EVENT_ENUM.ATTACK_ENEMY, id)
 			return
 		}
 
 		if (this.WillBlock(type)) {
-			console.log('stop!')
+			if(type === CONTROLLER_ENUM.TOP || type === CONTROLLER_ENUM.BOTTOM){
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE,1)
+			}else if(type === CONTROLLER_ENUM.LEFT || type === CONTROLLER_ENUM.RIGHT){
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE,0)
+			}else if(type === CONTROLLER_ENUM.TURNLEFT || type === CONTROLLER_ENUM.TURNRIGHT){
+					if(this.direction === DIRECTION_ENUM.TOP || this.direction === DIRECTION_ENUM.BOTTOM){
+						EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE,0)
+					} else if(this.direction === DIRECTION_ENUM.LEFT || this.direction === DIRECTION_ENUM.RIGHT){
+						EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE,1)
+					}
+			}
 			return
 		}
 
@@ -124,23 +138,26 @@ export default class Player extends Entity {
 	 */
 	move(type) {
 		EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
-		EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE)
 		if (type === CONTROLLER_ENUM.TOP) {
 			this.targetY -= 1
 			this.state = PLAYER_STATE.IDLE
 			this.isMoveEndY = false
+			this.showSmoke(DIRECTION_ENUM.TOP)
 		} else if (type === CONTROLLER_ENUM.BOTTOM) {
 			this.targetY += 1
 			this.state = PLAYER_STATE.IDLE
 			this.isMoveEndY = false
+			this.showSmoke(DIRECTION_ENUM.BOTTOM)
 		} else if (type === CONTROLLER_ENUM.LEFT) {
 			this.targetX -= 1
 			this.state = PLAYER_STATE.IDLE
 			this.isMoveEndX = false
+			this.showSmoke(DIRECTION_ENUM.LEFT)
 		} else if (type === CONTROLLER_ENUM.RIGHT) {
 			this.targetX += 1
 			this.state = PLAYER_STATE.IDLE
 			this.isMoveEndX = false
+			this.showSmoke(DIRECTION_ENUM.RIGHT)
 		} else if (type === CONTROLLER_ENUM.TURNLEFT) {
 			this.state = PLAYER_STATE.TURNLEFT
 			if (this.direction === DIRECTION_ENUM.TOP) {
@@ -153,6 +170,7 @@ export default class Player extends Entity {
 				this.direction = DIRECTION_ENUM.TOP
 			}
 			this.state = PLAYER_STATE.TURNLEFT
+			EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
 		} else if (type === CONTROLLER_ENUM.TURNRIGHT) {
 			this.state = PLAYER_STATE.TURNRIGHT
 			if (this.direction === DIRECTION_ENUM.TOP) {
@@ -165,20 +183,32 @@ export default class Player extends Entity {
 				this.direction = DIRECTION_ENUM.BOTTOM
 			}
 			this.state = PLAYER_STATE.TURNRIGHT
+			EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
 		}
-
-		// this.showSmoke()
 	}
 
 	/***
 	 * 生成烟雾
 	 */
-	showSmoke() {
-		const smoke = PoolManager.Instance.getItemByClass(ENEMY_TYPE_ENUM.SMOKE, Smoke)
-		smoke.x = this.targetX
-		smoke.y = this.targetY
-		smoke.direction = this.direction
-		DataManager.Instance.smokes.push(smoke)
+	showSmoke(direction) {
+		// const smoke = PoolManager.Instance.getItemByClass(ENEMY_TYPE_ENUM.SMOKE, Smoke)
+		const item = DataManager.Instance.smokes.find(i => i.state === PLAYER_STATE.DEATH)
+		let smoke = null
+		if (item) {
+			smoke = item
+			smoke.x = this.x
+			smoke.y = this.y
+			smoke.state = PLAYER_STATE.IDLE
+			smoke.direction = direction
+		}else{
+			smoke = new Smoke({
+				x: this.x,
+				y: this.y,
+				direction: direction,
+				state: PLAYER_STATE.IDLE
+			})
+			DataManager.Instance.smokes.push(smoke)
+		}
 	}
 
 	/***
@@ -249,8 +279,8 @@ export default class Player extends Entity {
 				}
 
 				const weaponNextY = y - 2
-				const nextPlayerTile = tileInfo[x][playerNextY]
-				const nextWeaponTile = tileInfo[x][weaponNextY]
+				const nextPlayerTile = tileInfo[x]?.[playerNextY]
+				const nextWeaponTile = tileInfo[x]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === x && doorY === playerNextY) || (doorX === x && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -292,8 +322,8 @@ export default class Player extends Entity {
 				}
 
 				const weaponNextY = y
-				const nextPlayerTile = tileInfo[x][playerNextY]
-				const nextWeaponTile = tileInfo[x][weaponNextY]
+				const nextPlayerTile = tileInfo[x]?.[playerNextY]
+				const nextWeaponTile = tileInfo[x]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === x && doorY === playerNextY) || (doorX === x && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -336,8 +366,8 @@ export default class Player extends Entity {
 
 				const weaponNextX = x - 1
 				const weaponNextY = y - 1
-				const nextPlayerTile = tileInfo[x][playerNextY]
-				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				const nextPlayerTile = tileInfo[x]?.[playerNextY]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === x && doorY === playerNextY) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -380,8 +410,8 @@ export default class Player extends Entity {
 
 				const weaponNextX = x + 1
 				const weaponNextY = y - 1
-				const nextPlayerTile = tileInfo[x][playerNextY]
-				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				const nextPlayerTile = tileInfo[x]?.[playerNextY]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === x && doorY === playerNextY) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -429,8 +459,8 @@ export default class Player extends Entity {
 				}
 
 				const weaponNextY = y
-				const nextPlayerTile = tileInfo[x][playerNextY]
-				const nextWeaponTile = tileInfo[x][weaponNextY]
+				const nextPlayerTile = tileInfo[x]?.[playerNextY]
+				const nextWeaponTile = tileInfo[x]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === x && doorY === playerNextY) || (doorX === x && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -472,8 +502,8 @@ export default class Player extends Entity {
 				}
 
 				const weaponNextY = y + 2
-				const nextPlayerTile = tileInfo[x][playerNextY]
-				const nextWeaponTile = tileInfo[x][weaponNextY]
+				const nextPlayerTile = tileInfo[x]?.[playerNextY]
+				const nextWeaponTile = tileInfo[x]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === x && doorY === playerNextY) || (doorX === x && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -516,8 +546,8 @@ export default class Player extends Entity {
 
 				const weaponNextX = x - 1
 				const weaponNextY = y + 1
-				const nextPlayerTile = tileInfo[x][playerNextY]
-				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				const nextPlayerTile = tileInfo[x]?.[playerNextY]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === x && doorY === playerNextY) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -560,8 +590,8 @@ export default class Player extends Entity {
 
 				const weaponNextX = x + 1
 				const weaponNextY = y + 1
-				const nextPlayerTile = tileInfo[x][playerNextY]
-				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				const nextPlayerTile = tileInfo[x]?.[playerNextY]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === x && doorY === playerNextY) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -611,8 +641,8 @@ export default class Player extends Entity {
 
 				const weaponNextX = x - 1
 				const weaponNextY = y - 1
-				const nextPlayerTile = tileInfo[playerNextX][y]
-				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				const nextPlayerTile = tileInfo[playerNextX]?.[y]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -656,8 +686,8 @@ export default class Player extends Entity {
 
 				const weaponNextX = x - 1
 				const weaponNextY = y + 1
-				const nextPlayerTile = tileInfo[playerNextX][y]
-				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				const nextPlayerTile = tileInfo[playerNextX]?.[y]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -700,8 +730,8 @@ export default class Player extends Entity {
 				}
 
 				const weaponNextX = x - 2
-				const nextPlayerTile = tileInfo[playerNextX][y]
-				const nextWeaponTile = tileInfo[weaponNextX][y]
+				const nextPlayerTile = tileInfo[playerNextX]?.[y]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[y]
 
 				//判断门
 				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === y)) && doorState !== PLAYER_STATE.DEATH) {
@@ -744,8 +774,8 @@ export default class Player extends Entity {
 				}
 
 				const weaponNextX = x
-				const nextPlayerTile = tileInfo[playerNextX][y]
-				const nextWeaponTile = tileInfo[weaponNextX][y]
+				const nextPlayerTile = tileInfo[playerNextX]?.[y]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[y]
 
 				//判断门
 				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === y)) && doorState !== PLAYER_STATE.DEATH) {
@@ -794,8 +824,8 @@ export default class Player extends Entity {
 
 				const weaponNextX = x + 1
 				const weaponNextY = y - 1
-				const nextPlayerTile = tileInfo[playerNextX][y]
-				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				const nextPlayerTile = tileInfo[playerNextX]?.[y]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -838,8 +868,8 @@ export default class Player extends Entity {
 
 				const weaponNextX = x + 1
 				const weaponNextY = y + 1
-				const nextPlayerTile = tileInfo[playerNextX][y]
-				const nextWeaponTile = tileInfo[weaponNextX][weaponNextY]
+				const nextPlayerTile = tileInfo[playerNextX]?.[y]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[weaponNextY]
 
 				//判断门
 				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === weaponNextY)) && doorState !== PLAYER_STATE.DEATH) {
@@ -881,8 +911,8 @@ export default class Player extends Entity {
 				}
 
 				const weaponNextX = x
-				const nextPlayerTile = tileInfo[playerNextX][y]
-				const nextWeaponTile = tileInfo[weaponNextX][y]
+				const nextPlayerTile = tileInfo[playerNextX]?.[y]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[y]
 
 				//判断门
 				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === y)) && doorState !== PLAYER_STATE.DEATH) {
@@ -924,8 +954,8 @@ export default class Player extends Entity {
 				}
 
 				const weaponNextX = x + 2
-				const nextPlayerTile = tileInfo[playerNextX][y]
-				const nextWeaponTile = tileInfo[weaponNextX][y]
+				const nextPlayerTile = tileInfo[playerNextX]?.[y]
+				const nextWeaponTile = tileInfo[weaponNextX]?.[y]
 
 				//判断门
 				if (((doorX === playerNextX && doorY === y) || (doorX === weaponNextX && doorY === y)) && doorState !== PLAYER_STATE.DEATH) {
@@ -1010,9 +1040,9 @@ export default class Player extends Entity {
 
 			//最后判断地图元素
 			if (
-				(!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
-				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
-				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
+				(!tileInfo[x]?.[nextY] || tileInfo[x]?.[nextY].turnable) &&
+				(!tileInfo[nextX]?.[y] || tileInfo[nextX]?.[y].turnable) &&
+				(!tileInfo[nextX]?.[nextY] || tileInfo[nextX]?.[nextY].turnable)
 			) {} else {
 				this.state = PLAYER_STATE.BLOCKTURNLEFT
 				return true
@@ -1068,9 +1098,9 @@ export default class Player extends Entity {
 
 			//最后判断地图元素
 			if (
-				(!tileInfo[x][nextY] || tileInfo[x][nextY].turnable) &&
-				(!tileInfo[nextX][y] || tileInfo[nextX][y].turnable) &&
-				(!tileInfo[nextX][nextY] || tileInfo[nextX][nextY].turnable)
+				(!tileInfo[x]?.[nextY] || tileInfo[x]?.[nextY].turnable) &&
+				(!tileInfo[nextX]?.[y] || tileInfo[nextX]?.[y].turnable) &&
+				(!tileInfo[nextX]?.[nextY] || tileInfo[nextX]?.[nextY].turnable)
 			) {} else {
 				this.state = PLAYER_STATE.BLOCKTURNRIGHT
 				return true

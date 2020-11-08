@@ -2,7 +2,7 @@ import Singleton from '../base/Singleton'
 
 
 const IMG_BG_PREFIX = 'images/bg/bg'
-const IMG_BG_COUNT = 19
+const IMG_BG_COUNT = 28
 
 const IMG_DOOR_PREFIX = 'images/door/door'
 const IMG_DOOR_COUNT = 2
@@ -14,7 +14,7 @@ const IMG_TURN_PREFIX = 'images/turn/turn'
 const IMG_TURN_COUNT = 24
 
 const IMG_CTRL_PREFIX = 'images/ctrl/ctrl'
-const IMG_CTRL_COUNT = 6
+const IMG_CTRL_COUNT = 10
 
 const IMG_BLOCKTURN_PREFIX = 'images/blockturn/blockturn'
 const IMG_BLOCKTURN_COUNT = 32
@@ -24,6 +24,9 @@ const IMG_BLOCKSIDE_COUNT = 32
 
 const IMG_BLOCKFACE_PREFIX = 'images/blockface/blockface'
 const IMG_BLOCKFACE_COUNT = 32
+
+const IMG_DEATH_PREFIX = 'images/death/death'
+const IMG_DEATH_COUNT = 100
 
 const IMG_IRONSKELETON_PREFIX = 'images/ironskeleton/ironskeleton'
 const IMG_IRONSKELETOE_COUNT = 72
@@ -77,6 +80,7 @@ export default class ResourceManager extends Singleton {
 			const spikes = this.loadSpikesImage()
 			const burst = this.loadBurstImage()
 			const door = this.loadDoorImage()
+			const death = this.loadDeathImage()
 			const allImg = [
 				...bg,
 				...idle,
@@ -92,6 +96,7 @@ export default class ResourceManager extends Singleton {
 				...spikes,
 				...burst,
 				...door,
+				...death,
 			]
 			this.totalCount = allImg.length
 			Promise.all(allImg).then(() => {
@@ -209,6 +214,14 @@ export default class ResourceManager extends Singleton {
 		const promiseList = []
 		for (let i = 0; i < IMG_DOOR_COUNT; i++) {
 			promiseList.push(this.loadImage(`${IMG_DOOR_PREFIX} (${i + 1}).png`))
+		}
+		return promiseList
+	}
+
+	loadDeathImage(){
+		const promiseList = []
+		for (let i = 0; i < IMG_DEATH_COUNT; i++) {
+			promiseList.push(this.loadImage(`${IMG_DEATH_PREFIX} (${i + 1}).png`))
 		}
 		return promiseList
 	}

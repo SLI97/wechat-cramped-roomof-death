@@ -16,7 +16,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.WALL_COLUMN,
     },
     {
-      'src': 5,
+      'src': 23,
       'type': TILE_TYPE_ENUM.WALL_COLUMN,
     },
     {
@@ -24,7 +24,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': 5,
+      'src': 22,
       'type': TILE_TYPE_ENUM.WALL_COLUMN,
     },
     {
@@ -288,7 +288,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.WALL_COLUMN,
     },
     {
-      'src': 14,
+      'src': 23,
       'type': TILE_TYPE_ENUM.WALL_RIGHT_BOOTM,
     },
     {
@@ -296,7 +296,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': 5,
+      'src': 22,
       'type': TILE_TYPE_ENUM.WALL_COLUMN,
     },
     {

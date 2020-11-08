@@ -13,6 +13,7 @@ import BlockRightSubStateMachine from './BlockRightSubStateMachine'
 import DeathSubStateMachine from './DeathSubStateMachine'
 import BlockTurnLeftSubStateMachine from './BlockTurnLeftSubStateMachine'
 import BlockTurnRightSubStateMachine from './BlockTurnRightSubStateMachine'
+import AirDeathSubStateMachine from "./AirDeathSubStateMachine";
 
 export const PARAMS_NAME = {
 	IDLE: 'IDLE',
@@ -26,6 +27,7 @@ export const PARAMS_NAME = {
 	BLOCKTURNLEFT: 'BLOCKTURNLEFT',
 	BLOCKTURNRIGHT: 'BLOCKTURNRIGHT',
 	DEATH: 'DEATH',
+	AIRDEATH: 'AIRDEATH',
 	DIRECTION: 'DIRECTION',
 }
 
@@ -100,6 +102,11 @@ export default class PlayerStateMachine extends StateMachine {
 			value: false,
 		})
 
+		this.params.set(PARAMS_NAME.AIRDEATH, {
+			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
+			value: false,
+		})
+
 		this.params.set(PARAMS_NAME.DIRECTION, {
 			type: FSM_PARAM_TYPE_ENUM.NUMBER,
 			value: 0
@@ -117,7 +124,8 @@ export default class PlayerStateMachine extends StateMachine {
 		this.states.set(PARAMS_NAME.BLOCKRIGHT, new BlockRightSubStateMachine(this.owner, this))
 		this.states.set(PARAMS_NAME.BLOCKTURNLEFT, new BlockTurnLeftSubStateMachine(this.owner, this))
 		this.states.set(PARAMS_NAME.BLOCKTURNRIGHT, new BlockTurnRightSubStateMachine(this.owner, this))
-		// this.states.set(PARAMS_NAME.DEATH, new DeathSubStateMachine(this.owner, this))
+		this.states.set(PARAMS_NAME.DEATH, new DeathSubStateMachine(this.owner, this))
+		this.states.set(PARAMS_NAME.AIRDEATH, new AirDeathSubStateMachine(this.owner, this))
 		this.currentState = this.states.get(PARAMS_NAME.IDLE)
 	}
 
@@ -157,6 +165,9 @@ export default class PlayerStateMachine extends StateMachine {
 			case this.states.get(PARAMS_NAME.DEATH):
 				this.switch()
 				break
+			case this.states.get(PARAMS_NAME.AIRDEATH):
+				this.switch()
+				break
 			default:
 				this.currentState = this.states.get(PARAMS_NAME.IDLE)
 				break
@@ -166,7 +177,11 @@ export default class PlayerStateMachine extends StateMachine {
 	}
 
 	switch () {
-		if (this.params.get(PARAMS_NAME.TURNLEFT).value) {
+		if (this.params.get(PARAMS_NAME.DEATH).value) {
+			this.currentState = this.states.get(PARAMS_NAME.DEATH)
+		} else if (this.params.get(PARAMS_NAME.AIRDEATH).value) {
+			this.currentState = this.states.get(PARAMS_NAME.AIRDEATH)
+		} else if (this.params.get(PARAMS_NAME.TURNLEFT).value) {
 			this.currentState = this.states.get(PARAMS_NAME.TURNLEFT)
 		} else if (this.params.get(PARAMS_NAME.TURNRIGHT).value) {
 			this.currentState = this.states.get(PARAMS_NAME.TURNRIGHT)

@@ -7,12 +7,10 @@ export default class SpikesOnePointState extends NoLoopState{
 	}
 
 	callback(){
-		
+
 	}
 
 	render(){
 		super.render()
-		// console.log(this.index)
-		// console.log(this.animations)
 	}
 }

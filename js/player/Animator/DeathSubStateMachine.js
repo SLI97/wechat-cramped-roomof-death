@@ -1,10 +1,10 @@
-import BlockTurnRightTopState from './BlockTurnRight/BlockTurnRightTopState'
-import BlockTurnRightBottomState from './BlockTurnRight/BlockTurnRightBottomState'
-import BlockTurnRightLeftState from './BlockTurnRight/BlockTurnRightLeftState'
-import BlockTurnRightRightState from './BlockTurnRight/BlockTurnRightRightState'
 import DirectionStateMachine from '../../base/DirectionStateMachine'
+import DeatTopState from '../../npc/ironSkeleton/Animator/Death/DeathTopState'
+import DeathBottomState from '../../npc/woodenSkeleton/Animator/Death/DeathBottomState'
+import DeathLeftState from '../../npc/woodenSkeleton/Animator/Death/DeathLeftState'
+import DeathRightState from '../../npc/woodenSkeleton/Animator/Death/DeathRightState'
 
-const IMG_IDLE_PREFIX = 'images/idle/idle'
+const IMG_DEATH_PREFIX = 'images/death/death'
 
 export default class DeathSubStateMachine extends DirectionStateMachine {
 	constructor(owner, fsm) {
@@ -12,10 +12,10 @@ export default class DeathSubStateMachine extends DirectionStateMachine {
 	}
 
   initClass(){
-    this.topClass = BlockTurnRightTopState
-    this.bottomClass = BlockTurnRightBottomState
-    this.leftClass = BlockTurnRightLeftState
-    this.rightClass = BlockTurnRightRightState
+    this.topClass = DeatTopState
+    this.bottomClass = DeathBottomState
+    this.leftClass = DeathLeftState
+    this.rightClass = DeathRightState
   }
 
 	initAnimations() {
@@ -24,20 +24,20 @@ export default class DeathSubStateMachine extends DirectionStateMachine {
 		this.leftAnimations = []
 		this.rightAnimations = []
 
-		for (let i = 5; i <= 8; i++) {
-			this.topAnimations.push(this.imageMap.get(`${IMG_IDLE_PREFIX} (${i }).png`))
+		for (let i = 29; i <= 42; i++) {
+			this.topAnimations.push(this.imageMap.get(`${IMG_DEATH_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 13; i <= 16; i++) {
-			this.bottomAnimations.push(this.imageMap.get(`${IMG_IDLE_PREFIX} (${i }).png`))
+		for (let i = 15; i <= 28; i++) {
+			this.bottomAnimations.push(this.imageMap.get(`${IMG_DEATH_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 21; i <= 24; i++) {
-			this.leftAnimations.push(this.imageMap.get(`${IMG_IDLE_PREFIX} (${i }).png`))
+		for (let i = 43; i <= 56; i++) {
+			this.leftAnimations.push(this.imageMap.get(`${IMG_DEATH_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 29; i <= 32; i++) {
-			this.rightAnimations.push(this.imageMap.get(`${IMG_IDLE_PREFIX} (${i }).png`))
+		for (let i = 1; i <= 14; i++) {
+			this.rightAnimations.push(this.imageMap.get(`${IMG_DEATH_PREFIX} (${i }).png`))
 		}
 	}
 }

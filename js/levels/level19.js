@@ -8,7 +8,7 @@ import {
 const mapInfo = [
   [
     {
-      'src': 9,
+      'src': 20,
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
@@ -16,7 +16,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': 9,
+      'src': 20,
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
@@ -348,7 +348,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.CLIFF_RIGHT,
     },
     {
-      'src': 9,
+      'src': 21,
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
@@ -356,7 +356,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': 9,
+      'src': 21,
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {

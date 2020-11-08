@@ -62,7 +62,7 @@
     │  │          AttackState.js
     │  │          BurstState.js
     │  │          BurstStateMachine.js
-    │  │          DeathState.js
+    │  │          AirDeathStateate.js
     │  │          IdleState.js
     │  │
     │  ├─Door
@@ -89,11 +89,11 @@
     │  │      │  IronSkeletonStateMachine.js
     │  │      │
     │  │      ├─Death
-    │  │      │      DeathBottomState.js
-    │  │      │      DeathLeftState.js
-    │  │      │      DeathRightState.js
-    │  │      │      DeathState.js
-    │  │      │      DeathTopState.js
+    │  │      │      AirDeathBottomState.js.js
+    │  │      │      AirDeathLeftState.js.js
+    │  │      │      AirDeathRightState.js.js
+    │  │      │      AirDeathState.js.js
+    │  │      │      AirDeathTopState.js.js
     │  │      │
     │  │      └─Idle
     │  │              IdleBottomState.js
@@ -159,11 +159,11 @@
     │          │      AttackTopState.js
     │          │
     │          ├─Death
-    │          │      DeathBottomState.js
-    │          │      DeathLeftState.js
-    │          │      DeathRightState.js
-    │          │      DeathState.js
-    │          │      DeathTopState.js
+    │          │      AirDeathBottomState.js.js
+    │          │      AirDeathLeftState.js.js
+    │          │      AirDeathRightStateate.js
+    │          │      AirDeathStateate.js
+    │          │      AirDeathTopStateate.js
     │          │
     │          └─Idle
     │                  IdleBottomState.js
@@ -239,11 +239,11 @@
     │      │      BlockTurnRightTopState.js
     │      │
     │      ├─Death
-    │      │      DeathBottomState.js
-    │      │      DeathLeftState.js
-    │      │      DeathRightState.js
-    │      │      DeathState.js
-    │      │      DeathTopState.js
+    │      │      AirDeathBottomState.js.js
+    │      │      AirDeathLeftState.js.js
+    │      │      AirDeathRightStateate.js
+    │      │      AirDeathStateate.js
+    │      │      AirDeathTopState.js.js
     │      │
     │      ├─Idle
     │      │      IdleBottomState.js

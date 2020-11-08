@@ -146,8 +146,8 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': 1,
-      'type': TILE_TYPE_ENUM.FLOOR,
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
     },
     {
       'src': 9,
@@ -189,7 +189,7 @@ const mapInfo = [
       'type': null,
     },
     {
-      'src': 9,
+      'src': 21,
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
@@ -197,7 +197,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': 5,
+      'src': 22,
       'type': TILE_TYPE_ENUM.WALL_COLUMN,
     },
     {
@@ -209,7 +209,6 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.CLIFF_RIGHT,
     }
   ],
-
 
   [
     {
@@ -269,7 +268,7 @@ const mapInfo = [
       'type': null,
     },
     {
-      'src': 9,
+      'src': 21,
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
@@ -277,7 +276,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': 9,
+      'src': 21,
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {

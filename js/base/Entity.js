@@ -57,9 +57,6 @@ export default class Entity extends Sprite {
       if (this.fsm.currentState === this.fsm.states.get(value)) {
         return
       }
-      if (value.indexOf('BLOCK') > -1) {
-        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
-      }
       this.fsm.setParams(value, true)
     }
   }

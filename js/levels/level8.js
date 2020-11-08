@@ -16,7 +16,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.WALL_COLUMN,
     },
     {
-      'src': 13,
+      'src': 23,
       'type': TILE_TYPE_ENUM.WALL_LEFT_BOTTOM,
     },
     {
@@ -54,8 +54,8 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': null,
-      'type': null,
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
     },
     {
       'src': 1,
@@ -66,8 +66,8 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
-      'src': null,
-      'type': null,
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
     },
     {
       'src': null,
@@ -88,8 +88,8 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
-      'src': null,
-      'type': null,
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
     },
     {
       'src': null,
@@ -126,8 +126,46 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
+    },
+    {
+      'src': 20,
+      'type': TILE_TYPE_ENUM.WALL_ROW,
+    },
+    {
+      'src': 18,
+      'type': TILE_TYPE_ENUM.CLIFF_LEFT,
+    },
+    {
       'src': null,
       'type': null,
+    },
+    {
+      'src': null,
+      'type': null,
+    },
+    {
+      'src': null,
+      'type': null,
+    },
+    {
+      'src': null,
+      'type': null,
+    },
+    {
+      'src': null,
+      'type': null,
+    },
+  ],
+  [
+    {
+      'src': 9,
+      'type': TILE_TYPE_ENUM.WALL_ROW,
+    },
+    {
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
     },
     {
       'src': 9,
@@ -164,49 +202,11 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
-      'src': null,
-      'type': null,
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
     },
     {
-      'src': 9,
-      'type': TILE_TYPE_ENUM.WALL_ROW,
-    },
-    {
-      'src': 18,
-      'type': TILE_TYPE_ENUM.CLIFF_LEFT,
-    },
-    {
-      'src': null,
-      'type': null,
-    },
-    {
-      'src': null,
-      'type': null,
-    },
-    {
-      'src': null,
-      'type': null,
-    },
-    {
-      'src': null,
-      'type': null,
-    },
-    {
-      'src': null,
-      'type': null,
-    },
-  ],
-  [
-    {
-      'src': 9,
-      'type': TILE_TYPE_ENUM.WALL_ROW,
-    },
-    {
-      'src': null,
-      'type': null,
-    },
-    {
-      'src': 9,
+      'src': 21,
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
@@ -244,50 +244,12 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
-      'src': 1,
-      'type': TILE_TYPE_ENUM.FLOOR,
-    },
-    {
-      'src': 1,
-      'type': TILE_TYPE_ENUM.FLOOR,
-    },
-    {
-      'src': 1,
-      'type': TILE_TYPE_ENUM.FLOOR,
-    },
-    {
-      'src': 18,
-      'type': TILE_TYPE_ENUM.CLIFF_LEFT,
+      'src': 17,
+      'type': TILE_TYPE_ENUM.CLIFF_CENTER,
     },
     {
       'src': null,
       'type': null,
-    },
-    {
-      'src': null,
-      'type': null,
-    },
-    {
-      'src': null,
-      'type': null,
-    },
-    {
-      'src': null,
-      'type': null,
-    },
-  ],
-  [
-    {
-      'src': 9,
-      'type': TILE_TYPE_ENUM.WALL_ROW,
-    },
-    {
-      'src': 1,
-      'type': TILE_TYPE_ENUM.FLOOR,
-    },
-    {
-      'src': 1,
-      'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
       'src': 1,
@@ -362,7 +324,45 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.FLOOR,
     },
     {
+      'src': 1,
+      'type': TILE_TYPE_ENUM.FLOOR,
+    },
+    {
+      'src': 1,
+      'type': TILE_TYPE_ENUM.FLOOR,
+    },
+    {
+      'src': 18,
+      'type': TILE_TYPE_ENUM.CLIFF_LEFT,
+    },
+    {
+      'src': null,
+      'type': null,
+    },
+    {
+      'src': null,
+      'type': null,
+    },
+    {
+      'src': null,
+      'type': null,
+    },
+    {
+      'src': null,
+      'type': null,
+    },
+  ],
+  [
+    {
       'src': 9,
+      'type': TILE_TYPE_ENUM.WALL_ROW,
+    },
+    {
+      'src': 1,
+      'type': TILE_TYPE_ENUM.FLOOR,
+    },
+    {
+      'src': 24,
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {

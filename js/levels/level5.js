@@ -20,7 +20,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.WALL_COLUMN,
     },
     {
-      'src': 13,
+      'src': 23,
       'type': TILE_TYPE_ENUM.WALL_LEFT_BOTTOM,
     },
     {
@@ -64,7 +64,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.CLIFF_CENTER,
     },
     {
-      'src': 9,
+      'src': 20,
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {
@@ -140,7 +140,7 @@ const mapInfo = [
   ],
   [
     {
-      'src': 14,
+      'src': 21,
       'type': TILE_TYPE_ENUM.WALL_RIGHT_BOOTM,
     },
     {
@@ -152,7 +152,7 @@ const mapInfo = [
       'type': TILE_TYPE_ENUM.CLIFF_CENTER,
     },
     {
-      'src': 9,
+      'src': 21,
       'type': TILE_TYPE_ENUM.WALL_ROW,
     },
     {

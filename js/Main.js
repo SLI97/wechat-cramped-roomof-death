@@ -1,8 +1,13 @@
 import DataManager from './runtime/DataManager'
+// import CanvasManager from './runtime/CanvasManager'
 import Singleton from './base/Singleton'
 
 import SceneManager from './scene/SceneManager'
 import StartScene from './scene/StartScene'
+import CanvasManager from './runtime/CanvasManager'
+
+const SCREEN_WIDTH = window.innerWidth
+const SCREEN_HEIGHT = window.innerHeight
 
 /**
  * 游戏主函数
@@ -16,6 +21,8 @@ export default class Main extends Singleton {
 	constructor() {
 		super()
 		this.bindLoop = this.loop.bind(this)
+
+		this.adapt()
 	}
 
 	start() {
@@ -39,5 +46,10 @@ export default class Main extends Singleton {
 	// 游戏逻辑更新主函数
 	update() {
 		SceneManager.Instance.updateScene()
+	}
+
+	adapt(){
+		// DataManager.Instance.dpr = SCREEN_WIDTH / 320
+		CanvasManager.Instance.adapt()
 	}
 }

@@ -6,6 +6,7 @@ import DeathState from './DeathState'
 import ResourceManager from '../../../runtime/ResourceManager'
 
 const PARAMS_NAME = {
+	IDLE:'IDLE',
 	ATTACK:'ATTACK',
 	DEATH: 'DEATH'
 }
@@ -26,6 +27,11 @@ export default class BurstStateMachine extends StateMachine {
 	}
 
 	initParams() {
+		this.params.set(PARAMS_NAME.IDLE, {
+			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
+			value: false
+		})
+
 		this.params.set(PARAMS_NAME.ATTACK, {
 			type: FSM_PARAM_TYPE_ENUM.TRIGGER,
 			value: false
@@ -66,19 +72,27 @@ export default class BurstStateMachine extends StateMachine {
 
 	update() {
 		const currentState = this.currentState
-		// console.log(currentState)
 		switch (currentState) {
 			case this.states.get(PLAYER_STATE.IDLE):
 				if (this.params.get(PARAMS_NAME.ATTACK).value) {
 					this.currentState = this.states.get(PLAYER_STATE.ATTACK)
+				}else if(this.params.get(PARAMS_NAME.DEATH).value){
+					this.currentState = this.states.get(PLAYER_STATE.DEATH)
 				}
 				break
 			case this.states.get(PLAYER_STATE.ATTACK):
-				if (this.params.get(PARAMS_NAME.DEATH).value) {
+				if (this.params.get(PARAMS_NAME.IDLE).value) {
+					this.currentState = this.states.get(PLAYER_STATE.IDLE)
+				}else if(this.params.get(PARAMS_NAME.DEATH).value){
 					this.currentState = this.states.get(PLAYER_STATE.DEATH)
 				}
 				break
 			case this.states.get(PLAYER_STATE.DEATH):
+				if (this.params.get(PARAMS_NAME.ATTACK).value) {
+					this.currentState = this.states.get(PLAYER_STATE.ATTACK)
+				}else if(this.params.get(PARAMS_NAME.IDLE).value){
+					this.currentState = this.states.get(PLAYER_STATE.IDLE)
+				}
 				break
 			default:
 				this.currentState = this.states.get(PLAYER_STATE.IDLE)

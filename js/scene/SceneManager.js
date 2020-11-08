@@ -27,7 +27,6 @@ export default class SceneManager extends Singleton {
 		}
 
 		if(this.scene){
-			// console.log(this.scene)
 			this.scene.updateScene()
 		}
 	}

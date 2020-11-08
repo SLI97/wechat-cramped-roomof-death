@@ -71,6 +71,11 @@ export default class WoodenSkeletonStateMachine extends StateMachine {
 				}
 				break
 			case  this.states.get(PLAYER_STATE.DEATH):
+				if (this.params.get(PARAMS_NAME.ATTACK).value) {
+					this.currentState = this.states.get(PLAYER_STATE.ATTACK)
+				} else if (this.params.get(PARAMS_NAME.IDLE).value) {
+					this.currentState = this.states.get(PLAYER_STATE.IDLE)
+				}
 				break
 			default:
 				this.currentState = this.states.get(PLAYER_STATE.IDLE)

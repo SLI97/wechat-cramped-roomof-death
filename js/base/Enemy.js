@@ -26,6 +26,11 @@ export default class Enemy extends Entity {
 		this.onChangeDirectionHandler(false)
 	}
 
+	off(){
+		EventManager.Instance.off(EVENT_ENUM.ATTACK_ENEMY, this.onDeadHandler)
+		EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onChangeDirectionHandler)
+	}
+
 	update() {
 		super.update()
 	}

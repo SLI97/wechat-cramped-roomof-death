@@ -24,19 +24,19 @@ export default class IdleSubStateMachine extends DirectionStateMachine {
 		this.leftAnimations = []
 		this.rightAnimations = []
 
-		for (let i = 13; i <= 16; i++) {
+		for (let i = 28; i <= 36; i++) {
 			this.topAnimations.push(this.imageMap.get(`${IMG_SMOKE_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 1; i <= 4; i++) {
+		for (let i = 40; i <= 48; i++) {
 			this.bottomAnimations.push(this.imageMap.get(`${IMG_SMOKE_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 9; i <= 12; i++) {
+		for (let i = 16; i <= 24; i++) {
 			this.leftAnimations.push(this.imageMap.get(`${IMG_SMOKE_PREFIX} (${i }).png`))
 		}
 
-		for (let i = 5; i <= 8; i++) {
+		for (let i = 4; i <= 12; i++) {
 			this.rightAnimations.push(this.imageMap.get(`${IMG_SMOKE_PREFIX} (${i }).png`))
 		}
 	}

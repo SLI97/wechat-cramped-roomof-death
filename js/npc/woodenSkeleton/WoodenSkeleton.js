@@ -27,6 +27,7 @@ export default class WoodenSkeleton extends Enemy {
 		if (this.state === PLAYER_STATE.DEATH) {
 			return
 		}
+
 		const {
 			targetX: playerX,
 			targetY: playerY,
@@ -35,8 +36,13 @@ export default class WoodenSkeleton extends Enemy {
 		if (((playerX === this.x && Math.abs(playerY - this.y) <= 1) || (
 				playerY === this.y && Math.abs(playerX - this.x) <= 1)) && playerState === PLAYER_STATE.IDLE) {
 			this.state = PLAYER_STATE.ATTACK
-			EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER)
+			EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER, PLAYER_STATE.DEATH)
 		}
+	}
+
+	off() {
+		super.off()
+		EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onAttackHandler)
 	}
 
 }

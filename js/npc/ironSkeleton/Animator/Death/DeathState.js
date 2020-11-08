@@ -8,6 +8,6 @@ export default class DeathState extends NoLoopState {
 	}
 
 	callback() {
-		EventManager.Instance.emit(EVENT_ENUM.OPENDOOR)
+		// EventManager.Instance.emit(EVENT_ENUM.OPENDOOR)
 	}
 }

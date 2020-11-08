@@ -10,12 +10,13 @@ export default class DataManager extends Singleton {
 
 	constructor() {
 		super()
+		this.dpr = 1
+		this.levelIndex = 1
+		this.frame = 0
 		this.reset()
 	}
 
 	reset() {
-		this.frame = 0
-		this.dpr = 1
 
 		//地图偏移
 		this.offset = {
@@ -29,15 +30,38 @@ export default class DataManager extends Singleton {
 		this.mapColumnCount = 0
 
 		//活动元素信息
+		if (this.player) {
+			this.player.off()
+		}
 		this.player = null
+
+		if (this.enemies instanceof Array && this.enemies.length) {
+			this.enemies.forEach(i => {
+				i.off()
+			})
+		}
 		this.enemies = []
+
+		if (this.spikes instanceof Array && this.spikes.length) {
+			this.spikes.forEach(i => {
+				i.off()
+			})
+		}
 		this.spikes = []
+
+		if (this.bursts instanceof Array && this.bursts.length) {
+			this.bursts.forEach(i => {
+				i.off()
+			})
+		}
 		this.bursts = []
+
+		if (this.door) {
+			this.door.off()
+		}
 		this.door = null
 		this.smokes = []
 
 		this.records = []
-
-		this.levelIndex = 21
 	}
 }

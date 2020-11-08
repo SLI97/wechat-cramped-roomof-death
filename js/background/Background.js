@@ -15,7 +15,6 @@ export default class Background extends Singleton {
 
 	constructor() {
 		super()
-		this.initTile()
 	}
 
 	initTile() {
